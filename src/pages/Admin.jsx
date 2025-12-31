@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   Users, FileText, MessageSquare, AlertTriangle, 
-  TrendingUp, BarChart3, Shield, Home, Bell
+  TrendingUp, BarChart3, Shield, Home
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
