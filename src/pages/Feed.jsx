@@ -22,7 +22,8 @@ export default function Feed() {
   const [comments, setComments] = useState({})
   const [newComment, setNewComment] = useState('')
   const [showComments, setShowComments] = useState(null)
-const [expandedPosts, setExpandedPosts] = useState(new Set()) // 추가
+  const [expandedPosts, setExpandedPosts] = useState(new Set())
+  const [searchQuery, setSearchQuery] = useState('') // 추가
   const [loading, setLoading] = useState(false)
   
   const [newPost, setNewPost] = useState({
@@ -45,12 +46,18 @@ const [expandedPosts, setExpandedPosts] = useState(new Set()) // 추가
     }
   }, [user])
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (search = '') => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false })
+      
+      if (search) {
+        query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`)
+      }
+      
+      const { data, error } = await query
       
       if (error) throw error
       
@@ -354,7 +361,13 @@ const [expandedPosts, setExpandedPosts] = useState(new Set()) // 추가
       console.error('댓글 작성 실패:', error)
     }
   }
-
+  
+  // 검색
+  const handleSearch = (e) => {
+    const value = e.target.value
+    setSearchQuery(value)
+    fetchPosts(value)
+  }
   return (
     <div className="min-h-screen pb-24 md:pb-20">
       {/* Navigation */}
@@ -400,13 +413,26 @@ const [expandedPosts, setExpandedPosts] = useState(new Set()) // 추가
               </div>
 
               <div className="relative hidden md:block">
-                <input
-                  type="text"
-                  placeholder="검색..."
-                  className="w-48 pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-teal-500 transition-colors bg-white"
-                />
-                <Search className="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-              </div>
+  <input
+    type="text"
+    value={searchQuery}
+    onChange={handleSearch}
+    placeholder="검색..."
+    className="w-48 pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-teal-500 transition-colors bg-white"
+  />
+  <Search className="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+  {searchQuery && (
+    <button
+      onClick={() => {
+        setSearchQuery('')
+        fetchPosts('')
+      }}
+      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+    >
+      <X className="w-3.5 h-3.5" />
+    </button>
+  )}
+</div>
 
               <button className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
                 <Search className="w-4 h-4 text-gray-600" />
@@ -577,9 +603,9 @@ const [expandedPosts, setExpandedPosts] = useState(new Set()) // 추가
   <h2 className="text-base font-bold mb-1 text-gray-900 hover:text-teal-600 cursor-pointer transition-colors">
     {post.title}
   </h2>
-  <p className={`text-sm text-gray-600 ${expandedPosts.has(post.id) ? '' : 'line-clamp-3'}`}>
-    {post.content}
-  </p>
+  <p className={`text-sm text-gray-600 ${expandedPosts.has(post.id) ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
+  {post.content}
+</p>
   {post.content.length > 100 && (
     <button
       onClick={() => {
