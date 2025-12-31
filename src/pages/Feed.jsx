@@ -4,7 +4,7 @@ import {
   TrendingUp, Search, Bell, User, Plus, 
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
-  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2
+  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -481,11 +481,22 @@ export default function Feed() {
                     {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
-                <span className="text-xs font-medium text-gray-700">{username}</span>
-              </button>
+             <span className="text-xs font-medium text-gray-700">{username}</span>
+</button>
 
-              <button 
-                onClick={() => setIsWriteModalOpen(true)}
+{/* 관리자 버튼 추가 */}
+{profile?.role === '관리자' && (
+  <button
+    onClick={() => navigate('/admin')}
+    className="hidden md:flex items-center space-x-2 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+  >
+    <Shield className="w-4 h-4" />
+    <span className="text-xs font-semibold">관리자</span>
+  </button>
+)}
+
+<button 
+  onClick={() => setIsWriteModalOpen(true)}
                 className="hidden md:flex px-3 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-sm font-semibold hover-lift shadow-md shadow-teal-500/30 items-center space-x-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
