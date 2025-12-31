@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 min-h-screen;
+    background-color: #f1f1f1;
+    font-family: 'Noto Sans KR', 'Archivo', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply bg-white border border-gray-200;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-teal-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .animated-border {
+    position: relative;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #008080, #008B8B, #008080) border-box;
+    border: 2px solid transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
