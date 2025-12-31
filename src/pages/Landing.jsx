@@ -1,7 +1,19 @@
 import { Link } from 'react-router-dom'
-import { TrendingUp, Briefcase, Zap, Users, Bell, Shield } from 'lucide-react'
+import { TrendingUp, Zap, Users, Shield, ArrowRight } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 export default function Landing() {
+  const navigate = useNavigate()
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      window.location.href = '/feed'
+    }
+  }, [user])
+
   return (
     <div className="min-h-screen">
       {/* Navigation */}

@@ -45,14 +45,15 @@ export default function Login() {
 
   const handleSignUp = async (e) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
+  
     try {
-      setLoading(true)
-      setError('')
       await signUpWithEmail(email, password, username)
-      navigate('/feed')
+      alert('회원가입 완료! 이메일을 확인하고 인증 링크를 클릭해주세요.')
+      // navigate('/feed') 제거 - 이메일 확인 필요
     } catch (error) {
-      setError('회원가입 실패: ' + error.message)
-      console.error('Signup error:', error)
+      setError(error.message)
     } finally {
       setLoading(false)
     }
