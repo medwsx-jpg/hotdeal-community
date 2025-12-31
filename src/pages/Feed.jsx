@@ -22,6 +22,7 @@ export default function Feed() {
   const [comments, setComments] = useState({})
   const [newComment, setNewComment] = useState('')
   const [showComments, setShowComments] = useState(null)
+const [expandedPosts, setExpandedPosts] = useState(new Set()) // 추가
   const [loading, setLoading] = useState(false)
   
   const [newPost, setNewPost] = useState({
@@ -571,14 +572,33 @@ export default function Feed() {
                           )}
                         </div>
                       </div>
-
-                      {/* Content */}
-                      <div className="mb-3">
-                        <h2 className="text-base font-bold mb-1 text-gray-900 hover:text-teal-600 cursor-pointer transition-colors">
-                          {post.title}
-                        </h2>
-                        <p className="text-sm text-gray-600 line-clamp-2">{post.content}</p>
-                      </div>
+{/* Content */}
+<div className="mb-3">
+  <h2 className="text-base font-bold mb-1 text-gray-900 hover:text-teal-600 cursor-pointer transition-colors">
+    {post.title}
+  </h2>
+  <p className={`text-sm text-gray-600 ${expandedPosts.has(post.id) ? '' : 'line-clamp-3'}`}>
+    {post.content}
+  </p>
+  {post.content.length > 100 && (
+    <button
+      onClick={() => {
+        setExpandedPosts(prev => {
+          const newSet = new Set(prev)
+          if (newSet.has(post.id)) {
+            newSet.delete(post.id)
+          } else {
+            newSet.add(post.id)
+          }
+          return newSet
+        })
+      }}
+      className="text-xs text-teal-600 hover:underline mt-1"
+    >
+      {expandedPosts.has(post.id) ? '접기' : '더보기'}
+    </button>
+  )}
+</div>
 
                       {/* Images */}
                       {post.images && post.images.length > 0 && (
