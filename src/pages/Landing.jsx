@@ -10,9 +10,9 @@ export default function Landing() {
 
   useEffect(() => {
     if (user) {
-      window.location.href = '/feed'
+      navigate('/feed')
     }
-  }, [user])
+  }, [user, navigate])
 
   return (
     <div className="min-h-screen">
