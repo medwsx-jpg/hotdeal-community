@@ -16,8 +16,9 @@ export default function Feed() {
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
 const [selectedImages, setSelectedImages] = useState([])
-const [openMenuId, setOpenMenuId] = useState(null) // 추가
-const [posts, setPosts] = useState([])  // 빈 배열로 변경
+const [openMenuId, setOpenMenuId] = useState(null)
+const [posts, setPosts] = useState([])
+const [likedPosts, setLikedPosts] = useState(new Set()) // 추가
     
  
   const [loading, setLoading] = useState(false)
@@ -38,44 +39,60 @@ const [posts, setPosts] = useState([])  // 빈 배열로 변경
   useEffect(() => {
     if (user) {
       fetchPosts()
+      checkLikes()
     }
   }, [user])
 
   const fetchPosts = async () => {
-    console.log('1. fetchPosts 시작')
-    console.log('2. 현재 user:', user)
-    
     try {
-      console.log('3. Supabase 쿼리 시작')
-      
-      setTimeout(() => console.log('3.5. 1초 후'), 1000)
-      
       const { data, error } = await supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false })
       
-      console.log('4. 쿼리 완료 - data:', data)
-      console.log('5. 쿼리 완료 - error:', error)
-      
       if (error) throw error
       
-      const transformed = data?.map(post => ({
-        ...post,
-        author: '사용자',
-        authorRole: '회원',
-        timeAgo: '방금 전'
-      })) || []
+      // 각 게시물의 좋아요 개수 가져오기
+      const postsWithCounts = await Promise.all(
+        (data || []).map(async (post) => {
+          const { count: likesCount } = await supabase
+            .from('likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+          
+          return {
+            ...post,
+            likes_count: likesCount || 0,
+            author: '사용자',
+            authorRole: '회원',
+            timeAgo: '방금 전'
+          }
+        })
+      )
       
-      console.log('6. 변환 완료:', transformed)
-      setPosts(transformed)
+      setPosts(postsWithCounts)
       setLoading(false)
     } catch (error) {
-      console.error('7. 에러 발생:', error)
+      console.error('에러 발생:', error)
       setLoading(false)
     }
   }
-
+// 좋아요 확인
+const checkLikes = async () => {
+  if (!user) return
+  
+  try {
+    const { data } = await supabase
+      .from('likes')
+      .select('post_id')
+      .eq('user_id', user.id)
+    
+    const liked = new Set(data?.map(like => like.post_id) || [])
+    setLikedPosts(liked)
+  } catch (error) {
+    console.error('좋아요 확인 실패:', error)
+  }
+}
   // 시간 계산 함수
   const getTimeAgo = (timestamp) => {
     const now = new Date()
@@ -228,6 +245,44 @@ const handleEdit = (post) => {
   })
   setSelectedImages(post.images || [])
   setIsWriteModalOpen(true)
+}
+// 좋아요 토글
+const handleLike = async (postId) => {
+  if (!user) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
+  const isLiked = likedPosts.has(postId)
+
+  try {
+    if (isLiked) {
+      // 좋아요 취소
+      await supabase
+        .from('likes')
+        .delete()
+        .eq('post_id', postId)
+        .eq('user_id', user.id)
+
+      setLikedPosts(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(postId)
+        return newSet
+      })
+    } else {
+      // 좋아요 추가
+      await supabase
+        .from('likes')
+        .insert([{ user_id: user.id, post_id: postId }])
+
+      setLikedPosts(prev => new Set(prev).add(postId))
+    }
+
+    // 게시물 목록 새로고침
+    fetchPosts()
+  } catch (error) {
+    console.error('좋아요 실패:', error)
+  }
 }
   return (
     <div className="min-h-screen pb-24 md:pb-20">
@@ -544,10 +599,17 @@ const handleEdit = (post) => {
 
                       {/* Actions */}
                       <div className="flex items-center space-x-5 text-gray-500">
-                        <button className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors">
-                          <ThumbsUp className="w-4 h-4" />
-                          <span className="text-xs font-medium">{post.likes_count}</span>
-                        </button>
+                      <button 
+  onClick={() => handleLike(post.id)}
+  className={`flex items-center space-x-1.5 transition-colors ${
+    likedPosts.has(post.id)
+      ? 'text-teal-600'
+      : 'text-gray-500 hover:text-teal-600'
+  }`}
+>
+  <ThumbsUp className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
+  <span className="text-xs font-medium">{post.likes_count || 0}</span>
+</button>
                         <button className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors">
                           <MessageCircle className="w-4 h-4" />
                           <span className="text-xs font-medium">{post.comments_count}</span>
