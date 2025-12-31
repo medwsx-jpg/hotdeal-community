@@ -153,11 +153,11 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={async () => {
-                  if (window.confirm('로그아웃 하시겠습니까?')) {
-                    await signOut()
-                    navigate('/login')
-                  }
-                }}
+                    if (window.confirm('로그아웃 하시겠습니까?')) {
+                      await signOut()
+                      window.location.href = '/login'
+                    }
+                  }}
                 className="w-full px-4 py-3 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition-colors"
               >
                 로그아웃
