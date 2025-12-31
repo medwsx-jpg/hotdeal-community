@@ -6,13 +6,24 @@ import { useEffect } from 'react'
 
 export default function Landing() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+const { user, loading } = useAuth()
 
-  useEffect(() => {
-    if (user) {
-      navigate('/feed')
-    }
-  }, [user, navigate])
+useEffect(() => {
+  if (!loading && user) {
+    navigate('/feed')
+  }
+}, [user, loading, navigate])
+
+if (loading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
+      </div>
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen">
