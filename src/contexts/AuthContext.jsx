@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   // 프로필 가져오기
   const fetchProfile = async (userId) => {
     try {
+      setLoading(true) // 로딩 시작
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -34,6 +35,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Error fetching profile:', error)
       setProfile(null)
+    } finally {
+      setLoading(false) // 로딩 완료
     }
   }
 
