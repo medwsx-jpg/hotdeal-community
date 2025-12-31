@@ -21,18 +21,25 @@ export default function Admin() {
   })
 
   useEffect(() => {
-    // 관리자 권한 확인
+    // 로그인 확인
     if (!user) {
       navigate('/login')
       return
     }
     
-    if (profile?.role !== '관리자') {
+    // profile 로딩 대기
+    if (profile === null) {
+      return // 아직 로딩 중
+    }
+    
+    // 관리자 권한 확인
+    if (profile.role !== '관리자') {
       alert('관리자만 접근할 수 있습니다.')
       navigate('/feed')
       return
     }
     
+    // 권한 확인 완료 후 통계 로드
     fetchStats()
   }, [user, profile, navigate])
 
