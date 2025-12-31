@@ -100,13 +100,20 @@ export default function Feed() {
             .select('*', { count: 'exact', head: true })
             .eq('post_id', post.id)
           
+          // 작성자 정보 가져오기
+          const { data: authorData } = await supabase
+            .from('profiles')
+            .select('username, role')
+            .eq('id', post.user_id)
+            .single()
+          
           return {
             ...post,
             likes_count: likesCount || 0,
             comments_count: commentsCount || 0,
-            author: '사용자',
-            authorRole: '회원',
-            timeAgo: '방금 전'
+            author: authorData?.username || '사용자',
+            authorRole: authorData?.role || '회원',
+            timeAgo: getTimeAgo(post.created_at)
           }
         })
       )
