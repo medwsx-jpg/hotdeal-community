@@ -4,7 +4,7 @@ import {
   TrendingUp, Search, Bell, User, Plus, 
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
-  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2  // 추가
+  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -15,12 +15,13 @@ export default function Feed() {
   const [activeTab, setActiveTab] = useState('all')
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
-const [selectedImages, setSelectedImages] = useState([])
-const [openMenuId, setOpenMenuId] = useState(null)
-const [posts, setPosts] = useState([])
-const [likedPosts, setLikedPosts] = useState(new Set()) // 추가
-    
- 
+  const [selectedImages, setSelectedImages] = useState([])
+  const [openMenuId, setOpenMenuId] = useState(null)
+  const [posts, setPosts] = useState([])
+  const [likedPosts, setLikedPosts] = useState(new Set())
+  const [comments, setComments] = useState({})
+  const [newComment, setNewComment] = useState('')
+  const [showComments, setShowComments] = useState(null)
   const [loading, setLoading] = useState(false)
   
   const [newPost, setNewPost] = useState({
@@ -52,7 +53,6 @@ const [likedPosts, setLikedPosts] = useState(new Set()) // 추가
       
       if (error) throw error
       
-      // 각 게시물의 좋아요 개수 가져오기
       const postsWithCounts = await Promise.all(
         (data || []).map(async (post) => {
           const { count: likesCount } = await supabase
@@ -60,9 +60,15 @@ const [likedPosts, setLikedPosts] = useState(new Set()) // 추가
             .select('*', { count: 'exact', head: true })
             .eq('post_id', post.id)
           
+          const { count: commentsCount } = await supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+          
           return {
             ...post,
             likes_count: likesCount || 0,
+            comments_count: commentsCount || 0,
             author: '사용자',
             authorRole: '회원',
             timeAgo: '방금 전'
@@ -77,23 +83,23 @@ const [likedPosts, setLikedPosts] = useState(new Set()) // 추가
       setLoading(false)
     }
   }
-// 좋아요 확인
-const checkLikes = async () => {
-  if (!user) return
-  
-  try {
-    const { data } = await supabase
-      .from('likes')
-      .select('post_id')
-      .eq('user_id', user.id)
+
+  const checkLikes = async () => {
+    if (!user) return
     
-    const liked = new Set(data?.map(like => like.post_id) || [])
-    setLikedPosts(liked)
-  } catch (error) {
-    console.error('좋아요 확인 실패:', error)
+    try {
+      const { data } = await supabase
+        .from('likes')
+        .select('post_id')
+        .eq('user_id', user.id)
+      
+      const liked = new Set(data?.map(like => like.post_id) || [])
+      setLikedPosts(liked)
+    } catch (error) {
+      console.error('좋아요 확인 실패:', error)
+    }
   }
-}
-  // 시간 계산 함수
+
   const getTimeAgo = (timestamp) => {
     const now = new Date()
     const postTime = new Date(timestamp)
@@ -108,22 +114,18 @@ const checkLikes = async () => {
     return `${diffDays}일 전`
   }
 
-  // 필터링된 게시물 (이제 서버에서 필터링하므로 불필요하지만 호환성 유지)
   const filteredPosts = posts
 
-  // 이미지 선택 핸들러
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files)
     const imageUrls = files.map(file => URL.createObjectURL(file))
     setSelectedImages([...selectedImages, ...imageUrls])
   }
 
-  // 이미지 제거
   const removeImage = (index) => {
     setSelectedImages(selectedImages.filter((_, i) => i !== index))
   }
 
-  // 게시물 작성 제출
   const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -137,7 +139,6 @@ const checkLikes = async () => {
       setLoading(true)
       
       if (editingPost) {
-        // 수정 모드
         const { error } = await supabase
           .from('posts')
           .update({
@@ -158,7 +159,6 @@ const checkLikes = async () => {
         if (error) throw error
         alert('수정되었습니다!')
       } else {
-        // 작성 모드
         const { error } = await supabase
           .from('posts')
           .insert([
@@ -182,7 +182,6 @@ const checkLikes = async () => {
         alert('게시물이 작성되었습니다!')
       }
       
-      // 초기화
       setIsWriteModalOpen(false)
       setEditingPost(null)
       setSelectedImages([])
@@ -206,91 +205,132 @@ const checkLikes = async () => {
     } finally {
       setLoading(false)
     }
-  } // <- handleSubmit 닫기
+  }
   
-  // 게시물 삭제 (handleSubmit 밖으로!)
   const handleDelete = async (postId) => {
-  if (!window.confirm('게시물을 삭제하시겠습니까?')) return
-  
-  try {
-    const { error } = await supabase
-      .from('posts')
-      .delete()
-      .eq('id', postId)
+    if (!window.confirm('게시물을 삭제하시겠습니까?')) return
     
-    if (error) throw error
-    
-    alert('삭제되었습니다!')
-    fetchPosts()
-  } catch (error) {
-    console.error('삭제 실패:', error)
-    alert('삭제 실패: ' + error.message)
-  }
-}
-
-// 게시물 수정 모달 열기
-const handleEdit = (post) => {
-  setEditingPost(post)
-  setNewPost({
-    title: post.title,
-    content: post.content,
-    type: post.type,
-    category: post.category,
-    tags: post.tags?.join(', ') || '',
-    discount: post.discount || '',
-    price: post.price || '',
-    hourlyPay: post.hourly_pay || '',
-    location: post.location || '',
-    period: post.period || ''
-  })
-  setSelectedImages(post.images || [])
-  setIsWriteModalOpen(true)
-}
-// 좋아요 토글
-const handleLike = async (postId) => {
-  if (!user) {
-    alert('로그인이 필요합니다.')
-    return
-  }
-
-  const isLiked = likedPosts.has(postId)
-
-  try {
-    if (isLiked) {
-      // 좋아요 취소
-      await supabase
-        .from('likes')
+    try {
+      const { error } = await supabase
+        .from('posts')
         .delete()
-        .eq('post_id', postId)
-        .eq('user_id', user.id)
+        .eq('id', postId)
+      
+      if (error) throw error
+      
+      alert('삭제되었습니다!')
+      fetchPosts()
+    } catch (error) {
+      console.error('삭제 실패:', error)
+      alert('삭제 실패: ' + error.message)
+    }
+  }
 
-      setLikedPosts(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(postId)
-        return newSet
-      })
-    } else {
-      // 좋아요 추가
-      await supabase
-        .from('likes')
-        .insert([{ user_id: user.id, post_id: postId }])
+  const handleEdit = (post) => {
+    setEditingPost(post)
+    setNewPost({
+      title: post.title,
+      content: post.content,
+      type: post.type,
+      category: post.category,
+      tags: post.tags?.join(', ') || '',
+      discount: post.discount || '',
+      price: post.price || '',
+      hourlyPay: post.hourly_pay || '',
+      location: post.location || '',
+      period: post.period || ''
+    })
+    setSelectedImages(post.images || [])
+    setIsWriteModalOpen(true)
+  }
 
-      setLikedPosts(prev => new Set(prev).add(postId))
+  const handleLike = async (postId) => {
+    if (!user) {
+      alert('로그인이 필요합니다.')
+      return
     }
 
-    // 게시물 목록 새로고침
-    fetchPosts()
-  } catch (error) {
-    console.error('좋아요 실패:', error)
+    const isLiked = likedPosts.has(postId)
+
+    try {
+      if (isLiked) {
+        await supabase
+          .from('likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id)
+
+        setLikedPosts(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(postId)
+          return newSet
+        })
+      } else {
+        await supabase
+          .from('likes')
+          .insert([{ user_id: user.id, post_id: postId }])
+
+        setLikedPosts(prev => new Set(prev).add(postId))
+      }
+
+      fetchPosts()
+    } catch (error) {
+      console.error('좋아요 실패:', error)
+    }
   }
-}
+
+  const fetchComments = async (postId) => {
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true })
+      
+      if (error) throw error
+      
+      setComments(prev => ({
+        ...prev,
+        [postId]: data || []
+      }))
+    } catch (error) {
+      console.error('댓글 로드 실패:', error)
+    }
+  }
+
+  const handleAddComment = async (postId) => {
+    if (!user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    if (!newComment.trim()) return
+
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .insert([{
+          user_id: user.id,
+          post_id: postId,
+          content: newComment.trim()
+        }])
+
+      if (error) throw error
+
+      setNewComment('')
+      fetchComments(postId)
+      fetchPosts()
+    } catch (error) {
+      console.error('댓글 작성 실패:', error)
+    }
+  }
+
   return (
     <div className="min-h-screen pb-24 md:pb-20">
-      {/* Navigation - Desktop */}
+      {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white z-50 border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
-            {/* Left: Logo + Slogan */}
             <div className="flex items-center space-x-3">
               <Link to="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
@@ -301,16 +341,12 @@ const handleLike = async (postId) => {
               <span className="hidden md:block text-sm text-gray-600">아끼고 나누는 우리 동네 문화</span>
             </div>
 
-            {/* Right: Menu + Actions */}
             <div className="flex items-center space-x-2">
-              {/* Desktop Menu Tabs */}
               <div className="hidden md:flex items-center space-x-1 mr-2">
                 <button 
                   onClick={() => setActiveTab('all')}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'all' 
-                      ? 'bg-teal-100 text-teal-700' 
-                      : 'text-gray-600 hover:text-gray-900'
+                    activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   전체
@@ -318,9 +354,7 @@ const handleLike = async (postId) => {
                 <button 
                   onClick={() => setActiveTab('hotdeal')}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'hotdeal' 
-                      ? 'bg-teal-100 text-teal-700' 
-                      : 'text-gray-600 hover:text-gray-900'
+                    activeTab === 'hotdeal' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   핫딜
@@ -328,16 +362,13 @@ const handleLike = async (postId) => {
                 <button 
                   onClick={() => setActiveTab('job')}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'job' 
-                      ? 'bg-teal-100 text-teal-700' 
-                      : 'text-gray-600 hover:text-gray-900'
+                    activeTab === 'job' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
                   알바
                 </button>
               </div>
 
-              {/* Search - Desktop */}
               <div className="relative hidden md:block">
                 <input
                   type="text"
@@ -347,18 +378,15 @@ const handleLike = async (postId) => {
                 <Search className="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
               </div>
 
-              {/* Mobile Search Button */}
               <button className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
                 <Search className="w-4 h-4 text-gray-600" />
               </button>
               
-              {/* Notification */}
               <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative">
                 <Bell className="w-4 h-4 text-gray-600" />
                 <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-teal-500 rounded-full"></span>
               </button>
               
-              {/* User Profile - Desktop only */}
               <button 
                 onClick={async () => {
                   if (window.confirm('로그아웃 하시겠습니까?')) {
@@ -378,7 +406,6 @@ const handleLike = async (postId) => {
                 <span className="text-xs font-medium text-gray-700">{profile?.username || '사용자'}</span>
               </button>
 
-              {/* Write Button - Desktop */}
               <button 
                 onClick={() => setIsWriteModalOpen(true)}
                 className="hidden md:flex px-3 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-sm font-semibold hover-lift shadow-md shadow-teal-500/30 items-center space-x-1.5"
@@ -394,7 +421,7 @@ const handleLike = async (postId) => {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 pt-20">
         <div className="flex gap-5">
-          {/* Left Sidebar - Desktop only */}
+          {/* Left Sidebar */}
           <aside className="hidden lg:block w-56 space-y-3">
             <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
               <h3 className="font-bold text-sm mb-3 text-gray-900">트렌딩 토픽</h3>
@@ -430,7 +457,6 @@ const handleLike = async (postId) => {
               </p>
             </div>
 
-            {/* Loading */}
             {loading && (
               <div className="text-center py-10">
                 <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
@@ -438,7 +464,6 @@ const handleLike = async (postId) => {
               </div>
             )}
 
-            {/* Posts */}
             {!loading && (
               <div className="space-y-3">
                 {filteredPosts.length === 0 ? (
@@ -474,51 +499,48 @@ const handleLike = async (postId) => {
                         </div>
                         
                         <div className="flex items-center space-x-1.5">
-  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-    post.type === 'hotdeal' 
-      ? 'bg-teal-100 text-teal-700'
-      : 'bg-cyan-100 text-cyan-700'
-  }`}>
-    {post.category}
-  </span>
-  
-  {/* 본인 게시물일 때만 메뉴 표시 */}
-  {user && post.user_id === user.id && (
-    <div className="relative">
-      <button
-        onClick={() => setOpenMenuId(openMenuId === post.id ? null : post.id)}
-        className="p-1 hover:bg-gray-100 rounded transition-colors"
-      >
-        <MoreVertical className="w-4 h-4 text-gray-600" />
-      </button>
-      
-      {openMenuId === post.id && (
-        <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-          <button
-            onClick={() => {
-              handleEdit(post)
-              setOpenMenuId(null)
-            }}
-            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
-          >
-            <Edit2 className="w-3.5 h-3.5" />
-            <span>수정</span>
-          </button>
-          <button
-            onClick={() => {
-              handleDelete(post.id)
-              setOpenMenuId(null)
-            }}
-            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>삭제</span>
-          </button>
-        </div>
-      )}
-    </div>
-  )}
-</div>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            post.type === 'hotdeal' ? 'bg-teal-100 text-teal-700' : 'bg-cyan-100 text-cyan-700'
+                          }`}>
+                            {post.category}
+                          </span>
+                          
+                          {user && post.user_id === user.id && (
+                            <div className="relative">
+                              <button
+                                onClick={() => setOpenMenuId(openMenuId === post.id ? null : post.id)}
+                                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                              >
+                                <MoreVertical className="w-4 h-4 text-gray-600" />
+                              </button>
+                              
+                              {openMenuId === post.id && (
+                                <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                                  <button
+                                    onClick={() => {
+                                      handleEdit(post)
+                                      setOpenMenuId(null)
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                    <span>수정</span>
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      handleDelete(post.id)
+                                      setOpenMenuId(null)
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span>삭제</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* Content */}
@@ -533,8 +555,7 @@ const handleLike = async (postId) => {
                       {post.images && post.images.length > 0 && (
                         <div className={`mb-3 grid gap-2 ${
                           post.images.length === 1 ? 'grid-cols-1' : 
-                          post.images.length === 2 ? 'grid-cols-2' : 
-                          'grid-cols-2'
+                          post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
                         }`}>
                           {post.images.slice(0, 4).map((img, i) => (
                             <div key={i} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
@@ -599,26 +620,78 @@ const handleLike = async (postId) => {
 
                       {/* Actions */}
                       <div className="flex items-center space-x-5 text-gray-500">
-                      <button 
-  onClick={() => handleLike(post.id)}
-  className={`flex items-center space-x-1.5 transition-colors ${
-    likedPosts.has(post.id)
-      ? 'text-teal-600'
-      : 'text-gray-500 hover:text-teal-600'
-  }`}
->
-  <ThumbsUp className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
-  <span className="text-xs font-medium">{post.likes_count || 0}</span>
-</button>
-                        <button className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors">
-                          <MessageCircle className="w-4 h-4" />
-                          <span className="text-xs font-medium">{post.comments_count}</span>
+                        <button 
+                          onClick={() => handleLike(post.id)}
+                          className={`flex items-center space-x-1.5 transition-colors ${
+                            likedPosts.has(post.id) ? 'text-teal-600' : 'text-gray-500 hover:text-teal-600'
+                          }`}
+                        >
+                          <ThumbsUp className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
+                          <span className="text-xs font-medium">{post.likes_count || 0}</span>
                         </button>
+
+                        <button 
+                          onClick={() => {
+                            if (showComments === post.id) {
+                              setShowComments(null)
+                            } else {
+                              setShowComments(post.id)
+                              fetchComments(post.id)
+                            }
+                          }}
+                          className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          <span className="text-xs font-medium">{post.comments_count || 0}</span>
+                        </button>
+
                         <button className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors ml-auto">
                           <Bookmark className="w-4 h-4" />
-                          <span className="text-xs font-medium">{post.bookmarks_count}</span>
+                          <span className="text-xs font-medium">{post.bookmarks_count || 0}</span>
                         </button>
                       </div>
+
+                      {/* Comments Section */}
+                      {showComments === post.id && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="space-y-3 mb-3">
+                            {comments[post.id]?.map((comment) => (
+                              <div key={comment.id} className="flex space-x-2">
+                                <div className="w-6 h-6 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                  U
+                                </div>
+                                <div className="flex-1">
+                                  <div className="bg-gray-100 rounded-lg px-3 py-2">
+                                    <p className="text-xs font-semibold text-gray-900">사용자</p>
+                                    <p className="text-sm text-gray-700 mt-0.5">{comment.content}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex space-x-2">
+                            <input
+                              type="text"
+                              value={newComment}
+                              onChange={(e) => setNewComment(e.target.value)}
+                              placeholder="댓글을 입력하세요..."
+                              className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleAddComment(post.id)
+                                }
+                              }}
+                            />
+                            <button
+                              onClick={() => handleAddComment(post.id)}
+                              className="px-4 py-2 bg-teal-500 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-colors"
+                            >
+                              작성
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </article>
                   ))
                 )}
@@ -626,7 +699,7 @@ const handleLike = async (postId) => {
             )}
           </main>
 
-          {/* Right Sidebar - Desktop only */}
+          {/* Right Sidebar */}
           <aside className="hidden xl:block w-64 space-y-3">
             <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
               <h3 className="font-bold text-sm mb-3 text-gray-900">인기 급상승 🔥</h3>
@@ -742,7 +815,6 @@ const handleLike = async (postId) => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
-              {/* Type Selection */}
               <div>
                 <label className="block text-sm font-semibold mb-2">카테고리</label>
                 <div className="flex gap-2">
@@ -750,9 +822,7 @@ const handleLike = async (postId) => {
                     type="button"
                     onClick={() => setNewPost({...newPost, type: 'hotdeal'})}
                     className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      newPost.type === 'hotdeal'
-                        ? 'bg-teal-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      newPost.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     핫딜
@@ -761,9 +831,7 @@ const handleLike = async (postId) => {
                     type="button"
                     onClick={() => setNewPost({...newPost, type: 'job'})}
                     className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      newPost.type === 'job'
-                        ? 'bg-teal-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     알바
@@ -771,7 +839,6 @@ const handleLike = async (postId) => {
                 </div>
               </div>
 
-              {/* Title */}
               <div>
                 <label className="block text-sm font-semibold mb-2">제목 *</label>
                 <input
@@ -784,7 +851,6 @@ const handleLike = async (postId) => {
                 />
               </div>
 
-              {/* Content */}
               <div>
                 <label className="block text-sm font-semibold mb-2">내용 *</label>
                 <textarea
@@ -796,7 +862,6 @@ const handleLike = async (postId) => {
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
                 />
                 
-                {/* Image Upload Button */}
                 <div className="flex items-center gap-2 mt-2">
                   <input
                     type="file"
@@ -823,7 +888,6 @@ const handleLike = async (postId) => {
                 </div>
               </div>
 
-              {/* Image Preview */}
               {selectedImages.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                   {selectedImages.map((img, index) => (
@@ -841,7 +905,6 @@ const handleLike = async (postId) => {
                 </div>
               )}
 
-              {/* Conditional Fields */}
               {newPost.type === 'hotdeal' ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -890,7 +953,6 @@ const handleLike = async (postId) => {
                 </div>
               )}
 
-              {/* Location */}
               <div>
                 <label className="block text-sm font-semibold mb-2">위치</label>
                 <input
@@ -902,7 +964,6 @@ const handleLike = async (postId) => {
                 />
               </div>
 
-              {/* Tags */}
               <div>
                 <label className="block text-sm font-semibold mb-2">
                   태그 
@@ -922,7 +983,6 @@ const handleLike = async (postId) => {
                 </p>
               </div>
 
-              {/* Submit Button */}
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
