@@ -116,10 +116,39 @@ export default function Feed() {
 
   const filteredPosts = posts
 
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const files = Array.from(e.target.files)
-    const imageUrls = files.map(file => URL.createObjectURL(file))
-    setSelectedImages([...selectedImages, ...imageUrls])
+    
+    try {
+      setLoading(true)
+      
+      const uploadedUrls = await Promise.all(
+        files.map(async (file) => {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `${Math.random()}.${fileExt}`
+          const filePath = `${user.id}/${fileName}`
+          
+          const { error: uploadError } = await supabase.storage
+            .from('post-images')
+            .upload(filePath, file)
+          
+          if (uploadError) throw uploadError
+          
+          const { data } = supabase.storage
+            .from('post-images')
+            .getPublicUrl(filePath)
+          
+          return data.publicUrl
+        })
+      )
+      
+      setSelectedImages([...selectedImages, ...uploadedUrls])
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error)
+      alert('이미지 업로드 실패: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const removeImage = (index) => {
