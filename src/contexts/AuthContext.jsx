@@ -20,24 +20,26 @@ export const AuthProvider = ({ children }) => {
     // 현재 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id)
-      } else {
-        setLoading(false)
-      }
+      setLoading(false) // 바로 false로!
+      // if (session?.user) {
+      //   fetchProfile(session.user.id)
+      // } else {
+      //   setLoading(false)
+      // }
     })
-
-   // 인증 상태 변경 감지
-const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-    setUser(session?.user ?? null)
-    if (session?.user) {
-      await fetchProfile(session.user.id)
-    } else {
-      setProfile(null)
-      setLoading(false) // 추가!
-    }
-  })
-
+  
+    // 인증 상태 변경 감지
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false) // 바로 false로!
+      // if (session?.user) {
+      //   await fetchProfile(session.user.id)
+      // } else {
+      //   setProfile(null)
+      //   setLoading(false)
+      // }
+    })
+  
     return () => subscription.unsubscribe()
   }, [])
 
