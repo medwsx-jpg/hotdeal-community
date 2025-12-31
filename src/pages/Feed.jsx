@@ -23,7 +23,8 @@ export default function Feed() {
   const [newComment, setNewComment] = useState('')
   const [showComments, setShowComments] = useState(null)
   const [expandedPosts, setExpandedPosts] = useState(new Set())
-  const [searchQuery, setSearchQuery] = useState('') // 추가
+  const [searchQuery, setSearchQuery] = useState('')
+  const [username, setUsername] = useState('사용자') // 추가
   const [loading, setLoading] = useState(false)
   
   const [newPost, setNewPost] = useState({
@@ -44,6 +45,25 @@ export default function Feed() {
       fetchPosts()
       checkLikes()
     }
+  }, [user])
+  
+  // 프로필 정보 가져오기
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single()
+      
+      if (data?.username) {
+        setUsername(data.username)
+      }
+    }
+    
+    fetchUserProfile()
   }, [user])
 
   const fetchPosts = async (search = '') => {
@@ -451,14 +471,9 @@ export default function Feed() {
               </button>
               
               <button 
-                onClick={async () => {
-                  if (window.confirm('로그아웃 하시겠습니까?')) {
-                    await signOut()
-                    navigate('/login')
-                  }
-                }}
-                className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-              >
+  onClick={() => navigate('/profile')}
+  className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+>
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full" />
                 ) : (
@@ -466,7 +481,7 @@ export default function Feed() {
                     {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
-                <span className="text-xs font-medium text-gray-700">{profile?.username || '사용자'}</span>
+                <span className="text-xs font-medium text-gray-700">{username}</span>
               </button>
 
               <button 
@@ -869,17 +884,12 @@ export default function Feed() {
           </button>
 
           <button 
-            onClick={async () => {
-              if (window.confirm('로그아웃 하시겠습니까?')) {
-                await signOut()
-                navigate('/login')
-              }
-            }}
-            className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
-          >
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-medium">MY</span>
-          </button>
+  onClick={() => navigate('/profile')}
+  className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
+>
+  <User className="w-5 h-5" />
+  <span className="text-[10px] font-medium">MY</span>
+</button>
         </div>
       </nav>
 
