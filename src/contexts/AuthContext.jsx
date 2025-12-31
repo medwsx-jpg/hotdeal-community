@@ -27,15 +27,16 @@ export const AuthProvider = ({ children }) => {
       }
     })
 
-    // 인증 상태 변경 감지
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        await fetchProfile(session.user.id)
-      } else {
-        setProfile(null)
-      }
-    })
+   // 인증 상태 변경 감지
+const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    setUser(session?.user ?? null)
+    if (session?.user) {
+      await fetchProfile(session.user.id)
+    } else {
+      setProfile(null)
+      setLoading(false) // 추가!
+    }
+  })
 
     return () => subscription.unsubscribe()
   }, [])
