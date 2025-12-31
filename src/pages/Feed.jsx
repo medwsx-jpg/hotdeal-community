@@ -54,7 +54,14 @@ export default function Feed() {
         .order('created_at', { ascending: false })
       
       if (search) {
-        query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`)
+        // 태그 검색 (# 포함)
+        if (search.startsWith('#')) {
+          const tag = search.substring(1)
+          query = query.contains('tags', [tag])
+        } else {
+          // 일반 검색
+          query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`)
+        }
       }
       
       const { data, error } = await query
@@ -681,17 +688,21 @@ export default function Feed() {
 
                       {/* Tags */}
                       {post.tags && post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mb-3">
-                          {post.tags.map((tag, i) => (
-                            <span 
-                              key={i} 
-                              className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[11px] rounded cursor-pointer hover:bg-teal-50 hover:text-teal-600 transition-colors"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+  <div className="flex flex-wrap gap-1.5 mb-3">
+    {post.tags.map((tag, i) => (
+      <span 
+        key={i}
+        onClick={() => {
+          setSearchQuery(`#${tag}`)
+          fetchPosts(`#${tag}`)
+        }}
+        className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[11px] rounded cursor-pointer hover:bg-teal-50 hover:text-teal-600 transition-colors"
+      >
+        #{tag}
+      </span>
+    ))}
+  </div>
+)}
 
                       {/* Actions */}
                       <div className="flex items-center space-x-5 text-gray-500">
