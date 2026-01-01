@@ -360,9 +360,25 @@ export default function Feed() {
       
       if (error) throw error
       
+      // 각 댓글의 작성자 정보 가져오기
+      const commentsWithAuthors = await Promise.all(
+        (data || []).map(async (comment) => {
+          const { data: authorData } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', comment.user_id)
+            .single()
+          
+          return {
+            ...comment,
+            author: authorData?.username || '사용자'
+          }
+        })
+      )
+      
       setComments(prev => ({
         ...prev,
-        [postId]: data || []
+        [postId]: commentsWithAuthors
       }))
     } catch (error) {
       console.error('댓글 로드 실패:', error)
@@ -777,7 +793,7 @@ export default function Feed() {
                                 </div>
                                 <div className="flex-1">
                                   <div className="bg-gray-100 rounded-lg px-3 py-2">
-                                    <p className="text-xs font-semibold text-gray-900">사용자</p>
+                                  <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
                                     <p className="text-sm text-gray-700 mt-0.5">{comment.content}</p>
                                   </div>
                                 </div>
