@@ -158,7 +158,27 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
     return `${diffDays}일 전`
   }
 
-  const filteredPosts = posts
+  const filteredPosts = posts.filter(post => {
+    // 전체
+    if (activeTab === 'all') return true
+    
+    // 핫딜
+    if (activeTab === 'hotdeal-jeonje') return post.type === 'hotdeal' && post.category === '전단지'
+    if (activeTab === 'hotdeal-sale') return post.type === 'hotdeal' && post.category === '할인'
+    if (activeTab === 'hotdeal-event') return post.type === 'hotdeal' && post.category === '행사'
+    
+    // 쉐어
+    if (activeTab === 'share-living') return post.type === 'share' && post.category === '생활용품'
+    if (activeTab === 'share-realestate') return post.type === 'share' && post.category === '부동산'
+    if (activeTab === 'share-etc') return post.type === 'share' && post.category === '기타'
+    
+    // JOB
+    if (activeTab === 'job-hire') return post.type === 'job' && post.category === '구인'
+    if (activeTab === 'job-seek') return post.type === 'job' && post.category === '구직'
+    if (activeTab === 'job-story') return post.type === 'job' && post.category === 'JOB썰'
+    
+    return true
+  })
 
   const handleImageSelect = async (e) => {
     const files = Array.from(e.target.files)
