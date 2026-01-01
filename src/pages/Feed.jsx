@@ -866,77 +866,71 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
 <div className="md:hidden mb-4 bg-white border border-gray-200 rounded-xl p-3">
 {activeMainTab === 'home' && (
   <div className="space-y-2">
-    {/* 메인 버튼들 */}
+    {/* 메인 버튼들 - 가로 배치 */}
     <div className="flex gap-2">
       <button
-        onClick={() => setActiveTab('all')}
+        onClick={() => { setActiveTab('all'); setExpandedMenus({...expandedMenus, hotdeal: false, share: false, job: false}) }}
         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
         }`}
       >
         전체
       </button>
+      
+      <button
+        onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, share: false, job: false})}
+        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          expandedMenus.hotdeal || activeTab.startsWith('hotdeal') ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
+        }`}
+      >
+        핫딜
+      </button>
+      
+      <button
+        onClick={() => setExpandedMenus({...expandedMenus, share: !expandedMenus.share, hotdeal: false, job: false})}
+        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          expandedMenus.share || activeTab.startsWith('share') ? 'bg-purple-100 text-purple-700' : 'bg-gray-50 text-gray-700'
+        }`}
+      >
+        쉐어
+      </button>
+      
+      <button
+        onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, share: false})}
+        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          expandedMenus.job || activeTab.startsWith('job') ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-50 text-gray-700'
+        }`}
+      >
+        JOB
+      </button>
     </div>
     
-    {/* 핫딜 */}
-    <div>
-      <button
-        onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal})}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium"
-      >
-        <span>핫딜</span>
-        <svg className={`w-4 h-4 transition-transform ${expandedMenus.hotdeal ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {expandedMenus.hotdeal && (
-        <div className="flex gap-2 mt-2">
-          <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>전단지</button>
-          <button onClick={() => setActiveTab('hotdeal-sale')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>할인</button>
-          <button onClick={() => setActiveTab('hotdeal-event')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>행사</button>
-        </div>
-      )}
-    </div>
+    {/* 핫딜 서브메뉴 */}
+    {expandedMenus.hotdeal && (
+      <div className="flex gap-2">
+        <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>전단지</button>
+        <button onClick={() => setActiveTab('hotdeal-sale')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>할인</button>
+        <button onClick={() => setActiveTab('hotdeal-event')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>행사</button>
+      </div>
+    )}
 
-    {/* 쉐어 */}
-    <div>
-      <button
-        onClick={() => setExpandedMenus({...expandedMenus, share: !expandedMenus.share})}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium"
-      >
-        <span>쉐어</span>
-        <svg className={`w-4 h-4 transition-transform ${expandedMenus.share ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {expandedMenus.share && (
-        <div className="flex gap-2 mt-2">
-          <button onClick={() => setActiveTab('share-living')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>생활용품</button>
-          <button onClick={() => setActiveTab('share-realestate')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>부동산</button>
-          <button onClick={() => setActiveTab('share-etc')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>기타</button>
-        </div>
-      )}
-    </div>
+    {/* 쉐어 서브메뉴 */}
+    {expandedMenus.share && (
+      <div className="flex gap-2">
+        <button onClick={() => setActiveTab('share-living')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>생활용품</button>
+        <button onClick={() => setActiveTab('share-realestate')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>부동산</button>
+        <button onClick={() => setActiveTab('share-etc')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>기타</button>
+      </div>
+    )}
 
-    {/* JOB */}
-    <div>
-      <button
-        onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job})}
-        className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium"
-      >
-        <span>JOB</span>
-        <svg className={`w-4 h-4 transition-transform ${expandedMenus.job ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {expandedMenus.job && (
-        <div className="flex gap-2 mt-2">
-          <button onClick={() => setActiveTab('job-hire')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구인</button>
-          <button onClick={() => setActiveTab('job-seek')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구직</button>
-          <button onClick={() => setActiveTab('job-story')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>JOB썰</button>
-        </div>
-      )}
-    </div>
+    {/* JOB 서브메뉴 */}
+    {expandedMenus.job && (
+      <div className="flex gap-2">
+        <button onClick={() => setActiveTab('job-hire')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구인</button>
+        <button onClick={() => setActiveTab('job-seek')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구직</button>
+        <button onClick={() => setActiveTab('job-story')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>JOB썰</button>
+      </div>
+    )}
   </div>
 )}
  {activeMainTab === 'talk' && (
