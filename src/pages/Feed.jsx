@@ -419,32 +419,32 @@ export default function Feed() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <div className="hidden md:flex items-center space-x-1 mr-2">
-                <button 
-                  onClick={() => setActiveTab('all')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  전체
-                </button>
-                <button 
-                  onClick={() => setActiveTab('hotdeal')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'hotdeal' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  핫딜
-                </button>
-                <button 
-                  onClick={() => setActiveTab('job')}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'job' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  알바
-                </button>
-              </div>
+            <div className="flex items-center space-x-1 mr-2">
+  <button 
+    onClick={() => setActiveTab('all')}
+    className={`px-2 md:px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+      activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
+    }`}
+  >
+    전체
+  </button>
+  <button 
+    onClick={() => setActiveTab('hotdeal')}
+    className={`px-2 md:px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+      activeTab === 'hotdeal' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
+    }`}
+  >
+    핫딜
+  </button>
+  <button 
+    onClick={() => setActiveTab('job')}
+    className={`px-2 md:px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+      activeTab === 'job' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
+    }`}
+  >
+    알바
+  </button>
+</div>
 
               <div className="relative">
   <input
