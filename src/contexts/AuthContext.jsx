@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext({})
@@ -16,7 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
 
   // 프로필 가져오기
   const fetchProfile = async (userId) => {
@@ -76,7 +74,7 @@ export const AuthProvider = ({ children }) => {
           console.log('🚪 로그아웃됨 - 랜딩페이지로 이동')
           setUser(null)
           setProfile(null)
-          navigate('/')
+          window.location.href = '/'
         }
         
         if (event === 'TOKEN_REFRESHED') {
@@ -107,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     )
   
     return () => subscription.unsubscribe()
-  }, [navigate])
+  }, [])
 
   // 구글 로그인
   const signInWithGoogle = async () => {
@@ -157,7 +155,7 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
-    // onAuthStateChange에서 SIGNED_OUT 이벤트로 navigate('/') 처리됨
+    // onAuthStateChange에서 SIGNED_OUT 이벤트로 window.location.href = '/' 처리됨
   }
 
   const value = {
