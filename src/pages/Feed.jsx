@@ -28,7 +28,7 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
   const [searchQuery, setSearchQuery] = useState('')
   const [username, setUsername] = useState('사용자') // 추가
   const [loading, setLoading] = useState(false)
-  
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -398,10 +398,11 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
             .eq('id', comment.user_id)
             .single()
           
-          return {
-            ...comment,
-            author: authorData?.username || '사용자'
-          }
+            return {
+              ...comment,
+              author: authorData?.username || '사용자',
+              timeAgo: getTimeAgo(comment.created_at)
+            }
         })
       )
       
@@ -1108,7 +1109,12 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
                         }`}>
                           {post.images.slice(0, 4).map((img, i) => (
                             <div key={i} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                              <img src={img} alt="" className="w-full h-full object-cover" />
+                              <img 
+  src={img} 
+  alt="" 
+  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity" 
+  onClick={() => setSelectedImageUrl(img)}
+/>
                               {i === 3 && post.images.length > 4 && (
                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                   <span className="text-white font-bold text-lg">+{post.images.length - 4}</span>
@@ -1215,8 +1221,11 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
                                 </div>
                                 <div className="flex-1">
                                   <div className="bg-gray-100 rounded-lg px-3 py-2">
-                                  <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
-                                    <p className="text-sm text-gray-700 mt-0.5">{comment.content}</p>
+                                  <div className="flex items-center justify-between mb-0.5">
+  <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
+  <p className="text-[10px] text-gray-400">{comment.timeAgo}</p>
+</div>
+<p className="text-sm text-gray-700">{comment.content}</p>
                                   </div>
                                 </div>
                               </div>
@@ -1723,7 +1732,28 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
             </form>
           </div>
         </div>
+        
       )}
+      {/* Image Lightbox Modal */}
+{selectedImageUrl && (
+  <div 
+    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+    onClick={() => setSelectedImageUrl(null)}
+  >
+    <button
+      onClick={() => setSelectedImageUrl(null)}
+      className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+    >
+      <X className="w-6 h-6 text-white" />
+    </button>
+    <img 
+      src={selectedImageUrl} 
+      alt="" 
+      className="max-w-full max-h-full object-contain"
+      onClick={(e) => e.stopPropagation()}
+    />
+  </div>
+)}
     </div>
   )
 }
