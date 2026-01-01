@@ -65,7 +65,7 @@ export default function Profile() {
       }
   
       alert('프로필이 저장되었습니다!')
-      window.location.href = '/feed'
+      navigate('/feed')
     } catch (error) {
       console.error('프로필 저장 실패:', error)
       alert('프로필 저장 실패: ' + error.message)
