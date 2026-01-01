@@ -29,6 +29,7 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
   const [username, setUsername] = useState('사용자') // 추가
   const [loading, setLoading] = useState(false)
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
+const [isImageZoomed, setIsImageZoomed] = useState(false)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -1734,23 +1735,48 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
         </div>
         
       )}
-      {/* Image Lightbox Modal */}
+   {/* Image Lightbox Modal */}
 {selectedImageUrl && (
   <div 
-    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-    onClick={() => setSelectedImageUrl(null)}
+    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 overflow-auto"
+    onClick={() => {
+      setSelectedImageUrl(null)
+      setIsImageZoomed(false)
+    }}
   >
     <button
-      onClick={() => setSelectedImageUrl(null)}
-      className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+      onClick={() => {
+        setSelectedImageUrl(null)
+        setIsImageZoomed(false)
+      }}
+      className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
     >
       <X className="w-6 h-6 text-white" />
     </button>
+    
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        setIsImageZoomed(!isImageZoomed)
+      }}
+      className="absolute top-4 left-4 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-sm font-medium z-10"
+    >
+      {isImageZoomed ? '축소' : '확대'}
+    </button>
+    
     <img 
       src={selectedImageUrl} 
       alt="" 
-      className="max-w-full max-h-full object-contain"
-      onClick={(e) => e.stopPropagation()}
+      className={`transition-all duration-300 ${
+        isImageZoomed 
+          ? 'cursor-zoom-out' 
+          : 'max-w-full max-h-full object-contain cursor-zoom-in'
+      }`}
+      style={isImageZoomed ? { width: 'auto', height: 'auto' } : {}}
+      onClick={(e) => {
+        e.stopPropagation()
+        setIsImageZoomed(!isImageZoomed)
+      }}
     />
   </div>
 )}
