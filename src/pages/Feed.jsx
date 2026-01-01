@@ -29,7 +29,7 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
   const [username, setUsername] = useState('사용자') // 추가
   const [loading, setLoading] = useState(false)
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
-const [isImageZoomed, setIsImageZoomed] = useState(false)
+  const [imageZoom, setImageZoom] = useState(100) // 100 = 100%
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -1735,49 +1735,85 @@ const [isImageZoomed, setIsImageZoomed] = useState(false)
         </div>
         
       )}
-   {/* Image Lightbox Modal */}
+  {/* Image Lightbox Modal */}
 {selectedImageUrl && (
   <div 
-    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 overflow-auto"
+    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center overflow-hidden"
     onClick={() => {
       setSelectedImageUrl(null)
-      setIsImageZoomed(false)
+      setImageZoom(100)
+    }}
+    onWheel={(e) => {
+      e.preventDefault()
+      const delta = e.deltaY > 0 ? -25 : 25
+      setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
     }}
   >
+    {/* 닫기 버튼 */}
     <button
       onClick={() => {
         setSelectedImageUrl(null)
-        setIsImageZoomed(false)
+        setImageZoom(100)
       }}
       className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
     >
       <X className="w-6 h-6 text-white" />
     </button>
     
-    <button
-      onClick={(e) => {
-        e.stopPropagation()
-        setIsImageZoomed(!isImageZoomed)
-      }}
-      className="absolute top-4 left-4 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white text-sm font-medium z-10"
-    >
-      {isImageZoomed ? '축소' : '확대'}
-    </button>
+    {/* 하단 줌 컨트롤 */}
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full z-10">
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          setImageZoom(prev => Math.max(25, prev - 25))
+        }}
+        className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white font-bold text-lg"
+      >
+        −
+      </button>
+      
+      <span className="text-white text-sm font-medium min-w-[60px] text-center">
+        {imageZoom}%
+      </span>
+      
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          setImageZoom(prev => Math.min(400, prev + 25))
+        }}
+        className="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white font-bold text-lg"
+      >
+        +
+      </button>
+      
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          setImageZoom(100)
+        }}
+        className="ml-2 px-3 py-1 bg-white/10 hover:bg-white/20 rounded-full transition-colors text-white text-xs font-medium"
+      >
+        원본
+      </button>
+    </div>
     
-    <img 
-      src={selectedImageUrl} 
-      alt="" 
-      className={`transition-all duration-300 ${
-        isImageZoomed 
-          ? 'cursor-zoom-out' 
-          : 'max-w-full max-h-full object-contain cursor-zoom-in'
-      }`}
-      style={isImageZoomed ? { width: 'auto', height: 'auto' } : {}}
-      onClick={(e) => {
-        e.stopPropagation()
-        setIsImageZoomed(!isImageZoomed)
-      }}
-    />
+    {/* 이미지 */}
+    <div 
+      className="relative w-full h-full flex items-center justify-center overflow-auto p-4"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <img 
+        src={selectedImageUrl} 
+        alt="" 
+        className="transition-transform duration-200 cursor-move"
+        style={{
+          transform: `scale(${imageZoom / 100})`,
+          maxWidth: imageZoom === 100 ? '100%' : 'none',
+          maxHeight: imageZoom === 100 ? '100%' : 'none'
+        }}
+        draggable="false"
+      />
+    </div>
   </div>
 )}
     </div>
