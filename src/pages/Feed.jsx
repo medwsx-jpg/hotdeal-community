@@ -862,13 +862,13 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
 
           {/* Feed */}
           <main className="flex-1">
-           {/* 모바일 탭 메뉴 */}
+      {/* 모바일 탭 메뉴 */}
 <div className="md:hidden mb-4 bg-white border border-gray-200 rounded-xl p-3">
   {activeMainTab === 'home' && (
     <div className="space-y-2">
       <button
         onClick={() => setActiveTab('all')}
-        className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
         }`}
       >
@@ -887,10 +887,10 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
           </svg>
         </button>
         {expandedMenus.hotdeal && (
-          <div className="ml-3 mt-1 space-y-1">
-            <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'text-gray-600'}`}>전단지</button>
-            <button onClick={() => setActiveTab('hotdeal-sale')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'text-gray-600'}`}>할인</button>
-            <button onClick={() => setActiveTab('hotdeal-event')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'text-gray-600'}`}>행사</button>
+          <div className="flex flex-wrap gap-2 mt-2">
+            <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>전단지</button>
+            <button onClick={() => setActiveTab('hotdeal-sale')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>할인</button>
+            <button onClick={() => setActiveTab('hotdeal-event')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>행사</button>
           </div>
         )}
       </div>
@@ -907,10 +907,10 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
           </svg>
         </button>
         {expandedMenus.share && (
-          <div className="ml-3 mt-1 space-y-1">
-            <button onClick={() => setActiveTab('share-living')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'text-gray-600'}`}>생활용품</button>
-            <button onClick={() => setActiveTab('share-realestate')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'text-gray-600'}`}>부동산</button>
-            <button onClick={() => setActiveTab('share-etc')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'text-gray-600'}`}>기타</button>
+          <div className="flex flex-wrap gap-2 mt-2">
+            <button onClick={() => setActiveTab('share-living')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>생활용품</button>
+            <button onClick={() => setActiveTab('share-realestate')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>부동산</button>
+            <button onClick={() => setActiveTab('share-etc')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>기타</button>
           </div>
         )}
       </div>
@@ -927,10 +927,10 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
           </svg>
         </button>
         {expandedMenus.job && (
-          <div className="ml-3 mt-1 space-y-1">
-            <button onClick={() => setActiveTab('job-hire')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'}`}>구인</button>
-            <button onClick={() => setActiveTab('job-seek')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'}`}>구직</button>
-            <button onClick={() => setActiveTab('job-story')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'}`}>JOB썰</button>
+          <div className="flex flex-wrap gap-2 mt-2">
+            <button onClick={() => setActiveTab('job-hire')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구인</button>
+            <button onClick={() => setActiveTab('job-seek')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구직</button>
+            <button onClick={() => setActiveTab('job-story')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>JOB썰</button>
           </div>
         )}
       </div>
@@ -938,20 +938,20 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
   )}
 
   {activeMainTab === 'talk' && (
-    <div className="space-y-2">
-      <button onClick={() => setActiveTab('talk-all')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
-      <button onClick={() => setActiveTab('talk-chat')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-chat' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>수다</button>
-      <button onClick={() => setActiveTab('talk-comfort')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-comfort' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>토닥</button>
-      <button onClick={() => setActiveTab('talk-qna')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-qna' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>Q&A</button>
-      <button onClick={() => setActiveTab('talk-tips')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-tips' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>꿀팁</button>
+    <div className="flex flex-wrap gap-2">
+      <button onClick={() => setActiveTab('talk-all')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
+      <button onClick={() => setActiveTab('talk-chat')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-chat' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>수다</button>
+      <button onClick={() => setActiveTab('talk-comfort')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-comfort' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>토닥</button>
+      <button onClick={() => setActiveTab('talk-qna')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-qna' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>Q&A</button>
+      <button onClick={() => setActiveTab('talk-tips')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-tips' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>꿀팁</button>
     </div>
   )}
 
   {activeMainTab === 'notice' && (
-    <div className="space-y-2">
-      <button onClick={() => setActiveTab('notice-all')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
-      <button onClick={() => setActiveTab('notice-announcement')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-announcement' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>공지</button>
-      <button onClick={() => setActiveTab('notice-event')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>이벤트</button>
+    <div className="flex flex-wrap gap-2">
+      <button onClick={() => setActiveTab('notice-all')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
+      <button onClick={() => setActiveTab('notice-announcement')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-announcement' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>공지</button>
+      <button onClick={() => setActiveTab('notice-event')} className={`px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>이벤트</button>
     </div>
   )}
 </div>
