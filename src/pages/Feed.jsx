@@ -13,6 +13,8 @@ export default function Feed() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('all')
+const [activeMainTab, setActiveMainTab] = useState('home')
+const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, hotdeal: false, share: false, job: false })
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
   const [selectedImages, setSelectedImages] = useState([])
@@ -435,32 +437,7 @@ export default function Feed() {
             </div>
 
             <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-1 mr-2">
-  <button 
-    onClick={() => setActiveTab('all')}
-    className={`px-2 md:px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-      activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
-    }`}
-  >
-    전체
-  </button>
-  <button 
-    onClick={() => setActiveTab('hotdeal')}
-    className={`px-2 md:px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-      activeTab === 'hotdeal' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
-    }`}
-  >
-    핫딜
-  </button>
-  <button 
-    onClick={() => setActiveTab('job')}
-    className={`px-2 md:px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
-      activeTab === 'job' ? 'bg-teal-100 text-teal-700' : 'text-gray-600 hover:text-gray-900'
-    }`}
-  >
-    알바
-  </button>
-</div>
+        
 
               <div className="relative">
   <input
@@ -530,29 +507,358 @@ export default function Feed() {
       <div className="max-w-6xl mx-auto px-4 pt-20">
         <div className="flex gap-5">
           {/* Left Sidebar */}
-          <aside className="hidden lg:block w-56 space-y-3">
-            <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
-              <h3 className="font-bold text-sm mb-3 text-gray-900">트렌딩 토픽</h3>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-xs cursor-pointer hover:text-teal-600 transition-colors">
-                  <Flame className="w-3.5 h-3.5 text-teal-500" />
-                  <span className="text-gray-700">#블랙프라이데이</span>
+          <aside className="hidden lg:block w-56">
+  <div className="bg-white border border-gray-200 rounded-xl p-3 sticky top-20">
+    <nav className="space-y-1">
+      {/* 홈 */}
+      <div>
+        <button
+          onClick={() => setExpandedMenus({...expandedMenus, home: !expandedMenus.home})}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center space-x-2">
+            <Home className="w-4 h-4" />
+            <span>홈</span>
+          </div>
+          <svg 
+            className={`w-4 h-4 transition-transform ${expandedMenus.home ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {expandedMenus.home && (
+          <div className="ml-3 mt-1 space-y-1">
+            {/* 전체 */}
+            <button
+              onClick={() => { setActiveMainTab('home'); setActiveTab('all') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'home' && activeTab === 'all'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              전체
+            </button>
+
+            {/* 핫딜 */}
+            <div>
+              <button
+                onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal})}
+                className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                <span>핫딜</span>
+                <svg 
+                  className={`w-3 h-3 transition-transform ${expandedMenus.hotdeal ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {expandedMenus.hotdeal && (
+                <div className="ml-3 mt-1 space-y-1">
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('hotdeal-jeonje') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'hotdeal-jeonje'
+                        ? 'bg-teal-50 text-teal-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    전단지
+                  </button>
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('hotdeal-sale') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'hotdeal-sale'
+                        ? 'bg-teal-50 text-teal-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    할인
+                  </button>
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('hotdeal-event') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'hotdeal-event'
+                        ? 'bg-teal-50 text-teal-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    행사
+                  </button>
                 </div>
-                <div className="flex items-center space-x-2 text-xs cursor-pointer hover:text-teal-600 transition-colors">
-                  <Flame className="w-3.5 h-3.5 text-teal-500" />
-                  <span className="text-gray-700">#연말알바</span>
-                </div>
-                <div className="flex items-center space-x-2 text-xs cursor-pointer hover:text-teal-600 transition-colors">
-                  <Flame className="w-3.5 h-3.5 text-teal-500" />
-                  <span className="text-gray-700">#IT기기할인</span>
-                </div>
-                <div className="flex items-center space-x-2 text-xs cursor-pointer hover:text-teal-600 transition-colors">
-                  <Flame className="w-3.5 h-3.5 text-teal-500" />
-                  <span className="text-gray-700">#무료강의</span>
-                </div>
-              </div>
+              )}
             </div>
-          </aside>
+
+            {/* 쉐어 */}
+            <div>
+              <button
+                onClick={() => setExpandedMenus({...expandedMenus, share: !expandedMenus.share})}
+                className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                <span>쉐어</span>
+                <svg 
+                  className={`w-3 h-3 transition-transform ${expandedMenus.share ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {expandedMenus.share && (
+                <div className="ml-3 mt-1 space-y-1">
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('share-living') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'share-living'
+                        ? 'bg-purple-50 text-purple-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    생활용품
+                  </button>
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('share-realestate') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'share-realestate'
+                        ? 'bg-purple-50 text-purple-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    부동산
+                  </button>
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('share-etc') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'share-etc'
+                        ? 'bg-purple-50 text-purple-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    기타
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* JOB */}
+            <div>
+              <button
+                onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job})}
+                className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                <span>JOB</span>
+                <svg 
+                  className={`w-3 h-3 transition-transform ${expandedMenus.job ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {expandedMenus.job && (
+                <div className="ml-3 mt-1 space-y-1">
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('job-hire') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'job-hire'
+                        ? 'bg-cyan-50 text-cyan-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    구인
+                  </button>
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('job-seek') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'job-seek'
+                        ? 'bg-cyan-50 text-cyan-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    구직
+                  </button>
+                  <button
+                    onClick={() => { setActiveMainTab('home'); setActiveTab('job-story') }}
+                    className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
+                      activeTab === 'job-story'
+                        ? 'bg-cyan-50 text-cyan-700 font-medium'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    JOB썰
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 톡 */}
+      <div>
+        <button
+          onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk})}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center space-x-2">
+            <MessageCircle className="w-4 h-4" />
+            <span>톡</span>
+          </div>
+          <svg 
+            className={`w-4 h-4 transition-transform ${expandedMenus.talk ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {expandedMenus.talk && (
+          <div className="ml-3 mt-1 space-y-1">
+            <button
+              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-all') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'talk' && activeTab === 'talk-all'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              전체
+            </button>
+            <button
+              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-chat') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'talk' && activeTab === 'talk-chat'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              수다
+            </button>
+            <button
+              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-comfort') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'talk' && activeTab === 'talk-comfort'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              토닥
+            </button>
+            <button
+              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-qna') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'talk' && activeTab === 'talk-qna'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              Q&A
+            </button>
+            <button
+              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-tips') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'talk' && activeTab === 'talk-tips'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              꿀팁
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 공지 */}
+      <div>
+        <button
+          onClick={() => setExpandedMenus({...expandedMenus, notice: !expandedMenus.notice})}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center space-x-2">
+            <Bell className="w-4 h-4" />
+            <span>공지</span>
+          </div>
+          <svg 
+            className={`w-4 h-4 transition-transform ${expandedMenus.notice ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        
+        {expandedMenus.notice && (
+          <div className="ml-3 mt-1 space-y-1">
+            <button
+              onClick={() => { setActiveMainTab('notice'); setActiveTab('notice-all') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'notice' && activeTab === 'notice-all'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              전체
+            </button>
+            <button
+              onClick={() => { setActiveMainTab('notice'); setActiveTab('notice-announcement') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'notice' && activeTab === 'notice-announcement'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              공지
+            </button>
+            <button
+              onClick={() => { setActiveMainTab('notice'); setActiveTab('notice-event') }}
+              className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                activeMainTab === 'notice' && activeTab === 'notice-event'
+                  ? 'bg-teal-50 text-teal-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              이벤트
+            </button>
+          </div>
+        )}
+      </div>
+    </nav>
+
+    {/* 트렌딩 토픽 */}
+    <div className="pt-3 mt-3 border-t border-gray-200">
+      <h3 className="font-bold text-xs mb-2 text-gray-900 px-3">트렌딩 토픽</h3>
+      <div className="space-y-1">
+        <div className="flex items-center space-x-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
+          <Flame className="w-3 h-3 text-teal-500" />
+          <span className="text-gray-700">#블랙프라이데이</span>
+        </div>
+        <div className="flex items-center space-x-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
+          <Flame className="w-3 h-3 text-teal-500" />
+          <span className="text-gray-700">#연말알바</span>
+        </div>
+        <div className="flex items-center space-x-2 px-3 py-1.5 text-xs cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
+          <Flame className="w-3 h-3 text-teal-500" />
+          <span className="text-gray-700">#IT기기할인</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
 
           {/* Feed */}
           <main className="flex-1">
@@ -996,14 +1302,14 @@ export default function Feed() {
         전단지
       </button>
       <button
-        type="button"
-        onClick={() => setNewPost({...newPost, category: '정보'})}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          newPost.category === '정보' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
-      >
-        정보
-      </button>
+  type="button"
+  onClick={() => setNewPost({...newPost, category: '할인'})}
+  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+    newPost.category === '할인' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+  }`}
+>
+  할인
+</button>
       <button
         type="button"
         onClick={() => setNewPost({...newPost, category: '행사'})}
