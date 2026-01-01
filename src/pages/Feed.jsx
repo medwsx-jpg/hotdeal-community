@@ -607,11 +607,15 @@ export default function Feed() {
                         </div>
                         
                         <div className="flex items-center space-x-1.5">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                            post.type === 'hotdeal' ? 'bg-teal-100 text-teal-700' : 'bg-cyan-100 text-cyan-700'
-                          }`}>
-                            {post.category}
-                          </span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+  post.type === 'hotdeal' 
+    ? 'bg-teal-100 text-teal-700' 
+    : post.type === 'share'
+    ? 'bg-purple-100 text-purple-700'
+    : 'bg-cyan-100 text-cyan-700'
+}`}>
+  {post.category}
+</span>
                           
                           {user && post.user_id === user.id && (
                             <div className="relative">
