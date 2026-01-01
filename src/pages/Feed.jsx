@@ -214,7 +214,7 @@ export default function Feed() {
           .from('posts')
           .update({
             type: newPost.type,
-            category: newPost.category || (newPost.type === 'hotdeal' ? '온라인' : '단기알바'),
+            category: newPost.category,
             title: newPost.title,
             content: newPost.content,
             tags: newPost.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
@@ -236,7 +236,7 @@ export default function Feed() {
             {
               user_id: user.id,
               type: newPost.type,
-              category: newPost.category || (newPost.type === 'hotdeal' ? '온라인' : '단기알바'),
+              category: newPost.category,
               title: newPost.title,
               content: newPost.content,
               tags: newPost.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
@@ -941,29 +941,143 @@ export default function Feed() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-semibold mb-2">카테고리</label>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setNewPost({...newPost, type: 'hotdeal'})}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      newPost.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    핫딜
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setNewPost({...newPost, type: 'job'})}
-                    className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    알바
-                  </button>
-                </div>
-              </div>
+             {/* 메인 카테고리 */}
+<div>
+  <label className="block text-sm font-semibold mb-2">메인 카테고리</label>
+  <div className="flex gap-2">
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, type: 'hotdeal', category: ''})}
+      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      핫딜
+    </button>
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, type: 'share', category: ''})}
+      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.type === 'share' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      쉐어
+    </button>
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, type: 'job', category: ''})}
+      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      JOB
+    </button>
+  </div>
+</div>
+
+{/* 서브 카테고리 */}
+<div>
+  <label className="block text-sm font-semibold mb-2">세부 카테고리 *</label>
+  
+  {/* 핫딜 서브 */}
+  {newPost.type === 'hotdeal' && (
+    <div className="grid grid-cols-3 gap-2">
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '전단지'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '전단지' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        전단지
+      </button>
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '정보'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '정보' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        정보
+      </button>
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '행사'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '행사' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        행사
+      </button>
+    </div>
+  )}
+  
+  {/* 쉐어 서브 */}
+  {newPost.type === 'share' && (
+    <div className="grid grid-cols-3 gap-2">
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '생활용품'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '생활용품' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        생활용품
+      </button>
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '부동산'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '부동산' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        부동산
+      </button>
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '기타'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '기타' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        기타
+      </button>
+    </div>
+  )}
+  
+  {/* JOB 서브 */}
+  {newPost.type === 'job' && (
+    <div className="grid grid-cols-3 gap-2">
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '구인'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '구인' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        구인
+      </button>
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: '구직'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '구직' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        구직
+      </button>
+      <button
+        type="button"
+        onClick={() => setNewPost({...newPost, category: 'JOB썰'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === 'JOB썰' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        JOB썰
+      </button>
+    </div>
+  )}
+</div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2">제목 *</label>
@@ -1031,53 +1145,59 @@ export default function Feed() {
                 </div>
               )}
 
-              {newPost.type === 'hotdeal' ? (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">할인율</label>
-                    <input
-                      type="text"
-                      value={newPost.discount}
-                      onChange={(e) => setNewPost({...newPost, discount: e.target.value})}
-                      placeholder="예: 50%"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">가격</label>
-                    <input
-                      type="text"
-                      value={newPost.price}
-                      onChange={(e) => setNewPost({...newPost, price: e.target.value})}
-                      placeholder="예: 무료"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">시급</label>
-                    <input
-                      type="text"
-                      value={newPost.hourlyPay}
-                      onChange={(e) => setNewPost({...newPost, hourlyPay: e.target.value})}
-                      placeholder="예: 15,000원"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">기간</label>
-                    <input
-                      type="text"
-                      value={newPost.period}
-                      onChange={(e) => setNewPost({...newPost, period: e.target.value})}
-                      placeholder="예: 1-2주"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                </div>
-              )}
+             {/* 핫딜만 할인율/가격 */}
+{newPost.type === 'hotdeal' && (
+  <div className="grid grid-cols-2 gap-3">
+    <div>
+      <label className="block text-sm font-semibold mb-2">할인율</label>
+      <input
+        type="text"
+        value={newPost.discount}
+        onChange={(e) => setNewPost({...newPost, discount: e.target.value})}
+        placeholder="예: 50%"
+        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-semibold mb-2">가격</label>
+      <input
+        type="text"
+        value={newPost.price}
+        onChange={(e) => setNewPost({...newPost, price: e.target.value})}
+        placeholder="예: 무료"
+        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+      />
+    </div>
+  </div>
+)}
+
+{/* JOB만 시급/기간 */}
+{newPost.type === 'job' && (
+  <div className="grid grid-cols-2 gap-3">
+    <div>
+      <label className="block text-sm font-semibold mb-2">시급</label>
+      <input
+        type="text"
+        value={newPost.hourlyPay}
+        onChange={(e) => setNewPost({...newPost, hourlyPay: e.target.value})}
+        placeholder="예: 15,000원"
+        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-semibold mb-2">기간</label>
+      <input
+        type="text"
+        value={newPost.period}
+        onChange={(e) => setNewPost({...newPost, period: e.target.value})}
+        placeholder="예: 1-2주"
+        className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+      />
+    </div>
+  </div>
+)}
+
+{/* 쉐어는 추가 필드 없음 */}
 
               <div>
                 <label className="block text-sm font-semibold mb-2">위치</label>
