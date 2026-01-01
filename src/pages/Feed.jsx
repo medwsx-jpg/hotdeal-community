@@ -862,14 +862,99 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
 
           {/* Feed */}
           <main className="flex-1">
-            <div 
-              onClick={() => setIsWriteModalOpen(true)}
-              className="mb-4 bg-white border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-teal-300 transition-colors"
-            >
-              <p className="text-sm text-gray-600">
-                로그를 작성해보세요. 이번 주엔 어떤 관심으로 있나요?
-              </p>
-            </div>
+           {/* 모바일 탭 메뉴 */}
+<div className="md:hidden mb-4 bg-white border border-gray-200 rounded-xl p-3">
+  {activeMainTab === 'home' && (
+    <div className="space-y-2">
+      <button
+        onClick={() => setActiveTab('all')}
+        className={`w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
+        }`}
+      >
+        전체
+      </button>
+      
+      {/* 핫딜 */}
+      <div>
+        <button
+          onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal})}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium"
+        >
+          <span>핫딜</span>
+          <svg className={`w-4 h-4 transition-transform ${expandedMenus.hotdeal ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {expandedMenus.hotdeal && (
+          <div className="ml-3 mt-1 space-y-1">
+            <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'text-gray-600'}`}>전단지</button>
+            <button onClick={() => setActiveTab('hotdeal-sale')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'text-gray-600'}`}>할인</button>
+            <button onClick={() => setActiveTab('hotdeal-event')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'text-gray-600'}`}>행사</button>
+          </div>
+        )}
+      </div>
+
+      {/* 쉐어 */}
+      <div>
+        <button
+          onClick={() => setExpandedMenus({...expandedMenus, share: !expandedMenus.share})}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium"
+        >
+          <span>쉐어</span>
+          <svg className={`w-4 h-4 transition-transform ${expandedMenus.share ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {expandedMenus.share && (
+          <div className="ml-3 mt-1 space-y-1">
+            <button onClick={() => setActiveTab('share-living')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'text-gray-600'}`}>생활용품</button>
+            <button onClick={() => setActiveTab('share-realestate')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'text-gray-600'}`}>부동산</button>
+            <button onClick={() => setActiveTab('share-etc')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'text-gray-600'}`}>기타</button>
+          </div>
+        )}
+      </div>
+
+      {/* JOB */}
+      <div>
+        <button
+          onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job})}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium"
+        >
+          <span>JOB</span>
+          <svg className={`w-4 h-4 transition-transform ${expandedMenus.job ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {expandedMenus.job && (
+          <div className="ml-3 mt-1 space-y-1">
+            <button onClick={() => setActiveTab('job-hire')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'}`}>구인</button>
+            <button onClick={() => setActiveTab('job-seek')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'}`}>구직</button>
+            <button onClick={() => setActiveTab('job-story')} className={`w-full text-left px-3 py-1.5 rounded-lg text-xs ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'text-gray-600'}`}>JOB썰</button>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+
+  {activeMainTab === 'talk' && (
+    <div className="space-y-2">
+      <button onClick={() => setActiveTab('talk-all')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
+      <button onClick={() => setActiveTab('talk-chat')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-chat' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>수다</button>
+      <button onClick={() => setActiveTab('talk-comfort')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-comfort' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>토닥</button>
+      <button onClick={() => setActiveTab('talk-qna')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-qna' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>Q&A</button>
+      <button onClick={() => setActiveTab('talk-tips')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-tips' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>꿀팁</button>
+    </div>
+  )}
+
+  {activeMainTab === 'notice' && (
+    <div className="space-y-2">
+      <button onClick={() => setActiveTab('notice-all')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
+      <button onClick={() => setActiveTab('notice-announcement')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-announcement' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>공지</button>
+      <button onClick={() => setActiveTab('notice-event')} className={`w-full px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>이벤트</button>
+    </div>
+  )}
+</div>
 
             {loading && (
               <div className="text-center py-10">
@@ -1183,55 +1268,55 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-        <div className="flex items-center justify-around h-16">
-          <button 
-            onClick={() => setActiveTab('all')}
-            className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-              activeTab === 'all' ? 'text-teal-600' : 'text-gray-600'
-            }`}
-          >
-            <Home className="w-5 h-5" />
-            <span className="text-[10px] font-medium">전체</span>
-          </button>
+  <div className="flex items-center justify-around h-16">
+    <button 
+      onClick={() => { setActiveMainTab('home'); setExpandedMenus({...expandedMenus, home: true}) }}
+      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
+        activeMainTab === 'home' ? 'text-teal-600' : 'text-gray-600'
+      }`}
+    >
+      <Home className="w-5 h-5" />
+      <span className="text-[10px] font-medium">홈</span>
+    </button>
 
-          <button 
-            onClick={() => setActiveTab('hotdeal')}
-            className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-              activeTab === 'hotdeal' ? 'text-teal-600' : 'text-gray-600'
-            }`}
-          >
-            <TrendingUp className="w-5 h-5" />
-            <span className="text-[10px] font-medium">핫딜</span>
-          </button>
+    <button 
+      onClick={() => { setActiveMainTab('talk'); setExpandedMenus({...expandedMenus, talk: true}) }}
+      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
+        activeMainTab === 'talk' ? 'text-teal-600' : 'text-gray-600'
+      }`}
+    >
+      <MessageCircle className="w-5 h-5" />
+      <span className="text-[10px] font-medium">톡</span>
+    </button>
 
-          <button 
-            onClick={() => setIsWriteModalOpen(true)}
-            className="flex flex-col items-center justify-center flex-1 h-full -mt-8"
-          >
-            <div className="w-14 h-14 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow-lg shadow-teal-500/30">
-              <Plus className="w-6 h-6 text-white" />
-            </div>
-          </button>
+    <button 
+      onClick={() => setIsWriteModalOpen(true)}
+      className="flex flex-col items-center justify-center flex-1 h-full -mt-8"
+    >
+      <div className="w-14 h-14 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow-lg shadow-teal-500/30">
+        <Plus className="w-6 h-6 text-white" />
+      </div>
+    </button>
 
-          <button 
-            onClick={() => setActiveTab('job')}
-            className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-              activeTab === 'job' ? 'text-teal-600' : 'text-gray-600'
-            }`}
-          >
-            <Briefcase className="w-5 h-5" />
-            <span className="text-[10px] font-medium">알바</span>
-          </button>
+    <button 
+      onClick={() => { setActiveMainTab('notice'); setExpandedMenus({...expandedMenus, notice: true}) }}
+      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
+        activeMainTab === 'notice' ? 'text-teal-600' : 'text-gray-600'
+      }`}
+    >
+      <Bell className="w-5 h-5" />
+      <span className="text-[10px] font-medium">공지</span>
+    </button>
 
-          <button 
-  onClick={() => navigate('/profile')}
-  className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
->
-  <User className="w-5 h-5" />
-  <span className="text-[10px] font-medium">MY</span>
-</button>
-        </div>
-      </nav>
+    <button 
+      onClick={() => navigate('/profile')}
+      className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
+    >
+      <User className="w-5 h-5" />
+      <span className="text-[10px] font-medium">MY</span>
+    </button>
+  </div>
+</nav>
 
       {/* Write Modal */}
       {isWriteModalOpen && (
