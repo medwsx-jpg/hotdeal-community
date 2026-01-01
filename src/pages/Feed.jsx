@@ -185,8 +185,18 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
     if (activeTab === 'talk-qna') return post.type === 'talk' && post.category === 'Q&A'
     if (activeTab === 'talk-tips') return post.type === 'talk' && post.category === '꿀팁'
     
+    // 공지
+    if (activeTab === 'notice-all') return post.type === 'notice'
+    if (activeTab === 'notice-announcement') return post.type === 'notice' && post.category === '공지'
+    if (activeTab === 'notice-event') return post.type === 'notice' && post.category === '이벤트'
+    
     return true
   })
+  
+  // 공지 게시물 상단 고정
+  const noticePosts = filteredPosts.filter(post => post.type === 'notice')
+  const regularPosts = filteredPosts.filter(post => post.type !== 'notice')
+  const sortedPosts = [...noticePosts, ...regularPosts]
 
   const handleImageSelect = async (e) => {
     const files = Array.from(e.target.files)
@@ -990,13 +1000,13 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
 
             {!loading && (
               <div className="space-y-3">
-                {filteredPosts.length === 0 ? (
+               {sortedPosts.length === 0 ? (
                   <div className="text-center py-10 bg-white border border-gray-200 rounded-xl">
                     <p className="text-gray-500">게시물이 없습니다.</p>
                     <p className="text-sm text-gray-400 mt-1">첫 번째 게시물을 작성해보세요!</p>
                   </div>
                 ) : (
-                  filteredPosts.map((post, index) => (
+                  sortedPosts.map((post, index) => (
                     <article 
                       key={post.id}
                       className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow animate-slide-up"
@@ -1010,8 +1020,14 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
                           </div>
                           <div>
                             <div className="flex items-center space-x-1.5">
-                              <span className="font-semibold text-sm text-gray-900">{post.author}</span>
-                              {post.hot && (
+                            <span className="font-semibold text-sm text-gray-900">{post.author}</span>
+{post.type === 'notice' && (
+  <span className="px-1.5 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full flex items-center space-x-0.5">
+    <span>📌</span>
+    <span>공지</span>
+  </span>
+)}
+{post.hot && (
                                 <span className="px-1.5 py-0.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-[10px] font-bold rounded-full flex items-center space-x-0.5">
                                   <Flame className="w-2.5 h-2.5" />
                                   <span>HOT</span>
@@ -1032,6 +1048,8 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
     ? 'bg-cyan-100 text-cyan-700'
     : post.type === 'talk'
     ? 'bg-orange-100 text-orange-700'
+    : post.type === 'notice'
+    ? 'bg-red-100 text-red-700'
     : 'bg-gray-100 text-gray-700'
 }`}>
   {post.category}
