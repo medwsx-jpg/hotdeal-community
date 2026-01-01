@@ -446,13 +446,13 @@ export default function Feed() {
                 </button>
               </div>
 
-              <div className="relative hidden md:block">
+              <div className="relative">
   <input
     type="text"
     value={searchQuery}
     onChange={handleSearch}
     placeholder="검색..."
-    className="w-48 pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-teal-500 transition-colors bg-white"
+    className="w-32 md:w-48 pl-8 pr-3 py-1.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-teal-500 transition-colors bg-white"
   />
   <Search className="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
   {searchQuery && (
@@ -467,10 +467,6 @@ export default function Feed() {
     </button>
   )}
 </div>
-
-              <button className="md:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                <Search className="w-4 h-4 text-gray-600" />
-              </button>
               
               <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative">
                 <Bell className="w-4 h-4 text-gray-600" />
