@@ -177,6 +177,13 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
     if (activeTab === 'job-seek') return post.type === 'job' && post.category === '구직'
     if (activeTab === 'job-story') return post.type === 'job' && post.category === 'JOB썰'
     
+    // 톡
+    if (activeTab === 'talk-all') return post.type === 'talk'
+    if (activeTab === 'talk-chat') return post.type === 'talk' && post.category === '수다'
+    if (activeTab === 'talk-comfort') return post.type === 'talk' && post.category === '토닥'
+    if (activeTab === 'talk-qna') return post.type === 'talk' && post.category === 'Q&A'
+    if (activeTab === 'talk-tips') return post.type === 'talk' && post.category === '꿀팁'
+    
     return true
   })
 
@@ -1019,7 +1026,11 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
     ? 'bg-teal-100 text-teal-700' 
     : post.type === 'share'
     ? 'bg-purple-100 text-purple-700'
-    : 'bg-cyan-100 text-cyan-700'
+    : post.type === 'job'
+    ? 'bg-cyan-100 text-cyan-700'
+    : post.type === 'talk'
+    ? 'bg-orange-100 text-orange-700'
+    : 'bg-gray-100 text-gray-700'
 }`}>
   {post.category}
 </span>
@@ -1355,35 +1366,44 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
              {/* 메인 카테고리 */}
 <div>
   <label className="block text-sm font-semibold mb-2">메인 카테고리</label>
-  <div className="flex gap-2">
-    <button
-      type="button"
-      onClick={() => setNewPost({...newPost, type: 'hotdeal', category: ''})}
-      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-        newPost.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-      }`}
-    >
-      핫딜
-    </button>
-    <button
-      type="button"
-      onClick={() => setNewPost({...newPost, type: 'share', category: ''})}
-      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-        newPost.type === 'share' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-      }`}
-    >
-      쉐어
-    </button>
-    <button
-      type="button"
-      onClick={() => setNewPost({...newPost, type: 'job', category: ''})}
-      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-        newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-      }`}
-    >
-      JOB
-    </button>
-  </div>
+  <div className="grid grid-cols-2 gap-2">
+  <button
+    type="button"
+    onClick={() => setNewPost({...newPost, type: 'hotdeal', category: ''})}
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      newPost.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }`}
+  >
+    핫딜
+  </button>
+  <button
+    type="button"
+    onClick={() => setNewPost({...newPost, type: 'share', category: ''})}
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      newPost.type === 'share' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }`}
+  >
+    쉐어
+  </button>
+  <button
+    type="button"
+    onClick={() => setNewPost({...newPost, type: 'job', category: ''})}
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }`}
+  >
+    JOB
+  </button>
+  <button
+    type="button"
+    onClick={() => setNewPost({...newPost, type: 'talk', category: ''})}
+    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      newPost.type === 'talk' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }`}
+  >
+    톡
+  </button>
+</div>
 </div>
 
 {/* 서브 카테고리 */}
@@ -1488,6 +1508,47 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
       </button>
     </div>
   )}
+  {/* 톡 서브 */}
+{newPost.type === 'talk' && (
+  <div className="grid grid-cols-2 gap-2">
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, category: '수다'})}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.category === '수다' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      수다
+    </button>
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, category: '토닥'})}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.category === '토닥' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      토닥
+    </button>
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, category: 'Q&A'})}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.category === 'Q&A' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      Q&A
+    </button>
+    <button
+      type="button"
+      onClick={() => setNewPost({...newPost, category: '꿀팁'})}
+      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        newPost.category === '꿀팁' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      꿀팁
+    </button>
+  </div>
+)}
 </div>
 
               <div>
