@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { TrendingUp, Zap, Users, Shield, ArrowRight, Bell, Briefcase } from 'lucide-react'
+import { TrendingUp, Zap, Users, Shield, ArrowRight, Bell, Briefcase, Flame, Share2, MessageCircle } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
