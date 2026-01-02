@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { TrendingUp, Mail, Chrome, Linkedin, ArrowLeft } from 'lucide-react'
+import { TrendingUp, Mail, Chrome, ArrowLeft } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
@@ -144,12 +144,18 @@ export default function Login() {
               </button>
 
               <button 
-                disabled
-                className="w-full flex items-center justify-center space-x-2.5 px-5 py-3 bg-[#0077B5] border-2 border-[#0077B5] rounded-xl text-sm font-semibold text-white opacity-50 cursor-not-allowed"
-              >
-                <Linkedin className="w-4 h-4" />
-                <span>링크드인 (준비 중)</span>
-              </button>
+  disabled
+  className="w-full flex items-center justify-center space-x-2.5 px-5 py-3 bg-[#FEE500] border-2 border-[#FEE500] rounded-xl text-sm font-semibold text-gray-900 opacity-60 cursor-not-allowed"
+>
+  <svg 
+    className="w-5 h-5" 
+    fill="currentColor" 
+    viewBox="0 0 24 24"
+  >
+    <path d="M12 3C6.48 3 2 6.58 2 11c0 2.89 1.97 5.44 4.95 6.88-.2.75-.77 2.86-.88 3.32-.14.58.21.57.44.41.18-.12 2.85-1.9 3.31-2.24C10.55 19.77 11.26 20 12 20c5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
+  </svg>
+  <span>카톡으로 로그인 (준비 중)</span>
+</button>
 
               <button 
                 onClick={() => setMode('login')}
