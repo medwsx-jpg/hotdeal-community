@@ -23,6 +23,8 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
   const [likedPosts, setLikedPosts] = useState(new Set())
   const [comments, setComments] = useState({})
   const [newComment, setNewComment] = useState('')
+  const [editingComment, setEditingComment] = useState(null)
+const [editCommentText, setEditCommentText] = useState('')
   const [showComments, setShowComments] = useState(null)
   const [expandedPosts, setExpandedPosts] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
@@ -452,7 +454,49 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
       console.error('댓글 작성 실패:', error)
     }
   }
+  const handleEditComment = async (commentId) => {
+    if (!editCommentText.trim()) return
   
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .update({ content: editCommentText.trim() })
+        .eq('id', commentId)
+  
+      if (error) throw error
+  
+      setEditingComment(null)
+      setEditCommentText('')
+      
+      // 해당 댓글이 속한 게시물 ID 찾기
+      const comment = Object.values(comments).flat().find(c => c.id === commentId)
+      if (comment) {
+        fetchComments(comment.post_id)
+      }
+    } catch (error) {
+      console.error('댓글 수정 실패:', error)
+      alert('댓글 수정 실패: ' + error.message)
+    }
+  }
+  
+  const handleDeleteComment = async (commentId, postId) => {
+    if (!window.confirm('댓글을 삭제하시겠습니까?')) return
+  
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .delete()
+        .eq('id', commentId)
+  
+      if (error) throw error
+  
+      fetchComments(postId)
+      fetchPosts()
+    } catch (error) {
+      console.error('댓글 삭제 실패:', error)
+      alert('댓글 삭제 실패: ' + error.message)
+    }
+  }
   // 검색
   const handleSearch = (e) => {
     const value = e.target.value
@@ -1233,22 +1277,76 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
                       {showComments === post.id && (
                         <div className="mt-4 pt-4 border-t border-gray-200">
                           <div className="space-y-3 mb-3">
-                            {comments[post.id]?.map((comment) => (
-                              <div key={comment.id} className="flex space-x-2">
-                                <div className="w-6 h-6 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                                  U
-                                </div>
-                                <div className="flex-1">
-                                  <div className="bg-gray-100 rounded-lg px-3 py-2">
-                                  <div className="flex items-center justify-between mb-0.5">
-  <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
-  <p className="text-[10px] text-gray-400">{comment.timeAgo}</p>
-</div>
-<p className="text-sm text-gray-700">{comment.content}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                          {comments[post.id]?.map((comment) => (
+  <div key={comment.id} className="flex space-x-2">
+    <div className="w-6 h-6 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+      {comment.author[0]}
+    </div>
+    <div className="flex-1">
+      {editingComment === comment.id ? (
+        // 수정 모드
+        <div className="space-y-2">
+          <textarea
+            value={editCommentText}
+            onChange={(e) => setEditCommentText(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+            rows="2"
+            autoFocus
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleEditComment(comment.id)}
+              className="px-3 py-1 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors"
+            >
+              수정 완료
+            </button>
+            <button
+              onClick={() => {
+                setEditingComment(null)
+                setEditCommentText('')
+              }}
+              className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      ) : (
+        // 일반 모드
+        <div>
+          <div className="bg-gray-100 rounded-lg px-3 py-2">
+            <div className="flex items-center justify-between mb-0.5">
+              <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
+              <div className="flex items-center space-x-2">
+                <p className="text-[10px] text-gray-400">{comment.timeAgo}</p>
+                {user && comment.user_id === user.id && (
+                  <div className="flex items-center space-x-1">
+                    <button
+                      onClick={() => {
+                        setEditingComment(comment.id)
+                        setEditCommentText(comment.content)
+                      }}
+                      className="text-gray-500 hover:text-teal-600 transition-colors"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteComment(comment.id, post.id)}
+                      className="text-gray-500 hover:text-red-600 transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-gray-700">{comment.content}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+))}
                           </div>
 
                           <div className="flex space-x-2">
