@@ -32,6 +32,7 @@ const [editCommentText, setEditCommentText] = useState('')
   const [loading, setLoading] = useState(false)
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [imageZoom, setImageZoom] = useState(100) // 100 = 100%
+  const [topPosts, setTopPosts] = useState({ byComments: [], byLikes: [] })
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -49,6 +50,7 @@ const [editCommentText, setEditCommentText] = useState('')
     if (user) {
       fetchPosts()
       checkLikes()
+      fetchTopPosts()
     }
   }, [user])
   
@@ -70,6 +72,54 @@ const [editCommentText, setEditCommentText] = useState('')
     
     fetchUserProfile()
   }, [user])
+  const fetchTopPosts = async () => {
+    try {
+      // 댓글 많은 순 Top 3
+      const { data: commentData } = await supabase
+        .from('posts')
+        .select('id, title, type, comments_count:comments(count)')
+        .order('created_at', { ascending: false })
+      
+      // 댓글 수 계산해서 정렬
+      const postsWithCommentCount = await Promise.all(
+        (commentData || []).map(async (post) => {
+          const { count } = await supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+          
+          return { ...post, comments_count: count || 0 }
+        })
+      )
+      
+      const topByComments = postsWithCommentCount
+        .sort((a, b) => b.comments_count - a.comments_count)
+        .slice(0, 3)
+      
+      // 좋아요 많은 순 Top 3
+      const postsWithLikeCount = await Promise.all(
+        (commentData || []).map(async (post) => {
+          const { count } = await supabase
+            .from('likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+          
+          return { ...post, likes_count: count || 0 }
+        })
+      )
+      
+      const topByLikes = postsWithLikeCount
+        .sort((a, b) => b.likes_count - a.likes_count)
+        .slice(0, 3)
+      
+      setTopPosts({
+        byComments: topByComments,
+        byLikes: topByLikes
+      })
+    } catch (error) {
+      console.error('인기 게시물 로드 실패:', error)
+    }
+  }
 
   const fetchPosts = async (search = '') => {
     try {
@@ -312,6 +362,7 @@ const [editCommentText, setEditCommentText] = useState('')
       })
       
       fetchPosts()
+fetchTopPosts()  // 추가
     } catch (error) {
       console.error('Error:', error)
       alert('실패: ' + error.message)
@@ -333,6 +384,7 @@ const [editCommentText, setEditCommentText] = useState('')
       
       alert('삭제되었습니다!')
       fetchPosts()
+fetchTopPosts()  // 추가
     } catch (error) {
       console.error('삭제 실패:', error)
       alert('삭제 실패: ' + error.message)
@@ -387,6 +439,7 @@ const [editCommentText, setEditCommentText] = useState('')
       }
 
       fetchPosts()
+fetchTopPosts()  // 추가
     } catch (error) {
       console.error('좋아요 실패:', error)
     }
@@ -450,6 +503,7 @@ const [editCommentText, setEditCommentText] = useState('')
       setNewComment('')
       fetchComments(postId)
       fetchPosts()
+fetchTopPosts()  // 추가
     } catch (error) {
       console.error('댓글 작성 실패:', error)
     }
@@ -492,6 +546,7 @@ const [editCommentText, setEditCommentText] = useState('')
   
       fetchComments(postId)
       fetchPosts()
+fetchTopPosts()  // 추가
     } catch (error) {
       console.error('댓글 삭제 실패:', error)
       alert('댓글 삭제 실패: ' + error.message)
@@ -1052,8 +1107,9 @@ const [editCommentText, setEditCommentText] = useState('')
                 ) : (
                   sortedPosts.map((post, index) => (
                     <article 
-                      key={post.id}
-                      className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow animate-slide-up"
+  key={post.id}
+  id={`post-${post.id}`}
+  className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow animate-slide-up"
                       style={{animationDelay: `${index * 0.1}s`}}
                     >
                       {/* Header */}
@@ -1378,44 +1434,76 @@ const [editCommentText, setEditCommentText] = useState('')
             )}
           </main>
 
-          {/* Right Sidebar */}
-          <aside className="hidden xl:block w-64 space-y-3">
-            <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
-              <h3 className="font-bold text-sm mb-3 text-gray-900">인기 급상승 🔥</h3>
-              <div className="space-y-3">
-                <div className="border-l-2 border-teal-500 pl-2.5">
-                  <h4 className="font-semibold text-xs mb-0.5 text-gray-900">콜라뷰티 CollaBeauty</h4>
-                  <p className="text-[11px] text-gray-600">새로 나온</p>
-                </div>
-                <div className="border-l-2 border-cyan-500 pl-2.5">
-                  <h4 className="font-semibold text-xs mb-0.5 text-gray-900">ModelContext.Cloud</h4>
-                  <p className="text-[11px] text-gray-600">새로 나온</p>
-                </div>
-                <div className="border-l-2 border-teal-400 pl-2.5">
-                  <h4 className="font-semibold text-xs mb-0.5 text-gray-900">뉴트리로직 NutriLogic</h4>
-                  <p className="text-[11px] text-gray-600">새로 나온</p>
-                </div>
-              </div>
+       {/* Right Sidebar */}
+<aside className="hidden xl:block w-64 space-y-3">
+  {/* 댓글 많은 게시물 */}
+  <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
+    <h3 className="font-bold text-sm mb-3 text-gray-900">💬 댓글 HOT</h3>
+    <div className="space-y-3">
+      {topPosts.byComments.length === 0 ? (
+        <p className="text-xs text-gray-500 text-center py-4">게시물이 없습니다</p>
+      ) : (
+        topPosts.byComments.map((post, index) => (
+          <div 
+            key={post.id} 
+            className="border-l-2 border-teal-500 pl-2.5 cursor-pointer hover:bg-gray-50 rounded transition-colors"
+            onClick={() => {
+              // 해당 게시물로 스크롤 (선택사항)
+              document.getElementById(`post-${post.id}`)?.scrollIntoView({ behavior: 'smooth' })
+            }}
+          >
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[10px] font-bold text-teal-600">#{index + 1}</span>
+              <span className="text-[10px] text-gray-500">{post.comments_count}개</span>
             </div>
+            <h4 className="font-semibold text-xs text-gray-900 line-clamp-1">{post.title}</h4>
+            <p className="text-[10px] text-gray-500">
+              {post.type === 'hotdeal' && '핫딜'}
+              {post.type === 'share' && '쉐어'}
+              {post.type === 'job' && 'JOB'}
+              {post.type === 'talk' && '톡'}
+              {post.type === 'notice' && '공지'}
+            </p>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <h3 className="font-bold text-sm mb-3 text-gray-900">추천 멤버</h3>
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-7 h-7 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full"></div>
-                    <div>
-                      <p className="text-xs font-semibold">Digitalog Social</p>
-                      <p className="text-[10px] text-gray-500">#디지털마케팅</p>
-                    </div>
-                  </div>
-                  <button className="px-2.5 py-1 bg-teal-500 text-white text-[11px] rounded-md font-medium hover-lift">
-                    팔로우
-                  </button>
-                </div>
-              </div>
+  {/* 좋아요 많은 게시물 */}
+  <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <h3 className="font-bold text-sm mb-3 text-gray-900">❤️ 좋아요 HOT</h3>
+    <div className="space-y-3">
+      {topPosts.byLikes.length === 0 ? (
+        <p className="text-xs text-gray-500 text-center py-4">게시물이 없습니다</p>
+      ) : (
+        topPosts.byLikes.map((post, index) => (
+          <div 
+            key={post.id} 
+            className="border-l-2 border-cyan-500 pl-2.5 cursor-pointer hover:bg-gray-50 rounded transition-colors"
+            onClick={() => {
+              document.getElementById(`post-${post.id}`)?.scrollIntoView({ behavior: 'smooth' })
+            }}
+          >
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[10px] font-bold text-cyan-600">#{index + 1}</span>
+              <span className="text-[10px] text-gray-500">{post.likes_count}개</span>
             </div>
-          </aside>
+            <h4 className="font-semibold text-xs text-gray-900 line-clamp-1">{post.title}</h4>
+            <p className="text-[10px] text-gray-500">
+              {post.type === 'hotdeal' && '핫딜'}
+              {post.type === 'share' && '쉐어'}
+              {post.type === 'job' && 'JOB'}
+              {post.type === 'talk' && '톡'}
+              {post.type === 'notice' && '공지'}
+            </p>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+</aside>
+             
         </div>
       </div>
 
