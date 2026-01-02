@@ -239,7 +239,16 @@ useEffect(() => {
     }
   }
 
-  const getTimeAgo = (timestamp) => {
+  // 숫자에 천 단위 콤마 추가
+const formatNumber = (num) => {
+  if (!num) return ''
+  // 숫자만 추출
+  const number = num.toString().replace(/[^0-9]/g, '')
+  // 천 단위 콤마 추가
+  return Number(number).toLocaleString()
+}
+
+const getTimeAgo = (timestamp) => {
     const now = new Date()
     const postTime = new Date(timestamp)
     const diffMs = now - postTime
@@ -1319,11 +1328,10 @@ fetchTopPosts()
                           </div>
                         )}
                         {post.hourly_pay && (
-                          <div className="flex items-center space-x-1 px-2 py-1 bg-cyan-50 rounded-md text-cyan-700 text-xs font-semibold border border-cyan-200">
-                            <DollarSign className="w-3 h-3" />
-                            <span>시급 {post.hourly_pay}</span>
-                          </div>
-                        )}
+  <div className="px-2 py-1 bg-cyan-50 rounded-md text-cyan-700 text-xs font-semibold border border-cyan-200">
+    <span>시급 {formatNumber(post.hourly_pay)}원</span>
+  </div>
+)}
                         {post.period && (
                           <div className="flex items-center space-x-1 px-2 py-1 bg-sky-50 rounded-md text-sky-700 text-xs font-semibold border border-sky-200">
                             <Clock className="w-3 h-3" />
