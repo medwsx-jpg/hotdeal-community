@@ -1322,51 +1322,58 @@ const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, no
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+<nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
   <div className="flex items-center justify-around h-16">
-  <button 
-  onClick={() => { 
-    setActiveMainTab('home'); 
-    setActiveTab('all'); 
-    setExpandedMenus({...expandedMenus, home: true}) 
-  }}
-  className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-    activeMainTab === 'home' ? 'text-teal-600' : 'text-gray-600'
-  }`}
->
-  <Home className="w-5 h-5" />
-  <span className="text-[10px] font-medium">홈</span>
-</button>
+    <button 
+      onClick={() => { 
+        setActiveMainTab('home'); 
+        setActiveTab('all'); 
+        setExpandedMenus({...expandedMenus, home: true}) 
+      }}
+      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
+        activeMainTab === 'home' ? 'text-teal-600' : 'text-gray-600'
+      }`}
+    >
+      <Home className="w-5 h-5" />
+      <span className="text-[10px] font-medium">홈</span>
+    </button>
 
-<button 
-  onClick={() => { 
-    setActiveMainTab('talk'); 
-    setActiveTab('talk-all'); 
-    setExpandedMenus({...expandedMenus, talk: true}) 
-  }}
-  className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-    activeMainTab === 'talk' ? 'text-teal-600' : 'text-gray-600'
-  }`}
->
-  <MessageCircle className="w-5 h-5" />
-  <span className="text-[10px] font-medium">톡</span>
-</button>
+    <button 
+      onClick={() => { 
+        setActiveMainTab('talk'); 
+        setActiveTab('talk-all'); 
+        setExpandedMenus({...expandedMenus, talk: true}) 
+      }}
+      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
+        activeMainTab === 'talk' ? 'text-teal-600' : 'text-gray-600'
+      }`}
+    >
+      <MessageCircle className="w-5 h-5" />
+      <span className="text-[10px] font-medium">톡</span>
+    </button>
 
-{/* + 버튼은 그대로 */}
+    <button 
+      onClick={() => setIsWriteModalOpen(true)}
+      className="flex flex-col items-center justify-center flex-1 h-full -mt-8"
+    >
+      <div className="w-14 h-14 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow-lg shadow-teal-500/30">
+        <Plus className="w-6 h-6 text-white" />
+      </div>
+    </button>
 
-<button 
-  onClick={() => { 
-    setActiveMainTab('notice'); 
-    setActiveTab('notice-all'); 
-    setExpandedMenus({...expandedMenus, notice: true}) 
-  }}
-  className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-    activeMainTab === 'notice' ? 'text-teal-600' : 'text-gray-600'
-  }`}
->
-  <Bell className="w-5 h-5" />
-  <span className="text-[10px] font-medium">공지</span>
-</button>
+    <button 
+      onClick={() => { 
+        setActiveMainTab('notice'); 
+        setActiveTab('notice-all'); 
+        setExpandedMenus({...expandedMenus, notice: true}) 
+      }}
+      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
+        activeMainTab === 'notice' ? 'text-teal-600' : 'text-gray-600'
+      }`}
+    >
+      <Bell className="w-5 h-5" />
+      <span className="text-[10px] font-medium">공지</span>
+    </button>
 
     <button 
       onClick={() => navigate('/profile')}
