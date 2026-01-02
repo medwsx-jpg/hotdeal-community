@@ -141,75 +141,76 @@ if (loading) {
       </section>
 
       {/* Categories */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            다양한 <span className="gradient-text">카테고리</span>
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-5">
-            <div className="group relative overflow-hidden rounded-2xl glass-effect p-6 hover-lift">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
-              <TrendingUp className="w-10 h-10 text-teal-500 mb-3" />
-              <h3 className="text-lg font-bold mb-2">온라인 핫딜</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                쇼핑몰, 마켓플레이스, 온라인 서비스의 최저가 정보
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">전자제품</span>
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">패션</span>
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">식품</span>
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">도서</span>
-              </div>
-            </div>
+<section className="py-20 bg-gradient-to-b from-white to-gray-50">
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="text-center mb-16">
+      <h2 className="text-3xl md:text-4xl font-bold mb-4">다양한 카테고리</h2>
+      <p className="text-gray-600 text-lg">동네문화에서 찾을 수 있는 모든 것</p>
+    </div>
 
-            <div className="group relative overflow-hidden rounded-2xl glass-effect p-6 hover-lift">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
-              <TrendingUp className="w-10 h-10 text-cyan-600 mb-3" />
-              <h3 className="text-lg font-bold mb-2">오프라인 핫딜</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                매장, 식당, 서비스업의 할인 및 이벤트 정보
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">외식</span>
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">카페</span>
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">뷰티</span>
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">헬스</span>
-              </div>
-            </div>
-
-            <div className="group relative overflow-hidden rounded-2xl glass-effect p-6 hover-lift">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-teal-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
-              <Briefcase className="w-10 h-10 text-teal-500 mb-3" />
-              <h3 className="text-lg font-bold mb-2">단기 알바</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                하루, 일주일 단위의 단기 아르바이트 정보
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">이벤트</span>
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">배달</span>
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">서빙</span>
-                <span className="px-2.5 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-medium">프로모션</span>
-              </div>
-            </div>
-
-            <div className="group relative overflow-hidden rounded-2xl glass-effect p-6 hover-lift">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
-              <Briefcase className="w-10 h-10 text-cyan-600 mb-3" />
-              <h3 className="text-lg font-bold mb-2">장기 알바</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                한 달 이상 장기 근무 가능한 아르바이트 정보
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">사무직</span>
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">판매직</span>
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">교육</span>
-                <span className="px-2.5 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-medium">IT</span>
-              </div>
-            </div>
-          </div>
+    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 핫딜 */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+        <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center mb-4">
+          <Flame className="w-6 h-6 text-white" />
         </div>
-      </section>
+        <h3 className="text-xl font-bold mb-2">핫딜</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          지역내 모든 전단지, 매장의 할인 정보, 행사 정보
+        </p>
+        <div className="flex items-start space-x-2 text-xs text-gray-500">
+          <TrendingUp className="w-4 h-4 text-teal-500 flex-shrink-0 mt-0.5" />
+          <span>식탁, 카페, 마트, 매장, 프리마켓, 행사</span>
+        </div>
+      </div>
+
+      {/* 쉐어 */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+          <Share2 className="w-6 h-6 text-white" />
+        </div>
+        <h3 className="text-xl font-bold mb-2">쉐어</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          생활에 필요한 모든것 나눠쓰고, 빌려쓰는 개념의 쉐어링
+        </p>
+        <div className="flex items-start space-x-2 text-xs text-gray-500">
+          <TrendingUp className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
+          <span>생활용품, 부동산, 기타</span>
+        </div>
+      </div>
+
+      {/* JOB */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
+          <Briefcase className="w-6 h-6 text-white" />
+        </div>
+        <h3 className="text-xl font-bold mb-2">JOB</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          지역 내 간단, 단기, 장기 일자리 구인정보와 구직 정보
+        </p>
+        <div className="flex items-start space-x-2 text-xs text-gray-500">
+          <Briefcase className="w-4 h-4 text-cyan-500 flex-shrink-0 mt-0.5" />
+          <span>구인, 구직, JOB썰</span>
+        </div>
+      </div>
+
+      {/* 톡 */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+        <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4">
+          <MessageCircle className="w-6 h-6 text-white" />
+        </div>
+        <h3 className="text-xl font-bold mb-2">톡</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          공유하며 함께 생활하는 우리의 톡
+        </p>
+        <div className="flex items-start space-x-2 text-xs text-gray-500">
+          <MessageCircle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+          <span>수다, 토닥, Q&A, 꿀팁</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* CTA Section */}
       <section className="py-16 px-4">
