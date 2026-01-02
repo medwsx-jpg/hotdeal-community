@@ -33,9 +33,10 @@ const [editCommentText, setEditCommentText] = useState('')
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [imageZoom, setImageZoom] = useState(100) // 100 = 100%
   const [topPosts, setTopPosts] = useState({ byComments: [], byLikes: [] })
-const [page, setPage] = useState(0)
-const [hasMore, setHasMore] = useState(true)
-const POSTS_PER_PAGE = 20
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const POSTS_PER_PAGE = 20
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -71,6 +72,17 @@ useEffect(() => {
   window.addEventListener('scroll', handleScroll)
   return () => window.removeEventListener('scroll', handleScroll)
 }, [page, loading, hasMore, searchQuery])
+
+// 맨 위로 가기 버튼 표시/숨김
+useEffect(() => {
+  const handleScrollTopButton = () => {
+    // 300px 이상 스크롤하면 버튼 표시
+    setShowScrollTop(window.scrollY > 300)
+  }
+  
+  window.addEventListener('scroll', handleScrollTopButton)
+  return () => window.removeEventListener('scroll', handleScrollTopButton)
+}, [])
   
   // 프로필 정보 가져오기
   useEffect(() => {
@@ -246,6 +258,14 @@ const formatNumber = (num) => {
   const number = num.toString().replace(/[^0-9]/g, '')
   // 천 단위 콤마 추가
   return Number(number).toLocaleString()
+}
+
+// 맨 위로 스크롤
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
 }
 
 const getTimeAgo = (timestamp) => {
@@ -1518,7 +1538,30 @@ fetchTopPosts()
           </div>
           </main>
 
-       {/* Right Sidebar */}
+{/* 맨 위로 가기 버튼 */}
+{showScrollTop && (
+  <button
+    onClick={scrollToTop}
+    className="fixed bottom-24 md:bottom-8 right-4 md:right-6 z-40 w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center group"
+    aria-label="맨 위로 가기"
+  >
+    <svg 
+      className="w-6 h-6 transition-transform group-hover:-translate-y-1" 
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth={2.5} 
+        d="M5 10l7-7m0 0l7 7m-7-7v18" 
+      />
+    </svg>
+  </button>
+)}
+
+{/* Right Sidebar */}
 <aside className="hidden xl:block w-64 space-y-3">
   {/* 댓글 많은 게시물 */}
   <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
