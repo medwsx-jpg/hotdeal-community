@@ -33,6 +33,9 @@ const [editCommentText, setEditCommentText] = useState('')
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [imageZoom, setImageZoom] = useState(100) // 100 = 100%
   const [topPosts, setTopPosts] = useState({ byComments: [], byLikes: [] })
+const [page, setPage] = useState(0)
+const [hasMore, setHasMore] = useState(true)
+const POSTS_PER_PAGE = 20
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -53,6 +56,21 @@ const [editCommentText, setEditCommentText] = useState('')
       fetchTopPosts()
     }
   }, [user])
+  // 무한 스크롤 감지
+useEffect(() => {
+  const handleScroll = () => {
+    // 맨 아래에서 500px 전에 미리 로드
+    const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 500
+    
+    if (bottom && !loading && hasMore) {
+      console.log('📜 다음 페이지 로딩:', page)
+      fetchPosts(page, searchQuery)
+    }
+  }
+  
+  window.addEventListener('scroll', handleScroll)
+  return () => window.removeEventListener('scroll', handleScroll)
+}, [page, loading, hasMore, searchQuery])
   
   // 프로필 정보 가져오기
   useEffect(() => {
@@ -121,12 +139,22 @@ const [editCommentText, setEditCommentText] = useState('')
     }
   }
 
-  const fetchPosts = async (search = '') => {
+  const fetchPosts = async (pageNum = 0, search = '', reset = false) => {
+    // 이미 로딩 중이거나, 더 이상 없으면 중단
+    if (loading || (!hasMore && !reset)) return
+    
     try {
+      setLoading(true)
+      
+      // 페이지네이션 범위 계산
+      const start = pageNum * POSTS_PER_PAGE
+      const end = start + POSTS_PER_PAGE - 1
+      
       let query = supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false })
+        .range(start, end)  // 👈 무한 스크롤 핵심!
       
       if (search) {
         // 태그 검색 (# 포함)
@@ -173,7 +201,21 @@ const [editCommentText, setEditCommentText] = useState('')
         })
       )
       
-      setPosts(postsWithCounts)
+      // 첫 페이지거나 리셋이면 교체, 아니면 추가
+      if (pageNum === 0 || reset) {
+        setPosts(postsWithCounts)
+      } else {
+        setPosts(prev => [...prev, ...postsWithCounts])
+      }
+      
+      // 20개 미만이면 더 이상 없음
+      if (data.length < POSTS_PER_PAGE) {
+        setHasMore(false)
+      } else {
+        setHasMore(true)
+      }
+      
+      setPage(pageNum + 1)
       setLoading(false)
     } catch (error) {
       console.error('에러 발생:', error)
@@ -361,8 +403,11 @@ const [editCommentText, setEditCommentText] = useState('')
         period: ''
       })
       
-      fetchPosts()
-fetchTopPosts()  // 추가
+      setPosts([])
+setPage(0)
+setHasMore(true)
+fetchPosts(0, searchQuery, true)
+fetchTopPosts()
     } catch (error) {
       console.error('Error:', error)
       alert('실패: ' + error.message)
@@ -383,8 +428,11 @@ fetchTopPosts()  // 추가
       if (error) throw error
       
       alert('삭제되었습니다!')
-      fetchPosts()
-fetchTopPosts()  // 추가
+      setPosts([])
+      setPage(0)
+      setHasMore(true)
+      fetchPosts(0, searchQuery, true)
+      fetchTopPosts()
     } catch (error) {
       console.error('삭제 실패:', error)
       alert('삭제 실패: ' + error.message)
@@ -438,8 +486,11 @@ fetchTopPosts()  // 추가
         setLikedPosts(prev => new Set(prev).add(postId))
       }
 
-      fetchPosts()
-fetchTopPosts()  // 추가
+      setPosts([])
+setPage(0)
+setHasMore(true)
+fetchPosts(0, searchQuery, true)
+fetchTopPosts()
     } catch (error) {
       console.error('좋아요 실패:', error)
     }
@@ -502,8 +553,11 @@ fetchTopPosts()  // 추가
 
       setNewComment('')
       fetchComments(postId)
-      fetchPosts()
-fetchTopPosts()  // 추가
+      setPosts([])
+setPage(0)
+setHasMore(true)
+fetchPosts(0, searchQuery, true)
+fetchTopPosts()
     } catch (error) {
       console.error('댓글 작성 실패:', error)
     }
@@ -545,8 +599,11 @@ fetchTopPosts()  // 추가
       if (error) throw error
   
       fetchComments(postId)
-      fetchPosts()
-fetchTopPosts()  // 추가
+      setPosts([])
+setPage(0)
+setHasMore(true)
+fetchPosts(0, searchQuery, true)
+fetchTopPosts()
     } catch (error) {
       console.error('댓글 삭제 실패:', error)
       alert('댓글 삭제 실패: ' + error.message)
@@ -556,7 +613,12 @@ fetchTopPosts()  // 추가
   const handleSearch = (e) => {
     const value = e.target.value
     setSearchQuery(value)
-    fetchPosts(value)
+    
+    // 검색 시 리셋
+    setPosts([])
+    setPage(0)
+    setHasMore(true)
+    fetchPosts(0, value, true)
   }
   return (
     <div className="min-h-screen pb-24 md:pb-20">
@@ -588,10 +650,13 @@ fetchTopPosts()  // 추가
   <Search className="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
   {searchQuery && (
     <button
-      onClick={() => {
-        setSearchQuery('')
-        fetchPosts('')
-      }}
+    onClick={() => {
+      setSearchQuery('')
+      setPosts([])
+      setPage(0)
+      setHasMore(true)
+      fetchPosts(0, '', true)
+    }}
       className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
     >
       <X className="w-3.5 h-3.5" />
@@ -1090,22 +1155,17 @@ fetchTopPosts()  // 추가
 )}
 </div>
 
-            {loading && (
-              <div className="text-center py-10">
-                <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
-              </div>
-            )}
+            
 
-            {!loading && (
-              <div className="space-y-3">
-               {sortedPosts.length === 0 ? (
+<div className="space-y-3">
+{sortedPosts.length === 0 && !loading ? (
                   <div className="text-center py-10 bg-white border border-gray-200 rounded-xl">
                     <p className="text-gray-500">게시물이 없습니다.</p>
                     <p className="text-sm text-gray-400 mt-1">첫 번째 게시물을 작성해보세요!</p>
                   </div>
-                ) : (
-                  sortedPosts.map((post, index) => (
+               ) : (
+                <>
+                  {sortedPosts.map((post, index) => (
                     <article 
   key={post.id}
   id={`post-${post.id}`}
@@ -1428,10 +1488,26 @@ fetchTopPosts()  // 추가
                         </div>
                       )}
                     </article>
-                  ))
+                 ))
+                }
+                
+                {/* 무한 스크롤 로딩 */}
+                {loading && (
+                  <div className="text-center py-8">
+                    <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-gray-600 mt-2">게시물을 불러오는 중...</p>
+                  </div>
                 )}
-              </div>
+                
+                {/* 마지막 게시물 */}
+                {!hasMore && sortedPosts.length > 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p className="text-sm">✨ 마지막 게시물입니다</p>
+                  </div>
+                )}
+              </>
             )}
+          </div>
           </main>
 
        {/* Right Sidebar */}
