@@ -491,37 +491,51 @@ fetchTopPosts()
       alert('로그인이 필요합니다.')
       return
     }
-
+  
     const isLiked = likedPosts.has(postId)
-
+  
     try {
+      // 즉시 화면 업데이트
+      setPosts(prevPosts => 
+        prevPosts.map(p => {
+          if (p.id === postId) {
+            return {
+              ...p,
+              likes_count: isLiked ? p.likes_count - 1 : p.likes_count + 1
+            }
+          }
+          return p
+        })
+      )
+  
       if (isLiked) {
-        await supabase
-          .from('likes')
-          .delete()
-          .eq('post_id', postId)
-          .eq('user_id', user.id)
-
         setLikedPosts(prev => {
           const newSet = new Set(prev)
           newSet.delete(postId)
           return newSet
         })
+        
+        await supabase
+          .from('likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id)
       } else {
+        setLikedPosts(prev => new Set(prev).add(postId))
+        
         await supabase
           .from('likes')
           .insert([{ user_id: user.id, post_id: postId }])
-
-        setLikedPosts(prev => new Set(prev).add(postId))
       }
-
-      setPosts([])
-setPage(0)
-setHasMore(true)
-fetchPosts(0, searchQuery, true)
-fetchTopPosts()
+  
+      fetchTopPosts()
     } catch (error) {
       console.error('좋아요 실패:', error)
+      setPosts([])
+      setPage(0)
+      setHasMore(true)
+      fetchPosts(0, searchQuery, true)
+      checkLikes()
     }
   }
 
@@ -566,29 +580,69 @@ fetchTopPosts()
       alert('로그인이 필요합니다.')
       return
     }
-
+  
     if (!newComment.trim()) return
-
+  
     try {
-      const { error } = await supabase
+      const tempComment = {
+        id: 'temp-' + Date.now(),
+        content: newComment.trim(),
+        user_id: user.id,
+        post_id: postId,
+        created_at: new Date().toISOString(),
+        author: username,
+        timeAgo: '방금 전'
+      }
+  
+      // 즉시 화면 업데이트
+      setComments(prev => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []), tempComment]
+      }))
+  
+      setPosts(prevPosts =>
+        prevPosts.map(p => {
+          if (p.id === postId) {
+            return {
+              ...p,
+              comments_count: p.comments_count + 1
+            }
+          }
+          return p
+        })
+      )
+  
+      setNewComment('')
+  
+      // 백그라운드에서 DB 저장
+      const { data, error } = await supabase
         .from('comments')
         .insert([{
           user_id: user.id,
           post_id: postId,
-          content: newComment.trim()
+          content: tempComment.content
         }])
-
+        .select()
+        .single()
+  
       if (error) throw error
-
-      setNewComment('')
-      fetchComments(postId)
-      setPosts([])
-setPage(0)
-setHasMore(true)
-fetchPosts(0, searchQuery, true)
-fetchTopPosts()
+  
+      // temp ID를 실제 ID로 교체
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId].map(c => 
+          c.id === tempComment.id ? { ...tempComment, id: data.id } : c
+        )
+      }))
+  
+      fetchTopPosts()
     } catch (error) {
       console.error('댓글 작성 실패:', error)
+      fetchComments(postId)
+      setPosts([])
+      setPage(0)
+      setHasMore(true)
+      fetchPosts(0, searchQuery, true)
     }
   }
   const handleEditComment = async (commentId) => {
@@ -620,6 +674,25 @@ fetchTopPosts()
     if (!window.confirm('댓글을 삭제하시겠습니까?')) return
   
     try {
+      // 즉시 화면 업데이트
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId].filter(c => c.id !== commentId)
+      }))
+  
+      setPosts(prevPosts =>
+        prevPosts.map(p => {
+          if (p.id === postId) {
+            return {
+              ...p,
+              comments_count: Math.max(0, p.comments_count - 1)
+            }
+          }
+          return p
+        })
+      )
+  
+      // 백그라운드에서 DB 삭제
       const { error } = await supabase
         .from('comments')
         .delete()
@@ -627,15 +700,15 @@ fetchTopPosts()
   
       if (error) throw error
   
-      fetchComments(postId)
-      setPosts([])
-setPage(0)
-setHasMore(true)
-fetchPosts(0, searchQuery, true)
-fetchTopPosts()
+      fetchTopPosts()
     } catch (error) {
       console.error('댓글 삭제 실패:', error)
       alert('댓글 삭제 실패: ' + error.message)
+      fetchComments(postId)
+      setPosts([])
+      setPage(0)
+      setHasMore(true)
+      fetchPosts(0, searchQuery, true)
     }
   }
   // 검색
