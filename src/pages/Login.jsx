@@ -155,13 +155,7 @@ export default function Login() {
   <span>카톡으로 로그인 (준비 중)</span>
 </button>
 
-              <button 
-                onClick={() => setMode('login')}
-                className="w-full flex items-center justify-center space-x-2.5 px-5 py-3 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover-lift hover:border-teal-300 transition-all group"
-              >
-                <Mail className="w-4 h-4 text-gray-600 group-hover:text-teal-500 transition-colors" />
-                <span>이메일 계정으로 로그인</span>
-              </button>
+              
             </div>
           )}
 
