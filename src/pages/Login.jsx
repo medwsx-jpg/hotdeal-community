@@ -70,8 +70,8 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center space-x-2 mb-6">
-        <img src="/logo.png" alt="동네문화" className="w-8 h-8 object-contain" />
-          <span className="text-2xl font-bold gradient-text">동네문화</span>
+        <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
+          <span className="text-2xl font-bold gradient-text">UDT79</span>
         </Link>
 
         {/* Login Card */}
@@ -92,7 +92,7 @@ export default function Login() {
               {mode === 'signup' ? '회원가입' : '로그인'}
             </h1>
             <p className="text-sm text-gray-600">
-              동네문화는 프로덕트에 진심인 메이커들을 위한 공간이에요.
+            UDT79 는 프로덕트에 진심인 메이커들을 위한 공간이에요.
             </p>
           </div>
 
@@ -268,7 +268,7 @@ export default function Login() {
 
           {/* Terms */}
           <p className="text-[11px] text-gray-500 text-center leading-relaxed">
-            동네문화의{' '}
+          UDT79 의{' '}
             <a href="#" className="text-teal-600 hover:underline font-medium">
               이용 약관
             </a>{' '}
@@ -291,7 +291,7 @@ export default function Login() {
             <div className="bg-emerald-50 rounded-lg p-2.5 border border-emerald-200">
               <p className="text-emerald-800 font-medium mb-1">서로에 대한 존중과 배려심을 갖고 소통해요.</p>
               <p className="text-emerald-700 text-[11px]">
-                동네문화는 건설적인 대화를 하는 공간입니다. 서로의 감정과 상황을 이해하며 비난보다는 
+              UDT79 는 건설적인 대화를 하는 공간입니다. 서로의 감정과 상황을 이해하며 비난보다는 
                 상대방에게 정중하게 질문하고 도움을 주고받아요.
               </p>
             </div>
