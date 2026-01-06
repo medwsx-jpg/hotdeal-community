@@ -154,7 +154,24 @@ export default function Login() {
   </svg>
   <span>카톡으로 로그인 (준비 중)</span>
 </button>
+{/* ⭐ 여기에 추가! */}
+<div className="relative my-4">
+  <div className="absolute inset-0 flex items-center">
+    <div className="w-full border-t border-gray-200"></div>
+  </div>
+  <div className="relative flex justify-center text-xs">
+    <span className="px-2 bg-white text-gray-500">또는</span>
+  </div>
+</div>
 
+<button 
+  onClick={() => setMode('login')}
+  disabled={loading}
+  className="w-full flex items-center justify-center space-x-2.5 px-5 py-3 bg-white border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover-lift hover:border-teal-300 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  <Mail className="w-5 h-5 text-gray-600 group-hover:text-teal-500 transition-colors" />
+  <span>이메일로 로그인</span>
+</button>
               
             </div>
           )}
