@@ -657,10 +657,10 @@ fetchTopPosts()
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-3">
               <Link to="/" className="flex items-center space-x-2">
-              <img src="/logo.png" alt="동네문화" className="w-8 h-8 object-contain" />
-                <span className="text-lg font-bold gradient-text">동네문화</span>
+              <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
+                <span className="text-lg font-bold gradient-text">UDT79</span>
               </Link>
-              <span className="hidden md:block text-sm text-gray-600">아끼고 나누는 우리 동네 문화</span>
+              <span className="hidden md:block text-sm text-gray-600">우리동네 득공대 친구</span>
             </div>
 
             <div className="flex items-center space-x-2">

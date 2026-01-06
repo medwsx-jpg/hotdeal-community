@@ -32,8 +32,8 @@ if (loading) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="동네문화" className="w-8 h-8 object-contain" />
-              <span className="text-lg font-bold gradient-text">동네문화</span>
+            <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
+              <span className="text-lg font-bold gradient-text">UDT79</span>
             </div>
             <div className="flex items-center space-x-3">
               <Link to="/feed" className="text-sm text-gray-700 hover:text-teal-600 font-medium transition-colors">
@@ -98,7 +98,7 @@ if (loading) {
       <section className="py-16 px-4 bg-white/50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">
-            왜 <span className="gradient-text">동네문화</span>인가?
+            왜 <span className="gradient-text">UDT79</span>인가?
           </h2>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -143,7 +143,7 @@ if (loading) {
   <div className="max-w-6xl mx-auto px-4">
     <div className="text-center mb-16">
       <h2 className="text-3xl md:text-4xl font-bold mb-4">다양한 카테고리</h2>
-      <p className="text-gray-600 text-lg">동네문화에서 찾을 수 있는 모든 것</p>
+      <p className="text-gray-600 text-lg">UDT79 에서 찾을 수 있는 모든 것</p>
     </div>
 
     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -240,7 +240,7 @@ if (loading) {
                 <div className="w-7 h-7 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-base font-bold">동네문화</span>
+                <span className="text-base font-bold">UDT79</span>
               </div>
               <p className="text-gray-400 text-xs">
                 최고의 핫딜과 알바 정보를 공유하는 커뮤니티
@@ -272,7 +272,7 @@ if (loading) {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center text-gray-400 text-xs">
-            © 2024 동네문화. All rights reserved.
+            © 2024 UDT79. All rights reserved.
           </div>
         </div>
       </footer>
