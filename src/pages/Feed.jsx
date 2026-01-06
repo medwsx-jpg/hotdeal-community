@@ -660,7 +660,7 @@ fetchTopPosts()
               <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
                 <span className="text-lg font-bold gradient-text">UDT79</span>
               </Link>
-              <span className="hidden md:block text-sm text-gray-600">우리동네 득공대 친구</span>
+              <span className="hidden md:block text-sm text-gray-600">우리동네 특공대 친구</span>
             </div>
 
             <div className="flex items-center space-x-2">
