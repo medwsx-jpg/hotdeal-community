@@ -70,9 +70,7 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center space-x-2 mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-white" />
-          </div>
+        <img src="/logo.png" alt="동네문화" className="w-8 h-8 object-contain" />
           <span className="text-2xl font-bold gradient-text">동네문화</span>
         </Link>
 

@@ -657,9 +657,7 @@ fetchTopPosts()
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-3">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-white" />
-                </div>
+              <img src="/logo.png" alt="동네문화" className="w-8 h-8 object-contain" />
                 <span className="text-lg font-bold gradient-text">동네문화</span>
               </Link>
               <span className="hidden md:block text-sm text-gray-600">아끼고 나누는 우리 동네 문화</span>

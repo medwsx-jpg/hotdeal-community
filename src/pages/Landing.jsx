@@ -32,9 +32,7 @@ if (loading) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-white" />
-              </div>
+            <img src="/logo.png" alt="동네문화" className="w-8 h-8 object-contain" />
               <span className="text-lg font-bold gradient-text">동네문화</span>
             </div>
             <div className="flex items-center space-x-3">
