@@ -16,52 +16,53 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // 프로필 가져오기
-  const loadProfile = async (userId) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-
-      if (error) throw error
-      setProfile(data)
-    } catch (error) {
-      console.error('프로필 로드 실패:', error)
-      setProfile(null)
-    }
-  }
-
   useEffect(() => {
     // 초기 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('📦 세션:', session ? '있음' : '없음')
       setUser(session?.user ?? null)
-      if (session?.user) {
-        loadProfile(session.user.id)
-      }
       setLoading(false)
+      
+      // 프로필 로드
+      if (session?.user) {
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+          .then(({ data }) => {
+            console.log('👤 프로필:', data)
+            setProfile(data)
+          })
+      }
     })
 
     // 세션 변경 감지
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('🔐 이벤트:', event)
         setUser(session?.user ?? null)
+        setLoading(false)
         
+        // 프로필 로드
         if (session?.user) {
-          await loadProfile(session.user.id)
+          supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+            .then(({ data }) => {
+              setProfile(data)
+            })
         } else {
           setProfile(null)
         }
-        
-        setLoading(false)
       }
     )
 
     return () => subscription.unsubscribe()
   }, [])
 
-  // 구글 로그인
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -72,7 +73,6 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error
   }
 
-  // GitHub 로그인
   const signInWithGitHub = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
@@ -83,7 +83,6 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error
   }
 
-  // 이메일 로그인
   const signInWithEmail = async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -92,7 +91,6 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error
   }
 
-  // 이메일 회원가입
   const signUpWithEmail = async (email, password, username) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -105,25 +103,13 @@ export const AuthProvider = ({ children }) => {
     return data
   }
 
-  // 로그아웃
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
   }
 
-  const value = {
-    user,
-    profile,
-    loading,
-    signInWithGoogle,
-    signInWithGitHub,
-    signInWithEmail,
-    signUpWithEmail,
-    signOut
-  }
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, signInWithGitHub, signInWithEmail, signUpWithEmail, signOut }}>
       {children}
     </AuthContext.Provider>
   )
