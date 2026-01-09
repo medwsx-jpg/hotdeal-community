@@ -52,13 +52,9 @@ const [editCommentText, setEditCommentText] = useState('')
     period: ''
   })
 
- // 인앱 브라우저 감지 & PWA 설치 확인
+// 인앱 브라우저 감지
 useEffect(() => {
-  // PWA로 이미 설치되어 있으면 로그인 페이지로
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    navigate('/login')
-    return
-  }
+  
 
   // 인앱 브라우저 감지
   const ua = navigator.userAgent || navigator.vendor || window.opera
@@ -515,12 +511,6 @@ fetchTopPosts()
 
 // 버튼 클릭 시 인앱 체크
 const handleActionClick = (action) => {
-  // PWA 설치되어 있으면 로그인으로
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    navigate('/login')
-    return
-  }
-
   // 인앱 브라우저면 설치 모달
   if (isInApp) {
     setShowInstallModal(true)
