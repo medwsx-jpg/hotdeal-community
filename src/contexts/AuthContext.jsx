@@ -59,21 +59,22 @@ export const AuthProvider = ({ children }) => {
     // 세션 상태 변화 감지 (자동 갱신 포함)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔐 Auth Event:', event) // 디버깅용
+        console.log('🔐 Auth Event:', event)
         
-        // 이벤트별 처리
         if (event === 'SIGNED_IN') {
           console.log('✅ 로그인 성공')
           setUser(session?.user ?? null)
           if (session?.user) {
             await fetchProfile(session.user.id)
           }
+          setLoading(false)  // ← 추가!
         }
         
         if (event === 'SIGNED_OUT') {
           console.log('🚪 로그아웃됨 - 랜딩페이지로 이동')
           setUser(null)
           setProfile(null)
+          setLoading(false)  // ← 추가!
           window.location.href = '/'
         }
         
@@ -81,7 +82,7 @@ export const AuthProvider = ({ children }) => {
           console.log('🔄 세션 자동 갱신됨!')
           const expiresAt = new Date(session.expires_at * 1000)
           console.log('새 만료 시간:', expiresAt.toLocaleString('ko-KR'))
-          // 사용자 정보는 유지되므로 별도 처리 불필요
+          setLoading(false)  // ← 추가!
         }
         
         if (event === 'USER_UPDATED') {
@@ -90,6 +91,7 @@ export const AuthProvider = ({ children }) => {
           if (session?.user) {
             await fetchProfile(session.user.id)
           }
+          setLoading(false)  // ← 추가!
         }
         
         // 일반적인 세션 변화 처리
@@ -100,6 +102,7 @@ export const AuthProvider = ({ children }) => {
           } else {
             setProfile(null)
           }
+          setLoading(false)  // ← 추가!
         }
       }
     )
