@@ -125,16 +125,23 @@ useEffect(() => {
   return () => window.removeEventListener('scroll', handleScroll)
 }, [page, loading, hasMore, searchQuery, user, isInApp])
 
-// 맨 위로 가기 버튼 표시/숨김
+// 비로그인/인앱 사용자 스크롤 맨 아래 감지 → 모달 자동 표시
 useEffect(() => {
-  const handleScrollTopButton = () => {
-    // 300px 이상 스크롤하면 버튼 표시
-    setShowScrollTop(window.scrollY > 300)
+  // 로그인했으면 무시
+  if (user) return
+  
+  const handleScrollBottom = () => {
+    // 맨 아래에서 50px 전 감지
+    const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50
+    
+    if (bottom && !showInstallModal && sortedPosts.length >= 10) {
+      setShowInstallModal(true)
+    }
   }
   
-  window.addEventListener('scroll', handleScrollTopButton)
-  return () => window.removeEventListener('scroll', handleScrollTopButton)
-}, [])
+  window.addEventListener('scroll', handleScrollBottom)
+  return () => window.removeEventListener('scroll', handleScrollBottom)
+}, [user, showInstallModal, sortedPosts.length])
   
   // 프로필 정보 가져오기
   useEffect(() => {
