@@ -12,7 +12,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Feed />} />
+        <Route path="/landing" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />

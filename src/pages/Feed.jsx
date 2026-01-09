@@ -881,7 +881,7 @@ const handleLike = async (postId) => {
           <div className="ml-3 mt-1 space-y-1">
             {/* 전체 */}
             <button
-              onClick={() => { setActiveMainTab('home'); setActiveTab('all') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('all') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'home' && activeTab === 'all'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -911,7 +911,7 @@ const handleLike = async (postId) => {
               {expandedMenus.hotdeal && (
                 <div className="ml-3 mt-1 space-y-1">
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('hotdeal-jeonje') }}
+                   onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('hotdeal-jeonje') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'hotdeal-jeonje'
                         ? 'bg-teal-50 text-teal-700 font-medium'
@@ -921,7 +921,7 @@ const handleLike = async (postId) => {
                     전단지
                   </button>
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('hotdeal-sale') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('hotdeal-sale') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'hotdeal-sale'
                         ? 'bg-teal-50 text-teal-700 font-medium'
@@ -931,7 +931,7 @@ const handleLike = async (postId) => {
                     할인
                   </button>
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('hotdeal-event') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('hotdeal-event') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'hotdeal-event'
                         ? 'bg-teal-50 text-teal-700 font-medium'
@@ -964,7 +964,7 @@ const handleLike = async (postId) => {
               {expandedMenus.share && (
                 <div className="ml-3 mt-1 space-y-1">
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('share-living') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('share-living') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'share-living'
                         ? 'bg-purple-50 text-purple-700 font-medium'
@@ -974,7 +974,7 @@ const handleLike = async (postId) => {
                     생활용품
                   </button>
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('share-realestate') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('share-realestate') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'share-realestate'
                         ? 'bg-purple-50 text-purple-700 font-medium'
@@ -984,7 +984,7 @@ const handleLike = async (postId) => {
                     부동산
                   </button>
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('share-etc') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('share-etc') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'share-etc'
                         ? 'bg-purple-50 text-purple-700 font-medium'
@@ -1017,7 +1017,7 @@ const handleLike = async (postId) => {
               {expandedMenus.job && (
                 <div className="ml-3 mt-1 space-y-1">
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('job-hire') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('job-hire') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'job-hire'
                         ? 'bg-cyan-50 text-cyan-700 font-medium'
@@ -1027,7 +1027,7 @@ const handleLike = async (postId) => {
                     구인
                   </button>
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('job-seek') }}
+                   onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('job-seek') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'job-seek'
                         ? 'bg-cyan-50 text-cyan-700 font-medium'
@@ -1037,7 +1037,7 @@ const handleLike = async (postId) => {
                     구직
                   </button>
                   <button
-                    onClick={() => { setActiveMainTab('home'); setActiveTab('job-story') }}
+                    onClick={() => handleActionClick(() => { setActiveMainTab('home'); setActiveTab('job-story') })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'job-story'
                         ? 'bg-cyan-50 text-cyan-700 font-medium'
@@ -1076,7 +1076,7 @@ const handleLike = async (postId) => {
         {expandedMenus.talk && (
           <div className="ml-3 mt-1 space-y-1">
             <button
-              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-all') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('talk'); setActiveTab('talk-all') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'talk' && activeTab === 'talk-all'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1086,7 +1086,7 @@ const handleLike = async (postId) => {
               전체
             </button>
             <button
-              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-chat') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('talk'); setActiveTab('talk-chat') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'talk' && activeTab === 'talk-chat'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1096,7 +1096,7 @@ const handleLike = async (postId) => {
               수다
             </button>
             <button
-              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-comfort') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('talk'); setActiveTab('talk-comfort') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'talk' && activeTab === 'talk-comfort'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1106,7 +1106,7 @@ const handleLike = async (postId) => {
               토닥
             </button>
             <button
-              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-qna') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('talk'); setActiveTab('talk-qna') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'talk' && activeTab === 'talk-qna'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1116,7 +1116,7 @@ const handleLike = async (postId) => {
               Q&A
             </button>
             <button
-              onClick={() => { setActiveMainTab('talk'); setActiveTab('talk-tips') }}
+             onClick={() => handleActionClick(() => { setActiveMainTab('talk'); setActiveTab('talk-tips') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'talk' && activeTab === 'talk-tips'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1152,7 +1152,7 @@ const handleLike = async (postId) => {
         {expandedMenus.notice && (
           <div className="ml-3 mt-1 space-y-1">
             <button
-              onClick={() => { setActiveMainTab('notice'); setActiveTab('notice-all') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('notice'); setActiveTab('notice-all') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'notice' && activeTab === 'notice-all'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1162,7 +1162,7 @@ const handleLike = async (postId) => {
               전체
             </button>
             <button
-              onClick={() => { setActiveMainTab('notice'); setActiveTab('notice-announcement') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('notice'); setActiveTab('notice-announcement') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'notice' && activeTab === 'notice-announcement'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1172,7 +1172,7 @@ const handleLike = async (postId) => {
               공지
             </button>
             <button
-              onClick={() => { setActiveMainTab('notice'); setActiveTab('notice-event') }}
+              onClick={() => handleActionClick(() => { setActiveMainTab('notice'); setActiveTab('notice-event') })}
               className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
                 activeMainTab === 'notice' && activeTab === 'notice-event'
                   ? 'bg-teal-50 text-teal-700 font-medium'
@@ -1432,11 +1432,11 @@ const handleLike = async (postId) => {
                         }`}>
                           {post.images.slice(0, 4).map((img, i) => (
                             <div key={i} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                              <img 
+                             <img 
   src={img} 
   alt="" 
   className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity" 
-  onClick={() => setSelectedImageUrl(img)}
+  onClick={() => handleActionClick(() => setSelectedImageUrl(img))}
 />
                               {i === 3 && post.images.length > 4 && (
                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
