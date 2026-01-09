@@ -134,14 +134,14 @@ useEffect(() => {
     // 맨 아래에서 50px 전 감지
     const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50
     
-    if (bottom && !showInstallModal && sortedPosts.length >= 10) {
+    if (bottom && !showInstallModal && posts.length >= 10) {
       setShowInstallModal(true)
     }
   }
   
   window.addEventListener('scroll', handleScrollBottom)
   return () => window.removeEventListener('scroll', handleScrollBottom)
-}, [user, showInstallModal, sortedPosts.length])
+}, [user, showInstallModal, posts.length])
   
   // 프로필 정보 가져오기
   useEffect(() => {
