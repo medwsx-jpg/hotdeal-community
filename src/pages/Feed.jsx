@@ -28,6 +28,7 @@ const [editCommentText, setEditCommentText] = useState('')
   const [showComments, setShowComments] = useState(null)
   const [expandedPosts, setExpandedPosts] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
+const [username, setUsername] = useState('사용자')
 const [loading, setLoading] = useState(false)
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [imageZoom, setImageZoom] = useState(100) // 100 = 100%
@@ -110,7 +111,10 @@ useEffect(() => {
 
 useEffect(() => {
   if (user) {
-    fetchPosts()
+    setHasMore(true)  // ← 이거 추가!
+    setPosts([])       // ← 이거 추가!
+    setPage(0)         // ← 이거 추가!
+    fetchPosts(0, '', true)  // ← reset=true로 변경!
     checkLikes()
     fetchTopPosts()
   }
@@ -165,7 +169,26 @@ useEffect(() => {
 }, [user, posts.length, isInApp, navigate])
   
  
-  const fetchTopPosts = async () => {
+  // 프로필 정보 가져오기
+useEffect(() => {
+  const fetchUserProfile = async () => {
+    if (!user) return
+    
+    const { data } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .single()
+    
+    if (data?.username) {
+      setUsername(data.username)
+    }
+  }
+  
+  fetchUserProfile()
+}, [user])
+
+const fetchTopPosts = async () => {
     try {
       // 댓글 많은 순 Top 3
       const { data: commentData } = await supabase
@@ -671,7 +694,7 @@ const handleLike = async (postId) => {
         user_id: user.id,
         post_id: postId,
         created_at: new Date().toISOString(),
-        author: profile?.username || '사용자',
+        author: username,
         timeAgo: '방금 전'
       }
   
@@ -896,7 +919,7 @@ const handleLike = async (postId) => {
                     {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
-             <span className="text-xs font-medium text-gray-700">{profile?.username || '사용자'}</span>
+            <span className="text-xs font-medium text-gray-700">{username}</span>
 </button>
 
 {/* 관리자 버튼 추가 */}
