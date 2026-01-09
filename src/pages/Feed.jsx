@@ -4,7 +4,7 @@ import {
   TrendingUp, Search, Bell, User, Plus, 
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
-  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield
+  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -37,6 +37,8 @@ const [editCommentText, setEditCommentText] = useState('')
   const [hasMore, setHasMore] = useState(true)
   const POSTS_PER_PAGE = 20
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [isInApp, setIsInApp] = useState(false)  // ← 추가
+  const [showInstallModal, setShowInstallModal] = useState(false)  // ← 추가
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -50,13 +52,38 @@ const [editCommentText, setEditCommentText] = useState('')
     period: ''
   })
 
-  useEffect(() => {
-    if (user) {
-      fetchPosts()
-      checkLikes()
-      fetchTopPosts()
-    }
-  }, [user])
+ // 인앱 브라우저 감지 & PWA 설치 확인
+useEffect(() => {
+  // PWA로 이미 설치되어 있으면 로그인 페이지로
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    navigate('/login')
+    return
+  }
+
+  // 인앱 브라우저 감지
+  const ua = navigator.userAgent || navigator.vendor || window.opera
+  const isKakao = /KAKAOTALK/i.test(ua)
+  const isLine = /Line/i.test(ua)
+  const isInsta = /Instagram/i.test(ua)
+  const isFB = /FBAN|FBAV/i.test(ua)
+  
+  const inApp = isKakao || isLine || isInsta || isFB
+  setIsInApp(inApp)
+
+  // 인앱이거나 로그인 안 되어 있으면 게시물만 보여주기
+  if (inApp || !user) {
+    fetchPosts()
+    fetchTopPosts()
+  }
+}, [navigate, user])
+
+useEffect(() => {
+  if (user) {
+    fetchPosts()
+    checkLikes()
+    fetchTopPosts()
+  }
+}, [user])
   // 무한 스크롤 감지
 useEffect(() => {
   const handleScroll = () => {
@@ -486,7 +513,31 @@ fetchTopPosts()
     setIsWriteModalOpen(true)
   }
 
-  const handleLike = async (postId) => {
+// 버튼 클릭 시 인앱 체크
+const handleActionClick = (action) => {
+  // PWA 설치되어 있으면 로그인으로
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    navigate('/login')
+    return
+  }
+
+  // 인앱 브라우저면 설치 모달
+  if (isInApp) {
+    setShowInstallModal(true)
+    return
+  }
+
+  // 로그인 안 되어 있으면 로그인 페이지로
+  if (!user) {
+    navigate('/login')
+    return
+  }
+
+  // 일반 브라우저 + 로그인됨 → 정상 작동
+  action()
+}
+
+const handleLike = async (postId) => {
     if (!user) {
       alert('로그인이 필요합니다.')
       return
@@ -729,10 +780,13 @@ fetchTopPosts()
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-3">
-              <Link to="/" className="flex items-center space-x-2">
-              <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
-                <span className="text-lg font-bold gradient-text">UDT79</span>
-              </Link>
+            <button 
+  onClick={() => handleActionClick(() => navigate('/'))}
+  className="flex items-center space-x-2"
+>
+  <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
+  <span className="text-lg font-bold gradient-text">UDT79</span>
+</button>
               <span className="hidden md:block text-sm text-gray-600">우리동네 특공대 친구</span>
             </div>
 
@@ -795,9 +849,9 @@ fetchTopPosts()
 )}
 
 <button 
-  onClick={() => setIsWriteModalOpen(true)}
-                className="hidden md:flex px-3 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-sm font-semibold hover-lift shadow-md shadow-teal-500/30 items-center space-x-1.5"
-              >
+  onClick={() => handleActionClick(() => setIsWriteModalOpen(true))}
+  className="hidden md:flex px-3 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-sm font-semibold hover-lift shadow-md shadow-teal-500/30 items-center space-x-1.5"
+>
                 <Plus className="w-3.5 h-3.5" />
                 <span>글쓰기</span>
               </button>
@@ -1360,21 +1414,21 @@ fetchTopPosts()
   <p className={`text-sm text-gray-600 ${expandedPosts.has(post.id) ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
   {post.content}
 </p>
-  {post.content.length > 100 && (
-    <button
-      onClick={() => {
-        setExpandedPosts(prev => {
-          const newSet = new Set(prev)
-          if (newSet.has(post.id)) {
-            newSet.delete(post.id)
-          } else {
-            newSet.add(post.id)
-          }
-          return newSet
-        })
-      }}
-      className="text-xs text-teal-600 hover:underline mt-1"
-    >
+{post.content.length > 100 && (
+  <button
+    onClick={() => handleActionClick(() => {
+      setExpandedPosts(prev => {
+        const newSet = new Set(prev)
+        if (newSet.has(post.id)) {
+          newSet.delete(post.id)
+        } else {
+          newSet.add(post.id)
+        }
+        return newSet
+      })
+    })}
+    className="text-xs text-teal-600 hover:underline mt-1"
+  >
       {expandedPosts.has(post.id) ? '접기' : '더보기'}
     </button>
   )}
@@ -1457,27 +1511,27 @@ fetchTopPosts()
 
                       {/* Actions */}
                       <div className="flex items-center space-x-5 text-gray-500">
-                        <button 
-                          onClick={() => handleLike(post.id)}
-                          className={`flex items-center space-x-1.5 transition-colors ${
-                            likedPosts.has(post.id) ? 'text-teal-600' : 'text-gray-500 hover:text-teal-600'
-                          }`}
-                        >
+                      <button 
+  onClick={() => handleActionClick(() => handleLike(post.id))}
+  className={`flex items-center space-x-1.5 transition-colors ${
+    likedPosts.has(post.id) ? 'text-teal-600' : 'text-gray-500 hover:text-teal-600'
+  }`}
+>
                           <ThumbsUp className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
                           <span className="text-xs font-medium">{post.likes_count || 0}</span>
                         </button>
 
                         <button 
-                          onClick={() => {
-                            if (showComments === post.id) {
-                              setShowComments(null)
-                            } else {
-                              setShowComments(post.id)
-                              fetchComments(post.id)
-                            }
-                          }}
-                          className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors"
-                        >
+  onClick={() => handleActionClick(() => {
+    if (showComments === post.id) {
+      setShowComments(null)
+    } else {
+      setShowComments(post.id)
+      fetchComments(post.id)
+    }
+  })}
+  className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors"
+>
                           <MessageCircle className="w-4 h-4" />
                           <span className="text-xs font-medium">{post.comments_count || 0}</span>
                         </button>
@@ -1578,11 +1632,11 @@ fetchTopPosts()
                               }}
                             />
                             <button
-                              onClick={() => handleAddComment(post.id)}
-                              className="px-4 py-2 bg-teal-500 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-colors"
-                            >
-                              작성
-                            </button>
+  onClick={() => handleActionClick(() => handleAddComment(post.id))}
+  className="px-4 py-2 bg-teal-500 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-colors"
+>
+  작성
+</button>
                           </div>
                         </div>
                       )}
@@ -1737,9 +1791,9 @@ fetchTopPosts()
     </button>
 
     <button 
-      onClick={() => setIsWriteModalOpen(true)}
-      className="flex flex-col items-center justify-center flex-1 h-full -mt-8"
-    >
+  onClick={() => handleActionClick(() => setIsWriteModalOpen(true))}
+  className="flex flex-col items-center justify-center flex-1 h-full -mt-8"
+>
       <div className="w-14 h-14 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow-lg shadow-teal-500/30">
         <Plus className="w-6 h-6 text-white" />
       </div>
@@ -2228,8 +2282,74 @@ fetchTopPosts()
         draggable="false"
       />
     </div>
+    </div>
+)}
+
+{/* 앱 설치 모달 */}
+{showInstallModal && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 relative">
+      {/* 닫기 버튼 */}
+      <button
+        onClick={() => setShowInstallModal(false)}
+        className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+      >
+        <X className="w-5 h-5 text-gray-400" />
+      </button>
+
+      {/* 아이콘 */}
+      <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6">
+        <Smartphone className="w-10 h-10 text-white" />
+      </div>
+      
+      {/* 제목 */}
+      <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+        UDT79 앱 설치
+      </h1>
+      
+      {/* 설명 */}
+      <p className="text-gray-600 mb-8 text-center">
+        홈 화면에 앱을 추가하고<br />
+        언제든 빠르게 접속하세요!
+      </p>
+
+      {/* 혜택 */}
+      <div className="space-y-3 mb-8">
+        <div className="flex items-center space-x-3 text-left bg-teal-50 rounded-lg p-3">
+          <span className="text-2xl">⚡</span>
+          <span className="text-sm text-gray-700">빠른 실행</span>
+        </div>
+        <div className="flex items-center space-x-3 text-left bg-cyan-50 rounded-lg p-3">
+          <span className="text-2xl">📱</span>
+          <span className="text-sm text-gray-700">앱처럼 사용</span>
+        </div>
+        <div className="flex items-center space-x-3 text-left bg-purple-50 rounded-lg p-3">
+          <span className="text-2xl">🔔</span>
+          <span className="text-sm text-gray-700">알림 받기 (준비중)</span>
+        </div>
+      </div>
+
+      {/* 안내 */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+        <p className="text-xs text-gray-700 font-medium mb-2">📱 설치 방법:</p>
+        <ol className="text-xs text-gray-600 space-y-1">
+          <li>1. 우측 상단 ⋯ (더보기) 클릭</li>
+          <li>2. "크롬에서 열기" 선택</li>
+          <li>3. "홈 화면에 추가" 버튼 클릭</li>
+        </ol>
+      </div>
+
+      {/* 버튼 */}
+      <button
+        onClick={() => setShowInstallModal(false)}
+        className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+      >
+        확인
+      </button>
+    </div>
   </div>
 )}
+
     </div>
   )
 }

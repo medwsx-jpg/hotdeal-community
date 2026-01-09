@@ -5,7 +5,7 @@ import Login from './pages/Login'
 import Feed from './pages/Feed'
 import Profile from './pages/Profile'
 import Admin from './pages/Admin'
-import Open from './pages/Open'
+
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<Admin />} />
-<Route path="/open" element={<Open />} />  // ← 추가!
+          <Route path="/open" element={<Navigate to="/feed" replace />} />
 <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
