@@ -40,7 +40,10 @@ const [editCommentText, setEditCommentText] = useState('')
   const [isInApp, setIsInApp] = useState(false)  // ← 추가
   const [showInstallModal, setShowInstallModal] = useState(false)
 const [deferredPrompt, setDeferredPrompt] = useState(null)
-const [isSimpleModal, setIsSimpleModal] = useState(false)  // ← 추가!
+const [isSimpleModal, setIsSimpleModal] = useState(false)
+const [showReportModal, setShowReportModal] = useState(false)  // ← 추가
+const [reportingPostId, setReportingPostId] = useState(null)  // ← 추가
+const [reportReason, setReportReason] = useState('')  // ← 추가
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -798,6 +801,38 @@ const handleLike = async (postId) => {
       setPage(0)
       setHasMore(true)
       fetchPosts(0, searchQuery, true)
+    }
+  }
+  // 신고 처리
+  const handleReport = async () => {
+    if (!user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    if (!reportReason) {
+      alert('신고 사유를 선택해주세요.')
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from('reports')
+        .insert([{
+          post_id: reportingPostId,
+          user_id: user.id,
+          reason: reportReason
+        }])
+
+      if (error) throw error
+
+      alert('신고가 접수되었습니다.')
+      setShowReportModal(false)
+      setReportingPostId(null)
+      setReportReason('')
+    } catch (error) {
+      console.error('신고 실패:', error)
+      alert('신고 실패: ' + error.message)
     }
   }
   // 검색
@@ -1574,10 +1609,18 @@ const handleLike = async (postId) => {
                           <span className="text-xs font-medium">{post.comments_count || 0}</span>
                         </button>
 
-                        <button className="flex items-center space-x-1.5 hover:text-teal-600 transition-colors ml-auto">
-                          <Bookmark className="w-4 h-4" />
-                          <span className="text-xs font-medium">{post.bookmarks_count || 0}</span>
-                        </button>
+                        <button 
+  onClick={() => handleActionClick(() => {
+    setReportingPostId(post.id)
+    setShowReportModal(true)
+  })}
+  className="flex items-center space-x-1.5 hover:text-red-600 transition-colors ml-auto text-gray-500"
+>
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+  <span className="text-xs font-medium">신고</span>
+</button>
                       </div>
 
                       {/* Comments Section */}
@@ -2517,7 +2560,101 @@ const handleLike = async (postId) => {
     )}
   </div>
 )}
+{/* 신고 모달 */}
+{showReportModal && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-6">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">게시물 신고</h2>
+        <button
+          onClick={() => {
+            setShowReportModal(false)
+            setReportingPostId(null)
+            setReportReason('')
+          }}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-400" />
+        </button>
+      </div>
 
+      {/* 신고 사유 */}
+      <div className="space-y-3 mb-6">
+        <p className="text-sm text-gray-600 mb-4">신고 사유를 선택해주세요</p>
+        
+        <button
+          onClick={() => setReportReason('스팸/광고')}
+          className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
+            reportReason === '스팸/광고'
+              ? 'border-red-500 bg-red-50 text-red-700'
+              : 'border-gray-200 hover:border-gray-300'
+          }`}
+        >
+          <div className="font-semibold">스팸/광고</div>
+          <div className="text-xs text-gray-500 mt-1">홍보성 게시물 또는 반복적인 게시물</div>
+        </button>
+
+        <button
+          onClick={() => setReportReason('욕설/비방')}
+          className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
+            reportReason === '욕설/비방'
+              ? 'border-red-500 bg-red-50 text-red-700'
+              : 'border-gray-200 hover:border-gray-300'
+          }`}
+        >
+          <div className="font-semibold">욕설/비방</div>
+          <div className="text-xs text-gray-500 mt-1">욕설, 비하, 혐오 표현</div>
+        </button>
+
+        <button
+          onClick={() => setReportReason('음란물')}
+          className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
+            reportReason === '음란물'
+              ? 'border-red-500 bg-red-50 text-red-700'
+              : 'border-gray-200 hover:border-gray-300'
+          }`}
+        >
+          <div className="font-semibold">음란물</div>
+          <div className="text-xs text-gray-500 mt-1">성적인 콘텐츠 또는 부적절한 이미지</div>
+        </button>
+
+        <button
+          onClick={() => setReportReason('기타')}
+          className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
+            reportReason === '기타'
+              ? 'border-red-500 bg-red-50 text-red-700'
+              : 'border-gray-200 hover:border-gray-300'
+          }`}
+        >
+          <div className="font-semibold">기타</div>
+          <div className="text-xs text-gray-500 mt-1">기타 부적절한 콘텐츠</div>
+        </button>
+      </div>
+
+      {/* 버튼 */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => {
+            setShowReportModal(false)
+            setReportingPostId(null)
+            setReportReason('')
+          }}
+          className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+        >
+          취소
+        </button>
+        <button
+          onClick={handleReport}
+          disabled={!reportReason}
+          className="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          신고하기
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   )
 }
