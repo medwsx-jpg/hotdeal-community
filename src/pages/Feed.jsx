@@ -13,15 +13,7 @@ export default function Feed() {
   const { user, profile, loading: authLoading, signOut } = useAuth()
   const navigate = useNavigate()
   
-  // 디버깅용 로그
-  useEffect(() => {
-    console.log('👤 Feed 렌더링:', {
-      authLoading,
-      hasUser: !!user,
-      hasProfile: !!profile,
-      username: profile?.username
-    })
-  }, [authLoading, user, profile])
+ 
   
   const [activeTab, setActiveTab] = useState('all')
 const [activeMainTab, setActiveMainTab] = useState('home')

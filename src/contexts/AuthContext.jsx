@@ -17,100 +17,47 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   // 프로필 가져오기
-const fetchProfile = async (userId) => {
-  try {
-    console.log('📥 프로필 fetch 시작:', userId)
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+  const loadProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
 
-    if (error) {
-      console.error('❌ Profile fetch error:', error)
-      setProfile(null)
-    } else {
-      console.log('✅ Profile loaded:', data)
+      if (error) throw error
       setProfile(data)
+    } catch (error) {
+      console.error('프로필 로드 실패:', error)
+      setProfile(null)
     }
-  } catch (error) {
-    console.error('❌ Error fetching profile:', error)
-    setProfile(null)
   }
-}
 
   useEffect(() => {
-    const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+    // 초기 세션 확인
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      
-      // 세션 만료 시간 로그 (디버깅용)
-      if (session) {
-        const expiresAt = new Date(session.expires_at * 1000)
-        console.log('현재 세션 만료 시간:', expiresAt.toLocaleString('ko-KR'))
-      }
-      
       if (session?.user) {
-        await fetchProfile(session.user.id)
+        loadProfile(session.user.id)
       }
       setLoading(false)
-    }
-  
-    initAuth()
-  
-    // 세션 상태 변화 감지 (자동 갱신 포함)
+    })
+
+    // 세션 변경 감지
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔐 Auth Event:', event)
-        
-        if (event === 'SIGNED_IN') {
-          console.log('✅ 로그인 성공')
-          setUser(session?.user ?? null)
-          if (session?.user) {
-            await fetchProfile(session.user.id)
-          }
-          setLoading(false)
-          return  // ← 추가! 여기서 끝
-        }
-        
-        if (event === 'SIGNED_OUT') {
-          console.log('🚪 로그아웃됨 - 랜딩페이지로 이동')
-          setUser(null)
-          setProfile(null)
-          setLoading(false)
-          window.location.href = '/'
-          return  // ← 추가! 여기서 끝
-        }
-        
-        if (event === 'TOKEN_REFRESHED') {
-          console.log('🔄 세션 자동 갱신됨!')
-          const expiresAt = new Date(session.expires_at * 1000)
-          console.log('새 만료 시간:', expiresAt.toLocaleString('ko-KR'))
-          setLoading(false)
-          return  // ← 추가! 여기서 끝
-        }
-        
-        if (event === 'USER_UPDATED') {
-          console.log('👤 사용자 정보 업데이트됨')
-          setUser(session?.user ?? null)
-          if (session?.user) {
-            await fetchProfile(session.user.id)
-          }
-          setLoading(false)
-          return  // ← 추가! 여기서 끝
-        }
-        
-        // 나머지 이벤트들
         setUser(session?.user ?? null)
+        
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          await loadProfile(session.user.id)
         } else {
           setProfile(null)
         }
+        
         setLoading(false)
       }
     )
-  
+
     return () => subscription.unsubscribe()
   }, [])
 
@@ -162,7 +109,6 @@ const fetchProfile = async (userId) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
-    // onAuthStateChange에서 SIGNED_OUT 이벤트로 window.location.href = '/' 처리됨
   }
 
   const value = {
