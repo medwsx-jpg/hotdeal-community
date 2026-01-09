@@ -906,8 +906,8 @@ const handleLike = async (postId) => {
                     {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
-         <span className="text-xs font-medium text-gray-700">
-  {profile?.username || '사용자'}
+        <span className="text-xs font-medium text-gray-700">
+  {profile?.username || (user?.email?.split('@')[0]) || '사용자'}
 </span>
 </button>
 
