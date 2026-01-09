@@ -24,6 +24,13 @@ export default function Profile() {
     }
   }, [profile])
 
+  // ← 여기에 추가!
+useEffect(() => {
+  if (!user) {
+    navigate('/login')
+  }
+}, [user, navigate])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     

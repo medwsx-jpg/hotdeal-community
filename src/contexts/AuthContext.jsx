@@ -106,6 +106,10 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
+    
+    // 명시적으로 상태 초기화
+    setUser(null)
+    setProfile(null)
   }
 
   return (
