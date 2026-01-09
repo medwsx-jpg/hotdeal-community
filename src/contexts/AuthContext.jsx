@@ -17,25 +17,27 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   // 프로필 가져오기
-  const fetchProfile = async (userId) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single()
-  
-      if (error) {
-        console.error('Profile fetch error:', error)
-        setProfile(null)
-      } else {
-        setProfile(data)
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error)
+const fetchProfile = async (userId) => {
+  try {
+    console.log('📥 프로필 fetch 시작:', userId)
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (error) {
+      console.error('❌ Profile fetch error:', error)
       setProfile(null)
+    } else {
+      console.log('✅ Profile loaded:', data)
+      setProfile(data)
     }
+  } catch (error) {
+    console.error('❌ Error fetching profile:', error)
+    setProfile(null)
   }
+}
 
   useEffect(() => {
     const initAuth = async () => {
