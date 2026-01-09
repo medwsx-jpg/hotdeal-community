@@ -125,23 +125,35 @@ useEffect(() => {
   return () => window.removeEventListener('scroll', handleScroll)
 }, [page, loading, hasMore, searchQuery, user, isInApp])
 
-// 비로그인/인앱 사용자 스크롤 맨 아래 감지 → 모달 자동 표시
+// 비로그인/인앱 사용자 스크롤 맨 아래 감지 → 모달 또는 로그인 페이지
 useEffect(() => {
   // 로그인했으면 무시
   if (user) return
   
+  let hasTriggered = false // 중복 실행 방지
+  
   const handleScrollBottom = () => {
+    if (hasTriggered) return
+    
     // 맨 아래에서 50px 전 감지
     const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50
     
-    if (bottom && !showInstallModal && posts.length >= 10) {
-      setShowInstallModal(true)
+    if (bottom && posts.length >= 10) {
+      hasTriggered = true
+      
+      if (isInApp) {
+        // 모바일 인앱: 모달 표시
+        setShowInstallModal(true)
+      } else {
+        // PC 또는 모바일 일반 브라우저: 로그인 페이지
+        navigate('/login')
+      }
     }
   }
   
   window.addEventListener('scroll', handleScrollBottom)
   return () => window.removeEventListener('scroll', handleScrollBottom)
-}, [user, showInstallModal, posts.length])
+}, [user, posts.length, isInApp, navigate])
   
   // 프로필 정보 가져오기
   useEffect(() => {
