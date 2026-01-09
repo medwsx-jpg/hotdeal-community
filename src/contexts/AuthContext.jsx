@@ -69,22 +69,25 @@ const fetchProfile = async (userId) => {
           if (session?.user) {
             await fetchProfile(session.user.id)
           }
-          setLoading(false)  // ← 추가!
+          setLoading(false)
+          return  // ← 추가! 여기서 끝
         }
         
         if (event === 'SIGNED_OUT') {
           console.log('🚪 로그아웃됨 - 랜딩페이지로 이동')
           setUser(null)
           setProfile(null)
-          setLoading(false)  // ← 추가!
+          setLoading(false)
           window.location.href = '/'
+          return  // ← 추가! 여기서 끝
         }
         
         if (event === 'TOKEN_REFRESHED') {
           console.log('🔄 세션 자동 갱신됨!')
           const expiresAt = new Date(session.expires_at * 1000)
           console.log('새 만료 시간:', expiresAt.toLocaleString('ko-KR'))
-          setLoading(false)  // ← 추가!
+          setLoading(false)
+          return  // ← 추가! 여기서 끝
         }
         
         if (event === 'USER_UPDATED') {
@@ -93,19 +96,18 @@ const fetchProfile = async (userId) => {
           if (session?.user) {
             await fetchProfile(session.user.id)
           }
-          setLoading(false)  // ← 추가!
+          setLoading(false)
+          return  // ← 추가! 여기서 끝
         }
         
-        // 일반적인 세션 변화 처리
-        if (!event.includes('REFRESH')) {
-          setUser(session?.user ?? null)
-          if (session?.user) {
-            await fetchProfile(session.user.id)
-          } else {
-            setProfile(null)
-          }
-          setLoading(false)  // ← 추가!
+        // 나머지 이벤트들
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setProfile(null)
         }
+        setLoading(false)
       }
     )
   
