@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Feed() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, loading: authLoading, signOut } = useAuth()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('all')
 const [activeMainTab, setActiveMainTab] = useState('home')
@@ -901,7 +901,9 @@ const handleLike = async (postId) => {
                     {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
-           <span className="text-xs font-medium text-gray-700">{profile?.username || '사용자'}</span>
+          <span className="text-xs font-medium text-gray-700">
+  {authLoading ? '로딩중...' : (profile?.username || '사용자')}
+</span>
 </button>
 
 {/* 관리자 버튼 추가 */}
