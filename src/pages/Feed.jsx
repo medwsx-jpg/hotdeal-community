@@ -225,29 +225,29 @@ const fetchTopPosts = async () => {
   }
 
   const fetchPosts = async (pageNum = 0, search = '', reset = false) => {
-    // 이미 로딩 중이거나, 더 이상 없으면 중단
     if (loading || (!hasMore && !reset)) return
     
     try {
       setLoading(true)
       
-      // 페이지네이션 범위 계산
       const start = pageNum * POSTS_PER_PAGE
       const end = start + POSTS_PER_PAGE - 1
       
+      // 🎉 한 번의 쿼리로 모든 정보 가져오기!
       let query = supabase
         .from('posts')
-        .select('*')
+        .select(`
+          *,
+          profiles:user_id (username, role)
+        `)
         .order('created_at', { ascending: false })
-        .range(start, end)  // 👈 무한 스크롤 핵심!
+        .range(start, end)
       
       if (search) {
-        // 태그 검색 (# 포함)
         if (search.startsWith('#')) {
           const tag = search.substring(1)
           query = query.contains('tags', [tag])
         } else {
-          // 일반 검색
           query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`)
         }
       }
@@ -256,44 +256,21 @@ const fetchTopPosts = async () => {
       
       if (error) throw error
       
-      const postsWithCounts = await Promise.all(
-        (data || []).map(async (post) => {
-          const { count: likesCount } = await supabase
-            .from('likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-          
-          const { count: commentsCount } = await supabase
-            .from('comments')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-          
-          // 작성자 정보 가져오기
-          const { data: authorData } = await supabase
-            .from('profiles')
-            .select('username, role')
-            .eq('id', post.user_id)
-            .single()
-          
-          return {
-            ...post,
-            likes_count: likesCount || 0,
-            comments_count: commentsCount || 0,
-            author: authorData?.username || '사용자',
-            authorRole: authorData?.role || '회원',
-            timeAgo: getTimeAgo(post.created_at)
-          }
-        })
-      )
+      // 추가 쿼리 없이 바로 매핑!
+      const postsWithData = (data || []).map(post => ({
+        ...post,
+        author: post.profiles?.username || '사용자',
+        authorRole: post.profiles?.role || '회원',
+        timeAgo: getTimeAgo(post.created_at)
+        // likes_count, comments_count는 이미 posts 테이블에 있음!
+      }))
       
-      // 첫 페이지거나 리셋이면 교체, 아니면 추가
       if (pageNum === 0 || reset) {
-        setPosts(postsWithCounts)
+        setPosts(postsWithData)
       } else {
-        setPosts(prev => [...prev, ...postsWithCounts])
+        setPosts(prev => [...prev, ...postsWithData])
       }
       
-      // 20개 미만이면 더 이상 없음
       if (data.length < POSTS_PER_PAGE) {
         setHasMore(false)
       } else {
