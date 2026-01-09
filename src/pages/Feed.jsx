@@ -35,10 +35,11 @@ const [editCommentText, setEditCommentText] = useState('')
   const [topPosts, setTopPosts] = useState({ byComments: [], byLikes: [] })
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(true)
-  const POSTS_PER_PAGE = 20
+  const POSTS_PER_PAGE = 10
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [isInApp, setIsInApp] = useState(false)  // ← 추가
-  const [showInstallModal, setShowInstallModal] = useState(false)  // ← 추가
+  const [showInstallModal, setShowInstallModal] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)  // ← 이거 추가!
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -52,10 +53,8 @@ const [editCommentText, setEditCommentText] = useState('')
     period: ''
   })
 
-// 인앱 브라우저 감지
+// 인앱 브라우저 감지 & PWA 설치 프롬프트 감지
 useEffect(() => {
-  
-
   // 인앱 브라우저 감지
   const ua = navigator.userAgent || navigator.vendor || window.opera
   const isKakao = /KAKAOTALK/i.test(ua)
@@ -66,10 +65,34 @@ useEffect(() => {
   const inApp = isKakao || isLine || isInsta || isFB
   setIsInApp(inApp)
 
+  // URL 파라미터 체크: ?install=true
+  const urlParams = new URLSearchParams(window.location.search)
+  const shouldInstall = urlParams.get('install') === 'true'
+  
+  // 크롬에서 ?install=true로 접속하면 자동으로 모달 표시
+  if (shouldInstall && !inApp) {
+    setShowInstallModal(true)
+    // URL 깔끔하게 정리
+    window.history.replaceState({}, '', window.location.pathname)
+  }
+
+  // PWA 설치 프롬프트 감지
+  const handleBeforeInstall = (e) => {
+    e.preventDefault()
+    setDeferredPrompt(e)
+    console.log('✅ PWA 설치 가능!')
+  }
+
+  window.addEventListener('beforeinstallprompt', handleBeforeInstall)
+
   // 인앱이거나 로그인 안 되어 있으면 게시물만 보여주기
   if (inApp || !user) {
     fetchPosts()
     fetchTopPosts()
+  }
+
+  return () => {
+    window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
   }
 }, [navigate, user])
 
@@ -2293,15 +2316,14 @@ const handleLike = async (postId) => {
       </div>
       
       {/* 제목 */}
-      <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
-        UDT79 앱 설치
-      </h1>
-      
-      {/* 설명 */}
-      <p className="text-gray-600 mb-8 text-center">
-        홈 화면에 앱을 추가하고<br />
-        언제든 빠르게 접속하세요!
-      </p>
+<h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+  앱처럼 편하게<br />사용하시겠습니까?
+</h1>
+
+{/* 설명 */}
+<p className="text-gray-600 mb-8 text-center">
+  홈 화면에 추가
+</p>
 
       {/* 혜택 */}
       <div className="space-y-3 mb-8">
@@ -2330,12 +2352,52 @@ const handleLike = async (postId) => {
       </div>
 
       {/* 버튼 */}
-      <button
-        onClick={() => setShowInstallModal(false)}
-        className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
-      >
-        확인
-      </button>
+{isInApp ? (
+  // 인앱 브라우저: 크롬으로 이동
+  <div className="flex gap-3">
+    <button
+      onClick={() => {
+        const intentUrl = `intent://${window.location.host}${window.location.pathname}?install=true#Intent;scheme=https;package=com.android.chrome;end;`
+        window.location.href = intentUrl
+      }}
+      className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+    >
+      예
+    </button>
+    <button
+      onClick={() => setShowInstallModal(false)}
+      className="flex-1 bg-gray-100 text-gray-700 px-6 py-4 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+    >
+      나중에
+    </button>
+  </div>
+) : deferredPrompt ? (
+  // 크롬 (PWA 지원): 바로 설치
+  <button
+    onClick={async () => {
+      deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
+      
+      if (outcome === 'accepted') {
+        console.log('✅ PWA 설치 완료!')
+      }
+      
+      setDeferredPrompt(null)
+      setShowInstallModal(false)
+    }}
+    className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+  >
+    홈 화면에 추가
+  </button>
+) : (
+  // 일반 브라우저: 그냥 닫기
+  <button
+    onClick={() => setShowInstallModal(false)}
+    className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+  >
+    확인
+  </button>
+)}
     </div>
   </div>
 )}
