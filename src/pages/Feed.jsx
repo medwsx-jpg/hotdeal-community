@@ -28,8 +28,7 @@ const [editCommentText, setEditCommentText] = useState('')
   const [showComments, setShowComments] = useState(null)
   const [expandedPosts, setExpandedPosts] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
-  const [username, setUsername] = useState('사용자') // 추가
-  const [loading, setLoading] = useState(false)
+const [loading, setLoading] = useState(false)
   const [selectedImageUrl, setSelectedImageUrl] = useState(null)
   const [imageZoom, setImageZoom] = useState(100) // 100 = 100%
   const [topPosts, setTopPosts] = useState({ byComments: [], byLikes: [] })
@@ -165,24 +164,7 @@ useEffect(() => {
   return () => window.removeEventListener('scroll', handleScrollBottom)
 }, [user, posts.length, isInApp, navigate])
   
-  // 프로필 정보 가져오기
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!user) return
-      
-      const { data } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single()
-      
-      if (data?.username) {
-        setUsername(data.username)
-      }
-    }
-    
-    fetchUserProfile()
-  }, [user])
+ 
   const fetchTopPosts = async () => {
     try {
       // 댓글 많은 순 Top 3
@@ -689,7 +671,7 @@ const handleLike = async (postId) => {
         user_id: user.id,
         post_id: postId,
         created_at: new Date().toISOString(),
-        author: username,
+        author: profile?.username || '사용자',
         timeAgo: '방금 전'
       }
   
@@ -914,7 +896,7 @@ const handleLike = async (postId) => {
                     {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
                   </div>
                 )}
-             <span className="text-xs font-medium text-gray-700">{username}</span>
+             <span className="text-xs font-medium text-gray-700">{profile?.username || '사용자'}</span>
 </button>
 
 {/* 관리자 버튼 추가 */}
