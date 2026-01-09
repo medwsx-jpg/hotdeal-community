@@ -87,11 +87,12 @@ if (shouldInstall && !inApp) {
 
   window.addEventListener('beforeinstallprompt', handleBeforeInstall)
 
-  // 인앱이거나 로그인 안 되어 있으면 게시물만 보여주기
-  if (inApp || !user) {
-    fetchPosts()
-    fetchTopPosts()
-  }
+  // 인앱이거나 로그인 안 되어 있으면 게시물 10개만 보여주기
+if (inApp || !user) {
+  fetchPosts(0, '', true)  // 첫 페이지만
+  fetchTopPosts()
+  setHasMore(false)  // 무한 스크롤 비활성화
+}
 
   return () => {
     window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
@@ -105,8 +106,11 @@ useEffect(() => {
     fetchTopPosts()
   }
 }, [user])
-  // 무한 스크롤 감지
+ // 무한 스크롤 감지 (로그인 시에만)
 useEffect(() => {
+  // 로그인 안 했거나 인앱이면 무한 스크롤 비활성화
+  if (!user || isInApp) return
+  
   const handleScroll = () => {
     // 맨 아래에서 500px 전에 미리 로드
     const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 500
@@ -119,7 +123,7 @@ useEffect(() => {
   
   window.addEventListener('scroll', handleScroll)
   return () => window.removeEventListener('scroll', handleScroll)
-}, [page, loading, hasMore, searchQuery])
+}, [page, loading, hasMore, searchQuery, user, isInApp])
 
 // 맨 위로 가기 버튼 표시/숨김
 useEffect(() => {
