@@ -233,13 +233,10 @@ const fetchTopPosts = async () => {
       const start = pageNum * POSTS_PER_PAGE
       const end = start + POSTS_PER_PAGE - 1
       
-      // 🎉 한 번의 쿼리로 모든 정보 가져오기!
+      // 게시물만 가져오기 (likes_count, comments_count 포함)
       let query = supabase
         .from('posts')
-        .select(`
-          *,
-          profiles:user_id (username, role)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .range(start, end)
       
@@ -256,14 +253,24 @@ const fetchTopPosts = async () => {
       
       if (error) throw error
       
-      // 추가 쿼리 없이 바로 매핑!
-      const postsWithData = (data || []).map(post => ({
-        ...post,
-        author: post.profiles?.username || '사용자',
-        authorRole: post.profiles?.role || '회원',
-        timeAgo: getTimeAgo(post.created_at)
-        // likes_count, comments_count는 이미 posts 테이블에 있음!
-      }))
+      // 작성자 정보만 별도로 가져오기 (한 번에)
+      const postsWithData = await Promise.all(
+        (data || []).map(async (post) => {
+          const { data: authorData } = await supabase
+            .from('profiles')
+            .select('username, role')
+            .eq('id', post.user_id)
+            .single()
+          
+          return {
+            ...post,
+            author: authorData?.username || '사용자',
+            authorRole: authorData?.role || '회원',
+            timeAgo: getTimeAgo(post.created_at)
+            // likes_count, comments_count는 이미 post에 있음!
+          }
+        })
+      )
       
       if (pageNum === 0 || reset) {
         setPosts(postsWithData)
