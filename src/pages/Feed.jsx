@@ -1671,12 +1671,52 @@ const handleLike = async (postId) => {
                   </div>
                 )}
                 
-                {/* 마지막 게시물 */}
-                {!hasMore && sortedPosts.length > 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-sm">✨ 마지막 게시물입니다</p>
-                  </div>
-                )}
+               {/* 마지막 게시물 또는 비로그인/인앱 사용자 CTA */}
+{!hasMore && sortedPosts.length > 0 && (
+  <div className="text-center py-8">
+    {(!user || isInApp) ? (
+      // 비로그인 또는 인앱 사용자용 CTA
+      <div className="max-w-md mx-auto bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-200 rounded-2xl p-8">
+        <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-3xl">🎯</span>
+        </div>
+        
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+          {isInApp ? '더 많은 게시물을 보려면?' : '계속 보시겠어요?'}
+        </h3>
+        
+        <p className="text-sm text-gray-600 mb-6">
+          {isInApp 
+            ? '앱을 설치하고 모든 게시물을 확인하세요!' 
+            : '로그인하고 무제한으로 게시물을 확인하세요!'}
+        </p>
+        
+        {isInApp ? (
+          // 인앱: 앱 설치 버튼
+          <button
+            onClick={() => setShowInstallModal(true)}
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg flex items-center justify-center space-x-2"
+          >
+            <Smartphone className="w-5 h-5" />
+            <span>앱 설치하고 더 보기</span>
+          </button>
+        ) : (
+          // 비로그인: 로그인 버튼
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg flex items-center justify-center space-x-2"
+          >
+            <User className="w-5 h-5" />
+            <span>로그인하고 더 보기</span>
+          </button>
+        )}
+      </div>
+    ) : (
+      // 로그인 사용자: 일반 메시지
+      <p className="text-sm text-gray-500">✨ 마지막 게시물입니다</p>
+    )}
+  </div>
+)}
               </>
             )}
           </div>
