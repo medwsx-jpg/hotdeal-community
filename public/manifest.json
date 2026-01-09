@@ -1,0 +1,24 @@
+{
+    "name": "UDT79 - 우리동네 특공대 친구",
+    "short_name": "UDT79",
+    "description": "동네 핫딜과 정보를 공유하는 커뮤니티",
+    "start_url": "/feed",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#14b8a6",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "/logo.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/logo.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ]
+  }
