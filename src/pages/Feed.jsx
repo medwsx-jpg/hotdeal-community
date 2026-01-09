@@ -39,7 +39,8 @@ const [editCommentText, setEditCommentText] = useState('')
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [isInApp, setIsInApp] = useState(false)  // ← 추가
   const [showInstallModal, setShowInstallModal] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState(null)  // ← 이거 추가!
+const [deferredPrompt, setDeferredPrompt] = useState(null)
+const [isSimpleModal, setIsSimpleModal] = useState(false)  // ← 추가!
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -69,12 +70,13 @@ useEffect(() => {
   const urlParams = new URLSearchParams(window.location.search)
   const shouldInstall = urlParams.get('install') === 'true'
   
-  // 크롬에서 ?install=true로 접속하면 자동으로 모달 표시
-  if (shouldInstall && !inApp) {
-    setShowInstallModal(true)
-    // URL 깔끔하게 정리
-    window.history.replaceState({}, '', window.location.pathname)
-  }
+ // 크롬에서 ?install=true로 접속하면 자동으로 간단 모달 표시
+if (shouldInstall && !inApp) {
+  setShowInstallModal(true)
+  setIsSimpleModal(true)  // ← 간단 모달 플래그
+  // URL 깔끔하게 정리
+  window.history.replaceState({}, '', window.location.pathname)
+}
 
   // PWA 설치 프롬프트 감지
   const handleBeforeInstall = (e) => {
@@ -2301,104 +2303,155 @@ const handleLike = async (postId) => {
 {/* 앱 설치 모달 */}
 {showInstallModal && (
   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 relative">
-      {/* 닫기 버튼 */}
-      <button
-        onClick={() => setShowInstallModal(false)}
-        className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-      >
-        <X className="w-5 h-5 text-gray-400" />
-      </button>
-
-      {/* 아이콘 */}
-      <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6">
-        <Smartphone className="w-10 h-10 text-white" />
+    {isSimpleModal ? (
+      // 간단한 모달 (크롬에서 ?install=true로 접속 시)
+      <div className="max-w-sm w-full bg-white rounded-2xl shadow-xl p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
+          UDT79
+        </h2>
+        <p className="text-sm text-gray-600 mb-6 text-center">
+          홈 화면에 추가하시겠습니까?
+        </p>
+        {deferredPrompt ? (
+          <button
+            onClick={async () => {
+              deferredPrompt.prompt()
+              const { outcome } = await deferredPrompt.userChoice
+              
+              if (outcome === 'accepted') {
+                console.log('✅ PWA 설치 완료!')
+              }
+              
+              setDeferredPrompt(null)
+              setShowInstallModal(false)
+              setIsSimpleModal(false)
+            }}
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold hover-lift shadow-lg mb-2"
+          >
+            홈 화면에 추가
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              setShowInstallModal(false)
+              setIsSimpleModal(false)
+            }}
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold hover-lift shadow-lg mb-2"
+          >
+            확인
+          </button>
+        )}
+        <button
+          onClick={() => {
+            setShowInstallModal(false)
+            setIsSimpleModal(false)
+          }}
+          className="w-full text-gray-500 text-sm hover:text-gray-700 transition-colors"
+        >
+          나중에
+        </button>
       </div>
-      
-      {/* 제목 */}
-<h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
-  앱처럼 편하게<br />사용하시겠습니까?
-</h1>
+    ) : (
+      // 기존 전체 모달 (인앱에서)
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 relative">
+        {/* 닫기 버튼 */}
+        <button
+          onClick={() => setShowInstallModal(false)}
+          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-400" />
+        </button>
 
-{/* 설명 */}
-<p className="text-gray-600 mb-8 text-center">
-  홈 화면에 추가
-</p>
+        {/* 아이콘 */}
+        <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Smartphone className="w-10 h-10 text-white" />
+        </div>
+        
+        {/* 제목 */}
+        <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+          앱처럼 편하게<br />사용하시겠습니까?
+        </h1>
+        
+        {/* 설명 */}
+        <p className="text-gray-600 mb-8 text-center">
+          홈 화면에 추가
+        </p>
 
-      {/* 혜택 */}
-      <div className="space-y-3 mb-8">
-        <div className="flex items-center space-x-3 text-left bg-teal-50 rounded-lg p-3">
-          <span className="text-2xl">⚡</span>
-          <span className="text-sm text-gray-700">빠른 실행</span>
+        {/* 혜택 */}
+        <div className="space-y-3 mb-8">
+          <div className="flex items-center space-x-3 text-left bg-teal-50 rounded-lg p-3">
+            <span className="text-2xl">⚡</span>
+            <span className="text-sm text-gray-700">빠른 실행</span>
+          </div>
+          <div className="flex items-center space-x-3 text-left bg-cyan-50 rounded-lg p-3">
+            <span className="text-2xl">📱</span>
+            <span className="text-sm text-gray-700">앱처럼 사용</span>
+          </div>
+          <div className="flex items-center space-x-3 text-left bg-purple-50 rounded-lg p-3">
+            <span className="text-2xl">🔔</span>
+            <span className="text-sm text-gray-700">알림 받기 (준비중)</span>
+          </div>
         </div>
-        <div className="flex items-center space-x-3 text-left bg-cyan-50 rounded-lg p-3">
-          <span className="text-2xl">📱</span>
-          <span className="text-sm text-gray-700">앱처럼 사용</span>
+
+        {/* 안내 */}
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <p className="text-xs text-gray-700 font-medium mb-2">📱 설치 방법:</p>
+          <ol className="text-xs text-gray-600 space-y-1">
+            <li>1. 우측 상단 ⋯ (더보기) 클릭</li>
+            <li>2. "크롬에서 열기" 선택</li>
+            <li>3. "홈 화면에 추가" 버튼 클릭</li>
+          </ol>
         </div>
-        <div className="flex items-center space-x-3 text-left bg-purple-50 rounded-lg p-3">
-          <span className="text-2xl">🔔</span>
-          <span className="text-sm text-gray-700">알림 받기 (준비중)</span>
-        </div>
+
+        {/* 버튼 */}
+        {isInApp ? (
+          // 인앱 브라우저: 크롬으로 이동
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                const intentUrl = `intent://${window.location.host}${window.location.pathname}?install=true#Intent;scheme=https;package=com.android.chrome;end;`
+                window.location.href = intentUrl
+              }}
+              className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+            >
+              예
+            </button>
+            <button
+              onClick={() => setShowInstallModal(false)}
+              className="flex-1 bg-gray-100 text-gray-700 px-6 py-4 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+            >
+              나중에
+            </button>
+          </div>
+        ) : deferredPrompt ? (
+          // 크롬 (PWA 지원): 바로 설치
+          <button
+            onClick={async () => {
+              deferredPrompt.prompt()
+              const { outcome } = await deferredPrompt.userChoice
+              
+              if (outcome === 'accepted') {
+                console.log('✅ PWA 설치 완료!')
+              }
+              
+              setDeferredPrompt(null)
+              setShowInstallModal(false)
+            }}
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+          >
+            홈 화면에 추가
+          </button>
+        ) : (
+          // 일반 브라우저: 그냥 닫기
+          <button
+            onClick={() => setShowInstallModal(false)}
+            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
+          >
+            확인
+          </button>
+        )}
       </div>
-
-      {/* 안내 */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <p className="text-xs text-gray-700 font-medium mb-2">📱 설치 방법:</p>
-        <ol className="text-xs text-gray-600 space-y-1">
-          <li>1. 우측 상단 ⋯ (더보기) 클릭</li>
-          <li>2. "크롬에서 열기" 선택</li>
-          <li>3. "홈 화면에 추가" 버튼 클릭</li>
-        </ol>
-      </div>
-
-      {/* 버튼 */}
-{isInApp ? (
-  // 인앱 브라우저: 크롬으로 이동
-  <div className="flex gap-3">
-    <button
-      onClick={() => {
-        const intentUrl = `intent://${window.location.host}${window.location.pathname}?install=true#Intent;scheme=https;package=com.android.chrome;end;`
-        window.location.href = intentUrl
-      }}
-      className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
-    >
-      예
-    </button>
-    <button
-      onClick={() => setShowInstallModal(false)}
-      className="flex-1 bg-gray-100 text-gray-700 px-6 py-4 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
-    >
-      나중에
-    </button>
-  </div>
-) : deferredPrompt ? (
-  // 크롬 (PWA 지원): 바로 설치
-  <button
-    onClick={async () => {
-      deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
-      
-      if (outcome === 'accepted') {
-        console.log('✅ PWA 설치 완료!')
-      }
-      
-      setDeferredPrompt(null)
-      setShowInstallModal(false)
-    }}
-    className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
-  >
-    홈 화면에 추가
-  </button>
-) : (
-  // 일반 브라우저: 그냥 닫기
-  <button
-    onClick={() => setShowInstallModal(false)}
-    className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg"
-  >
-    확인
-  </button>
-)}
-    </div>
+    )}
   </div>
 )}
 
