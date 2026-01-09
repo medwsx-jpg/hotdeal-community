@@ -73,13 +73,12 @@ useEffect(() => {
   const urlParams = new URLSearchParams(window.location.search)
   const shouldInstall = urlParams.get('install') === 'true'
   
- // 크롬에서 ?install=true로 접속하면 자동으로 간단 모달 표시
-if (shouldInstall && !inApp) {
-  setShowInstallModal(true)
-  setIsSimpleModal(true)  // ← 간단 모달 플래그
-  // URL 깔끔하게 정리
-  window.history.replaceState({}, '', window.location.pathname)
-}
+  // 크롬에서 ?install=true로 접속하면 자동으로 간단 모달 표시
+  if (shouldInstall && !inApp) {
+    setShowInstallModal(true)
+    setIsSimpleModal(true)
+    window.history.replaceState({}, '', window.location.pathname)
+  }
 
   // PWA 설치 프롬프트 감지
   const handleBeforeInstall = (e) => {
@@ -90,12 +89,20 @@ if (shouldInstall && !inApp) {
 
   window.addEventListener('beforeinstallprompt', handleBeforeInstall)
 
-  // 인앱이거나 로그인 안 되어 있으면 게시물 10개만 보여주기
-if (inApp || !user) {
-  fetchPosts(0, '', true)  // 첫 페이지만
-  fetchTopPosts()
-  setHasMore(false)  // 무한 스크롤 비활성화
-}
+  // 비로그인 사용자만 여기서 게시물 로드
+  if (!user) {
+    if (inApp) {
+      // 인앱: 10개만
+      fetchPosts(0, '', true)
+      fetchTopPosts()
+      setHasMore(false)
+    } else {
+      // 일반 브라우저: 10개만
+      fetchPosts(0, '', true)
+      fetchTopPosts()
+      setHasMore(false)
+    }
+  }
 
   return () => {
     window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
