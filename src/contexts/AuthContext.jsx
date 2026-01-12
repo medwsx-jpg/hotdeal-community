@@ -19,29 +19,44 @@ export const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
-    // Kakao SDK 초기화 (로딩 대기)
-    const initKakao = () => {
-      if (window.Kakao && !window.Kakao.isInitialized()) {
-        window.Kakao.init('64cedc6ff60d40bf274419f1679aab75')
-        console.log('🟡 Kakao SDK 초기화:', window.Kakao.isInitialized())
-      }
+    // Kakao SDK 동적 로드
+    const loadKakaoSDK = () => {
+      return new Promise((resolve, reject) => {
+        // 이미 로드되었으면 바로 리턴
+        if (window.Kakao) {
+          resolve()
+          return
+        }
+  
+        // 스크립트 태그 생성
+        const script = document.createElement('script')
+        script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'
+        script.integrity = 'sha384-TiCUE00h+gjhVkq3FHXnFzTBYL6lHXXfMEZxR8nIhB6W0pGQKKi1QwAscPdFgT3r'
+        script.crossOrigin = 'anonymous'
+        script.async = true
+        
+        script.onload = () => {
+          console.log('✅ Kakao SDK 로드 완료')
+          if (window.Kakao && !window.Kakao.isInitialized()) {
+            window.Kakao.init('64cedc6ff60d40bf274419f1679aab75')
+            console.log('🟡 Kakao SDK 초기화:', window.Kakao.isInitialized())
+          }
+          resolve()
+        }
+        
+        script.onerror = () => {
+          console.error('❌ Kakao SDK 로드 실패')
+          reject(new Error('Failed to load Kakao SDK'))
+        }
+        
+        document.head.appendChild(script)
+      })
     }
   
-    // SDK 로딩 대기
-    if (window.Kakao) {
-      initKakao()
-    } else {
-      // SDK 로드될 때까지 대기
-      const checkKakao = setInterval(() => {
-        if (window.Kakao) {
-          initKakao()
-          clearInterval(checkKakao)
-        }
-      }, 100)
-      
-      // 10초 후 타임아웃
-      setTimeout(() => clearInterval(checkKakao), 10000)
-    }
+    // SDK 로드
+    loadKakaoSDK().catch(err => {
+      console.error('Kakao SDK 로드 에러:', err)
+    })
   
     // 초기 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -49,7 +64,6 @@ export const AuthProvider = ({ children }) => {
       setUser(session?.user ?? null)
       setLoading(false)
       
-      // 프로필 로드
       if (session?.user) {
         supabase
           .from('profiles')
@@ -62,7 +76,7 @@ export const AuthProvider = ({ children }) => {
           })
       }
     })
-
+  
     // 세션 변경 감지
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -70,7 +84,6 @@ export const AuthProvider = ({ children }) => {
         setUser(session?.user ?? null)
         setLoading(false)
         
-        // 프로필 로드
         if (session?.user) {
           supabase
             .from('profiles')
@@ -85,7 +98,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
     )
-
+  
     return () => subscription.unsubscribe()
   }, [])
 
