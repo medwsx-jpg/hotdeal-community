@@ -28,35 +28,11 @@ export const AuthProvider = ({ children }) => {
           return
         }
   
-        const loadKakaoSDK = () => {
-          return new Promise((resolve, reject) => {
-            if (window.Kakao) {
-              resolve()
-              return
-            }
-        
-            const script = document.createElement('script')
-            script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'
-            script.crossOrigin = 'anonymous'
-            script.async = true
-            
-            script.onload = () => {
-              console.log('✅ Kakao SDK 로드 완료')
-              if (window.Kakao && !window.Kakao.isInitialized()) {
-                window.Kakao.init('64cedc6ff60d40bf274419f1679aab75')
-                console.log('🟡 Kakao SDK 초기화:', window.Kakao.isInitialized())
-              }
-              resolve()
-            }
-            
-            script.onerror = () => {
-              console.error('❌ Kakao SDK 로드 실패')
-              reject(new Error('Failed to load Kakao SDK'))
-            }
-            
-            document.head.appendChild(script)
-          })
-        }
+        // 스크립트 태그 생성
+        const script = document.createElement('script')
+        script.src = 'https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js'
+        script.crossOrigin = 'anonymous'
+        script.async = true
         
         script.onload = () => {
           console.log('✅ Kakao SDK 로드 완료')
@@ -76,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       })
     }
   
-    // SDK 로드
+    // SDK 로드 실행
     loadKakaoSDK().catch(err => {
       console.error('Kakao SDK 로드 에러:', err)
     })
