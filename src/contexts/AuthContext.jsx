@@ -16,8 +16,16 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
+
+
   useEffect(() => {
-    // 초기 세션 확인
+  // Kakao SDK 초기화
+  if (window.Kakao && !window.Kakao.isInitialized()) {
+    window.Kakao.init('64cedc6ff60d40bf274419f1679aab75') // JavaScript 키
+    console.log('🟡 Kakao SDK 초기화:', window.Kakao.isInitialized())
+  }
+
+  // 초기 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('📦 세션:', session ? '있음' : '없음')
       setUser(session?.user ?? null)
@@ -84,13 +92,84 @@ export const AuthProvider = ({ children }) => {
   }
 
   const signInWithKakao = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
-      options: {
-        redirectTo: `${window.location.origin}/feed`
-      }
-    })
-    if (error) throw error
+    if (!window.Kakao) {
+      alert('카카오 SDK 로딩 실패')
+      return
+    }
+  
+    try {
+      // 카카오 로그인
+      window.Kakao.Auth.login({
+        success: async (authObj) => {
+          console.log('🟡 카카오 로그인 성공:', authObj)
+          
+          // 카카오 사용자 정보 가져오기
+          window.Kakao.API.request({
+            url: '/v2/user/me',
+            success: async (res) => {
+              console.log('👤 카카오 사용자 정보:', res)
+              
+              const email = res.kakao_account?.email
+              const nickname = res.properties?.nickname || '사용자'
+              
+              if (!email) {
+                alert('이메일 정보를 가져올 수 없습니다.')
+                return
+              }
+              
+              // Supabase에 사용자 생성/로그인
+              const tempPassword = `kakao_${res.id}_temp`
+              
+              // 먼저 로그인 시도
+              let { error: signInError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: tempPassword
+              })
+              
+              // 로그인 실패하면 회원가입
+              if (signInError) {
+                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                  email: email,
+                  password: tempPassword,
+                  options: {
+                    data: { username: nickname },
+                    emailRedirectTo: `${window.location.origin}/feed`
+                  }
+                })
+                
+                if (signUpError) throw signUpError
+                
+                // 프로필 생성
+                if (signUpData.user) {
+                  const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([{
+                      id: signUpData.user.id,
+                      username: nickname,
+                      role: '회원'
+                    }])
+                  
+                  if (profileError) console.error('프로필 생성 실패:', profileError)
+                }
+              }
+              
+              window.location.href = '/feed'
+            },
+            fail: (error) => {
+              console.error('❌ 카카오 사용자 정보 실패:', error)
+              alert('사용자 정보를 가져올 수 없습니다.')
+            }
+          })
+        },
+        fail: (err) => {
+          console.error('❌ 카카오 로그인 실패:', err)
+          alert('카카오 로그인 실패')
+        }
+      })
+    } catch (error) {
+      console.error('❌ 에러:', error)
+      alert('로그인 중 오류가 발생했습니다.')
+    }
   }
 
   const signInWithEmail = async (email, password) => {
