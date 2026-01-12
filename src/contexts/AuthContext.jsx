@@ -19,13 +19,31 @@ export const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
-  // Kakao SDK 초기화
-  if (window.Kakao && !window.Kakao.isInitialized()) {
-    window.Kakao.init('64cedc6ff60d40bf274419f1679aab75') // JavaScript 키
-    console.log('🟡 Kakao SDK 초기화:', window.Kakao.isInitialized())
-  }
-
-  // 초기 세션 확인
+    // Kakao SDK 초기화 (로딩 대기)
+    const initKakao = () => {
+      if (window.Kakao && !window.Kakao.isInitialized()) {
+        window.Kakao.init('64cedc6ff60d40bf274419f1679aab75')
+        console.log('🟡 Kakao SDK 초기화:', window.Kakao.isInitialized())
+      }
+    }
+  
+    // SDK 로딩 대기
+    if (window.Kakao) {
+      initKakao()
+    } else {
+      // SDK 로드될 때까지 대기
+      const checkKakao = setInterval(() => {
+        if (window.Kakao) {
+          initKakao()
+          clearInterval(checkKakao)
+        }
+      }, 100)
+      
+      // 10초 후 타임아웃
+      setTimeout(() => clearInterval(checkKakao), 10000)
+    }
+  
+    // 초기 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log('📦 세션:', session ? '있음' : '없음')
       setUser(session?.user ?? null)
@@ -93,8 +111,13 @@ export const AuthProvider = ({ children }) => {
 
   const signInWithKakao = async () => {
     if (!window.Kakao) {
-      alert('카카오 SDK 로딩 실패')
+      alert('카카오 SDK를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+      console.error('❌ Kakao SDK not loaded')
       return
+    }
+  
+    if (!window.Kakao.isInitialized()) {
+      window.Kakao.init('64cedc6ff60d40bf274419f1679aab75')
     }
   
     try {
