@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth()
+  const { signInWithGoogle, signInWithKakao, signInWithEmail, signUpWithEmail } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [mode, setMode] = useState('buttons') // 'buttons', 'login', 'signup'
@@ -142,17 +142,14 @@ export default function Login() {
               </button>
 
               <button 
-  disabled
-  className="w-full flex items-center justify-center space-x-2.5 px-5 py-3 bg-[#FEE500] border-2 border-[#FEE500] rounded-xl text-sm font-semibold text-gray-900 opacity-60 cursor-not-allowed"
+  onClick={signInWithKakao}
+  disabled={loading}
+  className="w-full flex items-center justify-center space-x-2.5 px-5 py-3 bg-[#FEE500] hover:bg-[#FDD835] border-2 border-[#FEE500] rounded-xl text-sm font-semibold text-gray-900 transition-all hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
 >
-  <svg 
-    className="w-5 h-5" 
-    fill="currentColor" 
-    viewBox="0 0 24 24"
-  >
+  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
     <path d="M12 3C6.48 3 2 6.58 2 11c0 2.89 1.97 5.44 4.95 6.88-.2.75-.77 2.86-.88 3.32-.14.58.21.57.44.41.18-.12 2.85-1.9 3.31-2.24C10.55 19.77 11.26 20 12 20c5.52 0 10-3.58 10-8s-4.48-8-10-8z"/>
   </svg>
-  <span>카톡으로 로그인 (준비 중)</span>
+  <span>{loading ? '로그인 중...' : '카톡으로 로그인'}</span>
 </button>
 {/* ⭐ 여기에 추가! */}
 <div className="relative my-4">

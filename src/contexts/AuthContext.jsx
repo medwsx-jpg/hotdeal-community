@@ -83,6 +83,16 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error
   }
 
+  const signInWithKakao = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: `${window.location.origin}/feed`
+      }
+    })
+    if (error) throw error
+  }
+
   const signInWithEmail = async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -113,7 +123,17 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signInWithGoogle, signInWithGitHub, signInWithEmail, signUpWithEmail, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      profile, 
+      loading, 
+      signInWithGoogle, 
+      signInWithGitHub,
+      signInWithKakao,  // ← 추가!
+      signInWithEmail, 
+      signUpWithEmail, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   )
