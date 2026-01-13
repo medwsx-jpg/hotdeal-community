@@ -46,6 +46,9 @@ const [isSimpleModal, setIsSimpleModal] = useState(false)
 const [showReportModal, setShowReportModal] = useState(false)  // ← 추가
 const [reportingPostId, setReportingPostId] = useState(null)  // ← 추가
 const [reportReason, setReportReason] = useState('')  // ← 추가
+const [showApplicationModal, setShowApplicationModal] = useState(false)
+const [applicationMessage, setApplicationMessage] = useState('')
+const [applyingPostId, setApplyingPostId] = useState(null)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -827,6 +830,38 @@ const handleLike = async (postId) => {
       alert('신고 실패: ' + error.message)
     }
   }
+  // 지원하기 처리
+const handleApply = async () => {
+  if (!user) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
+  if (!applicationMessage.trim()) {
+    alert('지원 메시지를 입력해주세요.')
+    return
+  }
+
+  try {
+    const { error } = await supabase
+      .from('applications')
+      .insert([{
+        post_id: applyingPostId,
+        user_id: user.id,
+        message: applicationMessage.trim()
+      }])
+
+    if (error) throw error
+
+    alert('지원이 완료되었습니다!')
+    setShowApplicationModal(false)
+    setApplyingPostId(null)
+    setApplicationMessage('')
+  } catch (error) {
+    console.error('지원 실패:', error)
+    alert('지원 실패: ' + error.message)
+  }
+}
   // 검색
   const handleSearch = (e) => {
     const value = e.target.value
@@ -1618,6 +1653,19 @@ const handleLike = async (postId) => {
 
                       {/* Meta Info */}
                       <div className="flex flex-wrap gap-1.5 mb-3">
+  {/* 🆕 구인 게시물에만 지원하기 버튼 - 맨 앞에 추가 */}
+  {post.type === 'job' && post.category === '구인' && (
+    <button
+      onClick={() => handleActionClick(() => {
+        setApplyingPostId(post.id)
+        setShowApplicationModal(true)
+      })}
+      className="flex items-center space-x-1 px-3 py-2 bg-blue-50 rounded-md text-blue-700 text-xs font-semibold border border-blue-200 hover:bg-blue-100 transition-colors"
+    >
+      <Briefcase className="w-3 h-3" />
+      <span>지원하기</span>
+    </button>
+  )}
                         {post.discount && (
                           <div className="flex items-center space-x-1 px-2 py-1 bg-teal-50 rounded-md text-teal-700 text-xs font-semibold border border-teal-200">
                             <Tag className="w-3 h-3" />
@@ -2735,6 +2783,65 @@ const handleLike = async (postId) => {
           className="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           신고하기
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{/* 🆕 지원하기 모달 - 전체 추가 */}
+{showApplicationModal && (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-6">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">지원하기</h2>
+        <button
+          onClick={() => {
+            setShowApplicationModal(false)
+            setApplyingPostId(null)
+            setApplicationMessage('')
+          }}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-400" />
+        </button>
+      </div>
+
+      {/* 지원 메시지 입력 */}
+      <div className="mb-6">
+        <label className="block text-sm font-semibold text-gray-900 mb-2">
+          사장님에게 하고 싶은 말
+        </label>
+        <textarea
+          value={applicationMessage}
+          onChange={(e) => setApplicationMessage(e.target.value)}
+          placeholder="예) 저는 성실하고 약속을 잘 지켜요. 사장님과 함께 일하고 싶어요."
+          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+          rows="6"
+        />
+        <p className="text-xs text-gray-500 mt-2">
+          💡 성실한 자세와 열정을 보여주세요!
+        </p>
+      </div>
+
+      {/* 버튼 */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => {
+            setShowApplicationModal(false)
+            setApplyingPostId(null)
+            setApplicationMessage('')
+          }}
+          className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+        >
+          취소
+        </button>
+        <button
+          onClick={handleApply}
+          disabled={!applicationMessage.trim()}
+          className="flex-1 px-4 py-3 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          지원하기
         </button>
       </div>
     </div>
