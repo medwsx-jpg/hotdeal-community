@@ -1943,7 +1943,7 @@ const handleApply = async () => {
 )}
 
 {/* Right Sidebar */}
-<aside className="hidden xl:block w-64 space-y-3 sticky top-20">
+<aside className="hidden xl:block w-64 space-y-3 sticky top-20 self-start">
   {/* 댓글 많은 게시물 */}
   <div className="bg-white border border-gray-200 rounded-xl p-4">
     <h3 className="font-bold text-sm mb-3 text-gray-900">💬 댓글 HOT</h3>
