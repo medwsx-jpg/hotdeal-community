@@ -968,8 +968,8 @@ const handleApply = async () => {
       <div className="max-w-7xl mx-auto px-4 pt-20">
        {/* 🆕 PC 수평 탭 메뉴 */}
           <div className="hidden md:block mb-6">
-          <div className="bg-white border border-gray-200 rounded-xl p-2">
-            <div className="flex items-center gap-2 overflow-x-auto">
+          <div className="bg-white border border-gray-200 rounded-xl p-2 overflow-visible">
+          <div className="flex items-center gap-2">
               {/* 홈 */}
               <button
                 onClick={() => handleActionClick(() => { 
@@ -1004,7 +1004,7 @@ const handleApply = async () => {
                 </button>
                 
                 {expandedMenus.hotdeal && (
-                  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
+  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
                     <button
                       onClick={() => handleActionClick(() => { 
                         setActiveMainTab('home')
