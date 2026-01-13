@@ -5,6 +5,8 @@ import Login from './pages/Login'
 import Feed from './pages/Feed'
 import Profile from './pages/Profile'
 import Admin from './pages/Admin'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/open" element={<Navigate to="/feed" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/terms" element={<Terms />} />
+<Route path="/privacy" element={<Privacy />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

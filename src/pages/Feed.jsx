@@ -4,7 +4,8 @@ import {
   TrendingUp, Search, Bell, User, Plus, 
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
-  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone
+  Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone,
+  ChevronUp, ChevronDown  // 🆕 추가
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -49,6 +50,7 @@ const [reportReason, setReportReason] = useState('')  // ← 추가
 const [showApplicationModal, setShowApplicationModal] = useState(false)
 const [applicationMessage, setApplicationMessage] = useState('')
 const [applyingPostId, setApplyingPostId] = useState(null)
+const [showBusinessInfo, setShowBusinessInfo] = useState(false)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -1954,7 +1956,6 @@ const handleApply = async () => {
             key={post.id} 
             className="border-l-2 border-teal-500 pl-2.5 cursor-pointer hover:bg-gray-50 rounded transition-colors"
             onClick={() => {
-              // 해당 게시물로 스크롤 (선택사항)
               document.getElementById(`post-${post.id}`)?.scrollIntoView({ behavior: 'smooth' })
             }}
           >
@@ -2005,6 +2006,65 @@ const handleApply = async () => {
             </p>
           </div>
         ))
+      )}
+    </div>
+  </div>
+
+  {/* 🆕 링크 & 사업자정보 - 독립적으로 분리! */}
+  <div className="bg-white border border-gray-200 rounded-xl p-4">
+    {/* 링크 4개 */}
+    <div className="space-y-2 mb-4">
+      <button
+        onClick={() => window.location.href = 'mailto:ad@udt79.com'}
+        className="block w-full text-left text-xs text-gray-600 hover:text-teal-600 transition-colors"
+      >
+        광고 문의
+      </button>
+      <button
+        onClick={() => window.location.href = 'mailto:partner@udt79.com'}
+        className="block w-full text-left text-xs text-gray-600 hover:text-teal-600 transition-colors"
+      >
+        협업 제안
+      </button>
+      <button
+        onClick={() => navigate('/terms')}
+        className="block w-full text-left text-xs text-gray-600 hover:text-teal-600 transition-colors"
+      >
+        이용약관
+      </button>
+      <button
+        onClick={() => navigate('/privacy')}
+        className="block w-full text-left text-xs text-gray-600 hover:text-teal-600 transition-colors"
+      >
+        개인정보처리방침
+      </button>
+    </div>
+
+    {/* 사업자정보 (접기/펼치기) */}
+    <div className="pt-4 border-t border-gray-200">
+      <button
+        onClick={() => setShowBusinessInfo(!showBusinessInfo)}
+        className="flex items-center justify-between w-full text-xs font-semibold text-gray-700 hover:text-teal-600 transition-colors"
+      >
+        <span>UDT79 사업자 정보</span>
+        {showBusinessInfo ? (
+          <ChevronUp className="w-3 h-3" />
+        ) : (
+          <ChevronDown className="w-3 h-3" />
+        )}
+      </button>
+
+      {showBusinessInfo && (
+        <div className="mt-3 space-y-1 text-[10px] text-gray-600 leading-relaxed animate-slide-down">
+          <p>상호명: UDT79</p>
+          <p>대표자: [대표자명]</p>
+          <p>사업자등록번호: [000-00-00000]</p>
+          <p>통신판매업신고: [제0000-서울-00000호]</p>
+          <p>주소: [사업자 주소]</p>
+          <p>이메일: support@udt79.com</p>
+          <p>고객센터: 1234-5678</p>
+          <p className="pt-2 text-gray-500">© 2025 UDT79</p>
+        </div>
       )}
     </div>
   </div>
