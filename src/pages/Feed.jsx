@@ -969,8 +969,8 @@ const handleApply = async () => {
        {/* 🆕 PC 수평 탭 메뉴 */}
           <div className="hidden md:block mb-6">
           <div className="bg-white border border-gray-200 rounded-xl p-2 overflow-visible">
-          <div className="flex items-center gap-2">
-              {/* 홈 */}
+          <div className="flex items-center gap-2 justify-start">
+              {/* 전체 */}
               <button
                 onClick={() => handleActionClick(() => { 
                   setActiveMainTab('home')
@@ -986,7 +986,7 @@ const handleApply = async () => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                홈
+                전체
               </button>
 
               {/* 핫딜 드롭다운 */}
