@@ -965,11 +965,9 @@ const handleApply = async () => {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 pt-20">
-        <div className="flex gap-5">
-         
-{/* 🆕 PC 수평 탭 메뉴 */}
-<div className="hidden md:block mb-6">
+      <div className="max-w-7xl mx-auto px-4 pt-20">
+       {/* 🆕 PC 수평 탭 메뉴 */}
+          <div className="hidden md:block mb-6">
           <div className="bg-white border border-gray-200 rounded-xl p-2">
             <div className="flex items-center gap-2 overflow-x-auto">
               {/* 홈 */}
@@ -1213,10 +1211,12 @@ const handleApply = async () => {
                 }`}
               >
                 공지
-              </button>
+                </button>
             </div>
           </div>
         </div>
+
+        <div className="flex gap-5">
           {/* Feed */}
           <main className="flex-1">
       {/* 모바일 탭 메뉴 */}
