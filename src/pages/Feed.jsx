@@ -1943,9 +1943,9 @@ const handleApply = async () => {
 )}
 
 {/* Right Sidebar */}
-<aside className="hidden xl:block w-64 space-y-3">
+<aside className="hidden xl:block w-64 space-y-3 sticky top-20">
   {/* 댓글 많은 게시물 */}
-  <div className="bg-white border border-gray-200 rounded-xl p-4 sticky top-20">
+  <div className="bg-white border border-gray-200 rounded-xl p-4">
     <h3 className="font-bold text-sm mb-3 text-gray-900">💬 댓글 HOT</h3>
     <div className="space-y-3">
       {topPosts.byComments.length === 0 ? (
