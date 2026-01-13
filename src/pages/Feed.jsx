@@ -1219,14 +1219,21 @@ const handleApply = async () => {
         <div className="flex gap-5">
           {/* Feed */}
           <main className="flex-1">
-      {/* 모바일 탭 메뉴 */}
+    {/* 모바일 탭 메뉴 */}
 <div className="md:hidden mb-4 bg-white border border-gray-200 rounded-xl p-3">
 {activeMainTab === 'home' && (
   <div className="space-y-2">
     {/* 메인 버튼들 - 가로 배치 */}
     <div className="flex gap-2">
       <button
-        onClick={() => { setActiveTab('all'); setExpandedMenus({...expandedMenus, hotdeal: false, share: false, job: false}) }}
+        onClick={() => { 
+          setActiveTab('all')
+          setExpandedMenus({...expandedMenus, hotdeal: false, share: false, job: false})
+          setPosts([])
+          setPage(0)
+          setHasMore(true)
+          fetchPosts(0, '', true)
+        }}
         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           activeTab === 'all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
         }`}
@@ -1265,46 +1272,234 @@ const handleApply = async () => {
     {/* 핫딜 서브메뉴 */}
     {expandedMenus.hotdeal && (
       <div className="flex gap-2">
-        <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>전단지</button>
-        <button onClick={() => setActiveTab('hotdeal-sale')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>행사</button>
-        <button onClick={() => setActiveTab('hotdeal-event')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>기타</button>
+        <button 
+          onClick={() => { 
+            setActiveTab('hotdeal-jeonje')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'hotdeal', '전단지')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          전단지
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('hotdeal-sale')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'hotdeal', '행사')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          행사
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('hotdeal-event')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'hotdeal', '기타')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          기타
+        </button>
       </div>
     )}
 
     {/* 쉐어 서브메뉴 */}
     {expandedMenus.share && (
       <div className="flex gap-2">
-        <button onClick={() => setActiveTab('share-living')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>생활용품</button>
-        <button onClick={() => setActiveTab('share-realestate')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>부동산</button>
-        <button onClick={() => setActiveTab('share-etc')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>기타</button>
+        <button 
+          onClick={() => { 
+            setActiveTab('share-living')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'share', '생활용품')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          생활용품
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('share-realestate')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'share', '부동산')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          부동산
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('share-etc')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'share', '기타')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          기타
+        </button>
       </div>
     )}
 
     {/* JOB 서브메뉴 */}
     {expandedMenus.job && (
       <div className="flex gap-2">
-        <button onClick={() => setActiveTab('job-hire')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구인</button>
-        <button onClick={() => setActiveTab('job-seek')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>구직</button>
-        <button onClick={() => setActiveTab('job-story')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>JOB썰</button>
+        <button 
+          onClick={() => { 
+            setActiveTab('job-hire')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'job', '구인')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          구인
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('job-seek')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'job', '구직')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          구직
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('job-story')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'job', 'JOB썰')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          JOB썰
+        </button>
       </div>
     )}
   </div>
 )}
- {activeMainTab === 'talk' && (
+
+{activeMainTab === 'talk' && (
   <div className="flex gap-2">
-    <button onClick={() => setActiveTab('talk-all')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
-    <button onClick={() => setActiveTab('talk-chat')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-chat' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>수다</button>
-    <button onClick={() => setActiveTab('talk-comfort')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-comfort' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>토닥</button>
-    <button onClick={() => setActiveTab('talk-qna')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-qna' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>Q&A</button>
-    <button onClick={() => setActiveTab('talk-tips')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-tips' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>꿀팁</button>
+    <button 
+      onClick={() => { 
+        setActiveTab('talk-all')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'talk', '')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      전체
+    </button>
+    <button 
+      onClick={() => { 
+        setActiveTab('talk-chat')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'talk', '수다')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-chat' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      수다
+    </button>
+    <button 
+      onClick={() => { 
+        setActiveTab('talk-comfort')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'talk', '토닥')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-comfort' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      토닥
+    </button>
+    <button 
+      onClick={() => { 
+        setActiveTab('talk-qna')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'talk', 'Q&A')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-qna' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      Q&A
+    </button>
+    <button 
+      onClick={() => { 
+        setActiveTab('talk-tips')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'talk', '꿀팁')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'talk-tips' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      꿀팁
+    </button>
   </div>
 )}
 
 {activeMainTab === 'notice' && (
   <div className="flex gap-2">
-    <button onClick={() => setActiveTab('notice-all')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>전체</button>
-    <button onClick={() => setActiveTab('notice-announcement')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-announcement' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>공지</button>
-    <button onClick={() => setActiveTab('notice-event')} className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}>이벤트</button>
+    <button 
+      onClick={() => { 
+        setActiveTab('notice-all')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'notice', '')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-all' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      전체
+    </button>
+    <button 
+      onClick={() => { 
+        setActiveTab('notice-announcement')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'notice', '공지')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-announcement' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      공지
+    </button>
+    <button 
+      onClick={() => { 
+        setActiveTab('notice-event')
+        setPosts([])
+        setPage(0)
+        setHasMore(true)
+        fetchPosts(0, '', true, 'notice', '이벤트')
+      }} 
+      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium ${activeTab === 'notice-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'}`}
+    >
+      이벤트
+    </button>
   </div>
 )}
 </div>
