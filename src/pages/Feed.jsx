@@ -354,8 +354,8 @@ const getTimeAgo = (timestamp) => {
     
     // 핫딜
     if (activeTab === 'hotdeal-jeonje') return post.type === 'hotdeal' && post.category === '전단지'
-    if (activeTab === 'hotdeal-sale') return post.type === 'hotdeal' && post.category === '할인'
-    if (activeTab === 'hotdeal-event') return post.type === 'hotdeal' && post.category === '행사'
+    if (activeTab === 'hotdeal-sale') return post.type === 'hotdeal' && post.category === '행사'
+    if (activeTab === 'hotdeal-event') return post.type === 'hotdeal' && post.category === '기타'
     
     // 쉐어
     if (activeTab === 'share-living') return post.type === 'share' && post.category === '생활용품'
@@ -1011,7 +1011,7 @@ const handleLike = async (postId) => {
     setPosts([])
     setPage(0)
     setHasMore(true)
-    fetchPosts(0, '', true, 'hotdeal', '할인')
+    fetchPosts(0, '', true, 'hotdeal', '행사')
   })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'hotdeal-sale'
@@ -1019,7 +1019,7 @@ const handleLike = async (postId) => {
                         : 'text-gray-500 hover:bg-gray-50'
                     }`}
                   >
-                    할인
+                    행사
                   </button>
                   <button
   onClick={() => handleActionClick(() => { 
@@ -1028,7 +1028,7 @@ const handleLike = async (postId) => {
     setPosts([])
     setPage(0)
     setHasMore(true)
-    fetchPosts(0, '', true, 'hotdeal', '행사')
+    fetchPosts(0, '', true, 'hotdeal', '기타')
   })}
                     className={`w-full text-left px-3 py-1 rounded-lg text-xs transition-colors ${
                       activeTab === 'hotdeal-event'
@@ -1036,7 +1036,7 @@ const handleLike = async (postId) => {
                         : 'text-gray-500 hover:bg-gray-50'
                     }`}
                   >
-                    행사
+                    기타
                   </button>
                 </div>
               )}
@@ -1424,8 +1424,8 @@ const handleLike = async (postId) => {
     {expandedMenus.hotdeal && (
       <div className="flex gap-2">
         <button onClick={() => setActiveTab('hotdeal-jeonje')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>전단지</button>
-        <button onClick={() => setActiveTab('hotdeal-sale')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>할인</button>
-        <button onClick={() => setActiveTab('hotdeal-event')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>행사</button>
+        <button onClick={() => setActiveTab('hotdeal-sale')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>행사</button>
+        <button onClick={() => setActiveTab('hotdeal-event')} className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}>기타</button>
       </div>
     )}
 
@@ -1621,7 +1621,7 @@ const handleLike = async (postId) => {
                         {post.discount && (
                           <div className="flex items-center space-x-1 px-2 py-1 bg-teal-50 rounded-md text-teal-700 text-xs font-semibold border border-teal-200">
                             <Tag className="w-3 h-3" />
-                            <span>{post.discount} 할인</span>
+                            <span>{post.discount} 행사</span>
                           </div>
                         )}
                         {post.price && (
@@ -2108,21 +2108,21 @@ const handleLike = async (postId) => {
       </button>
       <button
   type="button"
-  onClick={() => setNewPost({...newPost, category: '할인'})}
+  onClick={() => setNewPost({...newPost, category: '행사'})}
   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-    newPost.category === '할인' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    newPost.category === '행사' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
   }`}
 >
-  할인
+  행사
 </button>
       <button
         type="button"
-        onClick={() => setNewPost({...newPost, category: '행사'})}
+        onClick={() => setNewPost({...newPost, category: '기타'})}
         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          newPost.category === '행사' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          newPost.category === '기타' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
-        행사
+        기타
       </button>
     </div>
   )}
