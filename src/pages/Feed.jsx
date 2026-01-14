@@ -284,18 +284,32 @@ const fetchTopPosts = async () => {
       // 작성자 정보만 별도로 가져오기 (한 번에)
       const postsWithData = await Promise.all(
         (data || []).map(async (post) => {
+          // 작성자 정보
           const { data: authorData } = await supabase
             .from('profiles')
             .select('username, role')
             .eq('id', post.user_id)
             .single()
           
+          // 댓글 수 실시간 계산
+          const { count: commentsCount } = await supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+          
+          // 좋아요 수 실시간 계산
+          const { count: likesCount } = await supabase
+            .from('likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id)
+          
           return {
             ...post,
             author: authorData?.username || '사용자',
             authorRole: authorData?.role || '회원',
-            timeAgo: getTimeAgo(post.created_at)
-            // likes_count, comments_count는 이미 post에 있음!
+            timeAgo: getTimeAgo(post.created_at),
+            comments_count: commentsCount || 0,
+            likes_count: likesCount || 0
           }
         })
       )
