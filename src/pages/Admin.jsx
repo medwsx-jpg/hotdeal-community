@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   Users, FileText, MessageSquare, AlertTriangle, 
-  TrendingUp, BarChart3, Shield, Home, Bell, Plus, X, Image as ImageIcon, Edit2, Trash2
+  TrendingUp, BarChart3, Shield, Home, Bell, Plus, X, Image as ImageIcon, Edit2, Trash2,
+  Award, Trophy, Medal  // 🆕 추가
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -32,6 +33,14 @@ export default function Admin() {
     totalReports: 0
   })
 
+  // 🆕 사용자 통계 상태
+  const [userStats, setUserStats] = useState({
+    topPosters: [],
+    topCommenters: [],
+    allUsers: []
+  })
+  const [statsPeriod, setStatsPeriod] = useState('all') // all, month, week, today
+
   useEffect(() => {
     if (!user) {
       navigate('/login')
@@ -50,6 +59,7 @@ export default function Admin() {
     
     fetchStats()
     fetchNotices()
+    fetchUserStats() // 🆕 추가
   }, [user, profile, navigate])
 
   const fetchStats = async () => {
@@ -70,6 +80,108 @@ export default function Admin() {
       })
     } catch (error) {
       console.error('통계 로드 실패:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 🆕 사용자 통계 fetch
+  const fetchUserStats = async (period = 'all') => {
+    try {
+      setLoading(true)
+      
+      // 기간 필터
+      let dateFilter = null
+      const now = new Date()
+      
+      if (period === 'today') {
+        dateFilter = new Date(now.setHours(0, 0, 0, 0)).toISOString()
+      } else if (period === 'week') {
+        const weekAgo = new Date(now.setDate(now.getDate() - 7))
+        dateFilter = weekAgo.toISOString()
+      } else if (period === 'month') {
+        const monthAgo = new Date(now.setMonth(now.getMonth() - 1))
+        dateFilter = monthAgo.toISOString()
+      }
+      
+      // 모든 사용자 정보 가져오기
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, username, email, created_at')
+      
+      if (!profiles) return
+      
+      // 각 사용자별 게시물 수, 댓글 수 계산
+      const userStatsData = await Promise.all(
+        profiles.map(async (profile) => {
+          // 게시물 수
+          let postsQuery = supabase
+            .from('posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id)
+          
+          if (dateFilter) {
+            postsQuery = postsQuery.gte('created_at', dateFilter)
+          }
+          
+          const { count: postsCount } = await postsQuery
+          
+          // 댓글 수
+          let commentsQuery = supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id)
+          
+          if (dateFilter) {
+            commentsQuery = commentsQuery.gte('created_at', dateFilter)
+          }
+          
+          const { count: commentsCount } = await commentsQuery
+          
+          // 좋아요 수 (받은 좋아요)
+          const { data: userPosts } = await supabase
+            .from('posts')
+            .select('id')
+            .eq('user_id', profile.id)
+          
+          let likesCount = 0
+          if (userPosts && userPosts.length > 0) {
+            const postIds = userPosts.map(p => p.id)
+            const { count } = await supabase
+              .from('likes')
+              .select('*', { count: 'exact', head: true })
+              .in('post_id', postIds)
+            
+            likesCount = count || 0
+          }
+          
+          return {
+            ...profile,
+            postsCount: postsCount || 0,
+            commentsCount: commentsCount || 0,
+            likesCount: likesCount
+          }
+        })
+      )
+      
+      // 게시물 많은 순 TOP 5
+      const topPosters = [...userStatsData]
+        .sort((a, b) => b.postsCount - a.postsCount)
+        .slice(0, 5)
+      
+      // 댓글 많은 순 TOP 5
+      const topCommenters = [...userStatsData]
+        .sort((a, b) => b.commentsCount - a.commentsCount)
+        .slice(0, 5)
+      
+      setUserStats({
+        topPosters,
+        topCommenters,
+        allUsers: userStatsData
+      })
+      
+    } catch (error) {
+      console.error('사용자 통계 로드 실패:', error)
     } finally {
       setLoading(false)
     }
@@ -349,11 +461,197 @@ export default function Admin() {
           </div>
 
           <div className="p-6">
-            {/* 대시보드 */}
+            {/* 🆕 대시보드 - 사용자 통계 */}
             {activeTab === 'dashboard' && (
-              <div className="text-center py-12">
-                <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">통계 차트는 곧 추가됩니다</p>
+              <div>
+                {/* 기간 필터 */}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-bold text-gray-900">📊 사용자 활동 통계</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setStatsPeriod('all')
+                        fetchUserStats('all')
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        statsPeriod === 'all'
+                          ? 'bg-teal-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      전체
+                    </button>
+                    <button
+                      onClick={() => {
+                        setStatsPeriod('month')
+                        fetchUserStats('month')
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        statsPeriod === 'month'
+                          ? 'bg-teal-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      이번 달
+                    </button>
+                    <button
+                      onClick={() => {
+                        setStatsPeriod('week')
+                        fetchUserStats('week')
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        statsPeriod === 'week'
+                          ? 'bg-teal-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      이번 주
+                    </button>
+                    <button
+                      onClick={() => {
+                        setStatsPeriod('today')
+                        fetchUserStats('today')
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        statsPeriod === 'today'
+                          ? 'bg-teal-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      오늘
+                    </button>
+                  </div>
+                </div>
+
+                {/* TOP 랭킹 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  {/* 게시물 TOP 5 */}
+                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Trophy className="w-5 h-5 text-teal-600" />
+                      <h3 className="font-bold text-gray-900">🏆 게시물 작성 TOP 5</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {userStats.topPosters.length === 0 ? (
+                        <p className="text-sm text-gray-600 text-center py-4">데이터가 없습니다</p>
+                      ) : (
+                        userStats.topPosters.map((user, index) => (
+                          <div 
+                            key={user.id} 
+                            className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <span className={`text-2xl ${
+                                index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤'
+                              }`}>
+                                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}
+                              </span>
+                              <div>
+                                <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
+                                <p className="text-xs text-gray-500">{user.email}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-teal-600">{user.postsCount}개</p>
+                              {index < 3 && (
+                                <p className="text-[10px] text-gray-500">🎁 포인트 {index === 0 ? 500 : index === 1 ? 300 : 200}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 댓글 TOP 5 */}
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <MessageSquare className="w-5 h-5 text-purple-600" />
+                      <h3 className="font-bold text-gray-900">💬 댓글 작성 TOP 5</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {userStats.topCommenters.length === 0 ? (
+                        <p className="text-sm text-gray-600 text-center py-4">데이터가 없습니다</p>
+                      ) : (
+                        userStats.topCommenters.map((user, index) => (
+                          <div 
+                            key={user.id} 
+                            className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <span className={`text-2xl ${
+                                index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤'
+                              }`}>
+                                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}
+                              </span>
+                              <div>
+                                <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
+                                <p className="text-xs text-gray-500">{user.email}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-purple-600">{user.commentsCount}개</p>
+                              {index < 3 && (
+                                <p className="text-[10px] text-gray-500">🎁 포인트 {index === 0 ? 300 : index === 1 ? 200 : 100}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 전체 사용자 테이블 */}
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="font-bold text-gray-900">📋 전체 사용자 통계</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">번호</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">사용자명</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">이메일</th>
+                          <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">게시물</th>
+                          <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">댓글</th>
+                          <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">좋아요</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">가입일</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {userStats.allUsers
+                          .sort((a, b) => b.postsCount - a.postsCount)
+                          .map((user, index) => (
+                          <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.username || '익명'}</td>
+                            <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
+                            <td className="px-6 py-4 text-sm text-center">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                                {user.postsCount}개
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-center">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                {user.commentsCount}개
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-center">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
+                                {user.likesCount}개
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600">
+                              {new Date(user.created_at).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             )}
             
