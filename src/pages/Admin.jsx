@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { 
   Users, FileText, MessageSquare, AlertTriangle, 
   TrendingUp, BarChart3, Shield, Home, Bell, Plus, X, Image as ImageIcon, Edit2, Trash2,
-  Award, Trophy, Medal  // 🆕 추가
+  Award, Trophy, Medal
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -39,7 +39,7 @@ export default function Admin() {
     topCommenters: [],
     allUsers: []
   })
-  const [statsPeriod, setStatsPeriod] = useState('all') // all, month, week, today
+  const [statsPeriod, setStatsPeriod] = useState('all')
 
   useEffect(() => {
     if (!user) {
@@ -59,7 +59,7 @@ export default function Admin() {
     
     fetchStats()
     fetchNotices()
-    fetchUserStats() // 🆕 추가
+    fetchUserStats()
   }, [user, profile, navigate])
 
   const fetchStats = async () => {
@@ -105,11 +105,26 @@ export default function Admin() {
       }
       
       // 모든 사용자 정보 가져오기
-      const { data: profiles } = await supabase
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, username, email, created_at')
+        .select('id, username, email')
       
-      if (!profiles) return
+      if (profilesError) {
+        console.error('프로필 로드 에러:', profilesError)
+        throw profilesError
+      }
+      
+      if (!profiles || profiles.length === 0) {
+        console.log('프로필 데이터 없음')
+        setUserStats({
+          topPosters: [],
+          topCommenters: [],
+          allUsers: []
+        })
+        return
+      }
+      
+      console.log('로드된 프로필:', profiles.length, '개')
       
       // 각 사용자별 게시물 수, 댓글 수 계산
       const userStatsData = await Promise.all(
@@ -124,7 +139,11 @@ export default function Admin() {
             postsQuery = postsQuery.gte('created_at', dateFilter)
           }
           
-          const { count: postsCount } = await postsQuery
+          const { count: postsCount, error: postsError } = await postsQuery
+          
+          if (postsError) {
+            console.error('게시물 카운트 에러:', postsError)
+          }
           
           // 댓글 수
           let commentsQuery = supabase
@@ -136,7 +155,11 @@ export default function Admin() {
             commentsQuery = commentsQuery.gte('created_at', dateFilter)
           }
           
-          const { count: commentsCount } = await commentsQuery
+          const { count: commentsCount, error: commentsError } = await commentsQuery
+          
+          if (commentsError) {
+            console.error('댓글 카운트 에러:', commentsError)
+          }
           
           // 좋아요 수 (받은 좋아요)
           const { data: userPosts } = await supabase
@@ -164,6 +187,8 @@ export default function Admin() {
         })
       )
       
+      console.log('사용자 통계:', userStatsData)
+      
       // 게시물 많은 순 TOP 5
       const topPosters = [...userStatsData]
         .sort((a, b) => b.postsCount - a.postsCount)
@@ -174,6 +199,9 @@ export default function Admin() {
         .sort((a, b) => b.commentsCount - a.commentsCount)
         .slice(0, 5)
       
+      console.log('TOP 게시물:', topPosters)
+      console.log('TOP 댓글:', topCommenters)
+      
       setUserStats({
         topPosters,
         topCommenters,
@@ -182,6 +210,8 @@ export default function Admin() {
       
     } catch (error) {
       console.error('사용자 통계 로드 실패:', error)
+      console.error('에러 상세:', error.message)
+      alert('통계 로드 실패: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -541,9 +571,7 @@ export default function Admin() {
                             className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow"
                           >
                             <div className="flex items-center space-x-3">
-                              <span className={`text-2xl ${
-                                index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤'
-                              }`}>
+                              <span className="text-2xl">
                                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}
                               </span>
                               <div>
@@ -579,9 +607,7 @@ export default function Admin() {
                             className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow"
                           >
                             <div className="flex items-center space-x-3">
-                              <span className={`text-2xl ${
-                                index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤'
-                              }`}>
+                              <span className="text-2xl">
                                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}
                               </span>
                               <div>
@@ -617,7 +643,6 @@ export default function Admin() {
                           <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">게시물</th>
                           <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">댓글</th>
                           <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">좋아요</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">가입일</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
@@ -642,9 +667,6 @@ export default function Admin() {
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
                                 {user.likesCount}개
                               </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600">
-                              {new Date(user.created_at).toLocaleDateString()}
                             </td>
                           </tr>
                         ))}
