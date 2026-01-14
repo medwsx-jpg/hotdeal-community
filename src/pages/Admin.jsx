@@ -106,8 +106,8 @@ export default function Admin() {
       
       // 모든 사용자 정보 가져오기
       const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, email')
+      .from('profiles')
+      .select('id, username')
       
       if (profilesError) {
         console.error('프로필 로드 에러:', profilesError)
@@ -575,8 +575,7 @@ export default function Admin() {
                                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}
                               </span>
                               <div>
-                                <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
-                                <p className="text-xs text-gray-500">{user.email}</p>
+                              <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
                               </div>
                             </div>
                             <div className="text-right">
@@ -611,8 +610,7 @@ export default function Admin() {
                                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}
                               </span>
                               <div>
-                                <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
-                                <p className="text-xs text-gray-500">{user.email}</p>
+                              <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
                               </div>
                             </div>
                             <div className="text-right">
@@ -639,7 +637,7 @@ export default function Admin() {
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">번호</th>
                           <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">사용자명</th>
-                          <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">이메일</th>
+                         
                           <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">게시물</th>
                           <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">댓글</th>
                           <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">좋아요</th>
@@ -652,7 +650,7 @@ export default function Admin() {
                           <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.username || '익명'}</td>
-                            <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
+                           
                             <td className="px-6 py-4 text-sm text-center">
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
                                 {user.postsCount}개
