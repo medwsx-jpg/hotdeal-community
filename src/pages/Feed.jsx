@@ -147,6 +147,20 @@ useEffect(() => {
   return () => window.removeEventListener('scroll', handleScroll)
 }, [page, loading, hasMore, searchQuery, user, isInApp])
 
+// 스크롤 위치 감지 (맨 위로 가기 버튼)
+useEffect(() => {
+  const handleScroll = () => {
+    if (window.scrollY > 300) {
+      setShowScrollTop(true)
+    } else {
+      setShowScrollTop(false)
+    }
+  }
+  
+  window.addEventListener('scroll', handleScroll)
+  return () => window.removeEventListener('scroll', handleScroll)
+}, [])
+
 // 비로그인/인앱 사용자 스크롤 맨 아래 감지 → 모달 또는 로그인 페이지
 useEffect(() => {
   // 로그인했으면 무시
@@ -1175,24 +1189,95 @@ const handleApply = async () => {
                 )}
               </div>
 
-              {/* 톡 */}
-              <button
-                onClick={() => handleActionClick(() => { 
-                  setActiveMainTab('talk')
-                  setActiveTab('talk-all')
-                  setPosts([])
-                  setPage(0)
-                  setHasMore(true)
-                  fetchPosts(0, '', true, 'talk', '')
-                })}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
-                  activeMainTab === 'talk'
-                    ? 'bg-orange-500 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                톡
-              </button>
+             {/* 톡 드롭다운 */}
+<div className="relative">
+  <button
+    onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, hotdeal: false, share: false, job: false})}
+    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
+      activeTab.startsWith('talk')
+        ? 'bg-orange-500 text-white'
+        : 'text-gray-700 hover:bg-gray-100'
+    }`}
+  >
+    <span>톡</span>
+    <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.talk ? 'rotate-180' : ''}`} />
+  </button>
+  
+  {expandedMenus.talk && (
+    <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
+      <button
+        onClick={() => handleActionClick(() => { 
+          setActiveMainTab('talk')
+          setActiveTab('talk-all')
+          setPosts([])
+          setPage(0)
+          setHasMore(true)
+          fetchPosts(0, '', true, 'talk', '')
+          setExpandedMenus({...expandedMenus, talk: false})
+        })}
+        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        전체
+      </button>
+      <button
+        onClick={() => handleActionClick(() => { 
+          setActiveMainTab('talk')
+          setActiveTab('talk-chat')
+          setPosts([])
+          setPage(0)
+          setHasMore(true)
+          fetchPosts(0, '', true, 'talk', '수다')
+          setExpandedMenus({...expandedMenus, talk: false})
+        })}
+        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        수다
+      </button>
+      <button
+        onClick={() => handleActionClick(() => { 
+          setActiveMainTab('talk')
+          setActiveTab('talk-comfort')
+          setPosts([])
+          setPage(0)
+          setHasMore(true)
+          fetchPosts(0, '', true, 'talk', '토닥')
+          setExpandedMenus({...expandedMenus, talk: false})
+        })}
+        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        토닥
+      </button>
+      <button
+        onClick={() => handleActionClick(() => { 
+          setActiveMainTab('talk')
+          setActiveTab('talk-qna')
+          setPosts([])
+          setPage(0)
+          setHasMore(true)
+          fetchPosts(0, '', true, 'talk', 'Q&A')
+          setExpandedMenus({...expandedMenus, talk: false})
+        })}
+        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        Q&A
+      </button>
+      <button
+        onClick={() => handleActionClick(() => { 
+          setActiveMainTab('talk')
+          setActiveTab('talk-tips')
+          setPosts([])
+          setPage(0)
+          setHasMore(true)
+          fetchPosts(0, '', true, 'talk', '꿀팁')
+          setExpandedMenus({...expandedMenus, talk: false})
+        })}
+        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        꿀팁
+      </button>
+    </div>
+  )}
+</div>
 
               {/* 공지 */}
               <button
