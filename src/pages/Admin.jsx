@@ -189,9 +189,28 @@ export default function Admin() {
 
   // 🆕 게시물 삭제
   const handleDeletePost = async (postId) => {
-    if (!window.confirm('이 게시물을 삭제하시겠습니까?')) return
+    if (!window.confirm('이 게시물을 삭제하시겠습니까?\n(관련 댓글, 좋아요, 신고도 함께 삭제됩니다)')) return
     
     try {
+      // 1. 관련 댓글 먼저 삭제
+      await supabase
+        .from('comments')
+        .delete()
+        .eq('post_id', postId)
+      
+      // 2. 관련 좋아요 삭제
+      await supabase
+        .from('likes')
+        .delete()
+        .eq('post_id', postId)
+      
+      // 3. 관련 신고 삭제
+      await supabase
+        .from('reports')
+        .delete()
+        .eq('post_id', postId)
+      
+      // 4. 게시물 삭제
       const { error } = await supabase
         .from('posts')
         .delete()
@@ -369,16 +388,28 @@ export default function Admin() {
 
   // 🆕 신고된 게시물 삭제
   const handleDeleteReportedPost = async (reportId, postId) => {
-    if (!window.confirm('이 게시물을 삭제하시겠습니까? (관련 신고도 함께 삭제됩니다)')) return
+    if (!window.confirm('이 게시물을 삭제하시겠습니까?\n(관련 댓글, 좋아요, 신고도 함께 삭제됩니다)')) return
     
     try {
-      // 먼저 해당 게시물에 대한 모든 신고 삭제
+      // 1. 관련 댓글 먼저 삭제
+      await supabase
+        .from('comments')
+        .delete()
+        .eq('post_id', postId)
+      
+      // 2. 관련 좋아요 삭제
+      await supabase
+        .from('likes')
+        .delete()
+        .eq('post_id', postId)
+      
+      // 3. 관련 신고 삭제
       await supabase
         .from('reports')
         .delete()
         .eq('post_id', postId)
       
-      // 게시물 삭제
+      // 4. 게시물 삭제
       const { error } = await supabase
         .from('posts')
         .delete()
