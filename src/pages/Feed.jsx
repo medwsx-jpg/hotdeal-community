@@ -2114,13 +2114,13 @@ const handleApply = async () => {
     {/* 링크 4개 */}
     <div className="space-y-2 mb-4">
       <button
-        onClick={() => window.location.href = 'mailto:ad@udt79.com'}
+        onClick={() => window.open('https://open.kakao.com/o/sNlIAtbi', '_blank')}
         className="block w-full text-left text-xs text-gray-600 hover:text-teal-600 transition-colors"
       >
         광고 문의
       </button>
       <button
-        onClick={() => window.location.href = 'mailto:partner@udt79.com'}
+        onClick={() => window.open('https://open.kakao.com/o/sNlIAtbi', '_blank')}
         className="block w-full text-left text-xs text-gray-600 hover:text-teal-600 transition-colors"
       >
         협업 제안
