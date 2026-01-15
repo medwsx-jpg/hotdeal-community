@@ -51,6 +51,9 @@ const [showApplicationModal, setShowApplicationModal] = useState(false)
 const [applicationMessage, setApplicationMessage] = useState('')
 const [applyingPostId, setApplyingPostId] = useState(null)
 const [showBusinessInfo, setShowBusinessInfo] = useState(false)
+// 🆕 새 게시물 알림 상태
+const [hasNewPosts, setHasNewPosts] = useState(false)
+const [latestPostId, setLatestPostId] = useState(null)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
@@ -128,6 +131,49 @@ useEffect(() => {
     fetchTopPosts()
   }
 }, [user])
+
+// 🆕 30초마다 새 게시물 체크 (로그인 사용자만)
+useEffect(() => {
+  if (!user) return
+  
+  // 초기 최신 게시물 ID 저장
+  const initLatestId = async () => {
+    const { data } = await supabase
+      .from('posts')
+      .select('id')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    
+    if (data) {
+      setLatestPostId(data.id)
+    }
+  }
+  
+  initLatestId()
+  
+  // 30초마다 체크
+  const interval = setInterval(async () => {
+    try {
+      const { data } = await supabase
+        .from('posts')
+        .select('id')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (data && latestPostId && data.id !== latestPostId) {
+        console.log('🔔 새 게시물 감지!')
+        setHasNewPosts(true)
+      }
+    } catch (error) {
+      console.error('새 게시물 체크 실패:', error)
+    }
+  }, 30000) // 30초
+  
+  return () => clearInterval(interval)
+}, [user, latestPostId])
+
  // 무한 스크롤 감지 (로그인 시에만)
 useEffect(() => {
   // 로그인 안 했거나 인앱이면 무한 스크롤 비활성화
@@ -190,8 +236,30 @@ useEffect(() => {
   window.addEventListener('scroll', handleScrollBottom)
   return () => window.removeEventListener('scroll', handleScrollBottom)
 }, [user, posts.length, isInApp, navigate])
+
+// 🆕 새 게시물 로드 (알림 바 클릭 시)
+const loadNewPosts = async () => {
+  // 새 게시물 로드
+  await fetchPosts(0, '', true)
   
- 
+  // 최신 게시물 ID 업데이트
+  const { data } = await supabase
+    .from('posts')
+    .select('id')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+  
+  if (data) {
+    setLatestPostId(data.id)
+  }
+  
+  // 맨 위로 스크롤
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  
+  // 알림 바 숨기기
+  setHasNewPosts(false)
+}
 
 
 const fetchTopPosts = async () => {
@@ -992,8 +1060,21 @@ const handleApply = async () => {
         </div>
       </nav>
 
+      {/* 🆕 새 게시물 알림 바 */}
+      {hasNewPosts && user && (
+        <div 
+          onClick={loadNewPosts}
+          className="fixed top-14 left-0 right-0 z-40 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2.5 px-4 text-center cursor-pointer hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg"
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <Bell className="w-4 h-4 animate-bounce" />
+            <span className="text-sm font-medium">새 게시물이 있습니다. 클릭하여 확인하세요!</span>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pt-20">
+      <div className={`max-w-7xl mx-auto px-4 ${hasNewPosts && user ? 'pt-28' : 'pt-20'}`}>
        {/* 🆕 PC 수평 탭 메뉴 */}
           <div className="hidden md:block mb-6">
           <div className="bg-white border border-gray-200 rounded-xl p-2 overflow-visible">
