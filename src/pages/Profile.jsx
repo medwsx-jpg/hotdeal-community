@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Mail, Camera, ArrowLeft, Save, FileText, MessageCircle, Briefcase } from 'lucide-react'
+import { User, Mail, Camera, ArrowLeft, Save, FileText, MessageCircle, Briefcase, MoreVertical, Edit2, Trash2, X, Image as ImageIcon, Plus } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -21,6 +21,24 @@ export default function Profile() {
   const [receivedApplications, setReceivedApplications] = useState([])
   const [myApplications, setMyApplications] = useState([])
   const [applicationSubTab, setApplicationSubTab] = useState('received')
+  
+  // 🆕 수정/삭제 관련 State
+  const [openMenuId, setOpenMenuId] = useState(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingPost, setEditingPost] = useState(null)
+  const [selectedImages, setSelectedImages] = useState([])
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    content: '',
+    type: 'hotdeal',
+    category: '',
+    tags: '',
+    discount: '',
+    price: '',
+    hourlyPay: '',
+    location: '',
+    period: ''
+  })
 
   useEffect(() => {
     if (profile) {
@@ -156,6 +174,125 @@ export default function Profile() {
     if (diffMins < 60) return `${diffMins}분 전`
     if (diffHours < 24) return `${diffHours}시간 전`
     return `${diffDays}일 전`
+  }
+
+  // 🆕 게시물 수정
+  const handleEdit = (post) => {
+    setEditingPost(post)
+    setEditFormData({
+      title: post.title,
+      content: post.content,
+      type: post.type,
+      category: post.category,
+      tags: post.tags?.join(', ') || '',
+      discount: post.discount || '',
+      price: post.price || '',
+      hourlyPay: post.hourly_pay || '',
+      location: post.location || '',
+      period: post.period || ''
+    })
+    setSelectedImages(post.images || [])
+    setIsEditModalOpen(true)
+  }
+
+  // 🆕 게시물 삭제
+  const handleDelete = async (postId) => {
+    if (!window.confirm('게시물을 삭제하시겠습니까?')) return
+    
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+      
+      if (error) throw error
+      
+      alert('삭제되었습니다!')
+      fetchMyPosts()
+    } catch (error) {
+      console.error('삭제 실패:', error)
+      alert('삭제 실패: ' + error.message)
+    }
+  }
+
+  // 🆕 이미지 선택
+  const handleImageSelect = async (e) => {
+    const files = Array.from(e.target.files)
+    
+    try {
+      setLoading(true)
+      
+      const uploadedUrls = await Promise.all(
+        files.map(async (file) => {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `${Math.random()}.${fileExt}`
+          const filePath = `${user.id}/${fileName}`
+          
+          const { error: uploadError } = await supabase.storage
+            .from('post-images')
+            .upload(filePath, file)
+          
+          if (uploadError) throw uploadError
+          
+          const { data } = supabase.storage
+            .from('post-images')
+            .getPublicUrl(filePath)
+          
+          return data.publicUrl
+        })
+      )
+      
+      setSelectedImages([...selectedImages, ...uploadedUrls])
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error)
+      alert('이미지 업로드 실패: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 🆕 이미지 제거
+  const removeImage = (index) => {
+    setSelectedImages(selectedImages.filter((_, i) => i !== index))
+  }
+
+  // 🆕 수정 제출
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
+    
+    try {
+      setLoading(true)
+      
+      const { error } = await supabase
+        .from('posts')
+        .update({
+          type: editFormData.type,
+          category: editFormData.category,
+          title: editFormData.title,
+          content: editFormData.content,
+          tags: editFormData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+          discount: editFormData.discount || null,
+          price: editFormData.price || null,
+          hourly_pay: editFormData.hourlyPay || null,
+          location: editFormData.location || null,
+          period: editFormData.period || null,
+          images: selectedImages.length > 0 ? selectedImages : null
+        })
+        .eq('id', editingPost.id)
+      
+      if (error) throw error
+      
+      alert('수정되었습니다!')
+      setIsEditModalOpen(false)
+      setEditingPost(null)
+      setSelectedImages([])
+      fetchMyPosts()
+    } catch (error) {
+      console.error('수정 실패:', error)
+      alert('수정 실패: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -357,23 +494,77 @@ export default function Profile() {
                   myPosts.map((post) => (
                     <div
                       key={post.id}
-                      onClick={() => navigate(`/feed#post-${post.id}`)}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all cursor-pointer"
+                      className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 flex-1">{post.title}</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          post.type === 'hotdeal' ? 'bg-teal-100 text-teal-700' :
-                          post.type === 'share' ? 'bg-purple-100 text-purple-700' :
-                          post.type === 'job' ? 'bg-cyan-100 text-cyan-700' :
-                          post.type === 'talk' ? 'bg-orange-100 text-orange-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {post.category}
-                        </span>
+                        <h3 
+                          onClick={() => navigate(`/feed#post-${post.id}`)}
+                          className="font-semibold text-gray-900 flex-1 cursor-pointer hover:text-teal-600 transition-colors"
+                        >
+                          {post.title}
+                        </h3>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            post.type === 'hotdeal' ? 'bg-teal-100 text-teal-700' :
+                            post.type === 'share' ? 'bg-purple-100 text-purple-700' :
+                            post.type === 'job' ? 'bg-cyan-100 text-cyan-700' :
+                            post.type === 'talk' ? 'bg-orange-100 text-orange-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {post.category}
+                          </span>
+                          
+                          {/* 🆕 점 3개 메뉴 */}
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setOpenMenuId(openMenuId === post.id ? null : post.id)
+                              }}
+                              className="p-1 hover:bg-gray-100 rounded transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4 text-gray-600" />
+                            </button>
+                            
+                            {openMenuId === post.id && (
+                              <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEdit(post)
+                                    setOpenMenuId(null)
+                                  }}
+                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                  <span>수정</span>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDelete(post.id)
+                                    setOpenMenuId(null)
+                                  }}
+                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>삭제</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">{post.content}</p>
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                      <p 
+                        onClick={() => navigate(`/feed#post-${post.id}`)}
+                        className="text-sm text-gray-600 line-clamp-2 mb-2 cursor-pointer"
+                      >
+                        {post.content}
+                      </p>
+                      <div 
+                        onClick={() => navigate(`/feed#post-${post.id}`)}
+                        className="flex items-center space-x-4 text-xs text-gray-500 cursor-pointer"
+                      >
                         <span>👍 {post.likes_count || 0}</span>
                         <span>💬 {post.comments_count || 0}</span>
                         <span className="ml-auto">{getTimeAgo(post.created_at)}</span>
@@ -497,6 +688,225 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* 🆕 수정 모달 */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold">게시물 수정</h2>
+              <button 
+                onClick={() => {
+                  setIsEditModalOpen(false)
+                  setEditingPost(null)
+                  setSelectedImages([])
+                }}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="p-4 md:p-6 space-y-4">
+              {/* 메인 카테고리 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">메인 카테고리</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData({...editFormData, type: 'hotdeal', category: ''})}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      editFormData.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    핫딜
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData({...editFormData, type: 'share', category: ''})}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      editFormData.type === 'share' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    쉐어
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData({...editFormData, type: 'job', category: ''})}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      editFormData.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    JOB
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFormData({...editFormData, type: 'talk', category: ''})}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      editFormData.type === 'talk' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    톡
+                  </button>
+                </div>
+              </div>
+
+              {/* 서브 카테고리 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">세부 카테고리 *</label>
+                {editFormData.type === 'hotdeal' && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '전단지'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '전단지' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>전단지</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '행사'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '행사' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>행사</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '기타'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '기타' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>기타</button>
+                  </div>
+                )}
+                {editFormData.type === 'share' && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '생활용품'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '생활용품' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>생활용품</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '부동산'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '부동산' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>부동산</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '기타'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '기타' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>기타</button>
+                  </div>
+                )}
+                {editFormData.type === 'job' && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '구인'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '구인' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>구인</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '구직'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '구직' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>구직</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: 'JOB썰'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === 'JOB썰' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>JOB썰</button>
+                  </div>
+                )}
+                {editFormData.type === 'talk' && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '수다'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '수다' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>수다</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '토닥'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '토닥' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>토닥</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: 'Q&A'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === 'Q&A' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>Q&A</button>
+                    <button type="button" onClick={() => setEditFormData({...editFormData, category: '꿀팁'})} className={`px-4 py-2 rounded-lg text-sm font-medium ${editFormData.category === '꿀팁' ? 'bg-teal-500 text-white' : 'bg-gray-100'}`}>꿀팁</button>
+                  </div>
+                )}
+              </div>
+
+              {/* 제목 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">제목 *</label>
+                <input
+                  type="text"
+                  required
+                  value={editFormData.title}
+                  onChange={(e) => setEditFormData({...editFormData, title: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                />
+              </div>
+
+              {/* 내용 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">내용 *</label>
+                <textarea
+                  required
+                  value={editFormData.content}
+                  onChange={(e) => setEditFormData({...editFormData, content: e.target.value})}
+                  rows="6"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="file"
+                    id="edit-image-upload"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="edit-image-upload"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer"
+                  >
+                    <ImageIcon className="w-4 h-4" />
+                    <span className="text-xs">이미지</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* 이미지 미리보기 */}
+              {selectedImages.length > 0 && (
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                  {selectedImages.map((img, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group">
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 p-1 bg-black/50 hover:bg-black/70 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* 추가 필드 */}
+              {editFormData.type === 'hotdeal' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">할인율</label>
+                    <input type="text" value={editFormData.discount} onChange={(e) => setEditFormData({...editFormData, discount: e.target.value})} placeholder="예: 50%" className="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">가격</label>
+                    <input type="text" value={editFormData.price} onChange={(e) => setEditFormData({...editFormData, price: e.target.value})} placeholder="예: 9,900원" className="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                  </div>
+                </div>
+              )}
+              {editFormData.type === 'job' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">시급</label>
+                    <input type="text" value={editFormData.hourlyPay} onChange={(e) => setEditFormData({...editFormData, hourlyPay: e.target.value})} placeholder="예: 15,000원" className="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">기간</label>
+                    <input type="text" value={editFormData.period} onChange={(e) => setEditFormData({...editFormData, period: e.target.value})} placeholder="예: 1-2주" className="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+                  </div>
+                </div>
+              )}
+
+              {/* 위치 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">위치</label>
+                <input type="text" value={editFormData.location} onChange={(e) => setEditFormData({...editFormData, location: e.target.value})} placeholder="예: 강남구" className="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              </div>
+
+              {/* 태그 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">태그</label>
+                <input type="text" value={editFormData.tags} onChange={(e) => setEditFormData({...editFormData, tags: e.target.value})} placeholder="쉼표로 구분" className="w-full px-4 py-2 border border-gray-200 rounded-lg" />
+              </div>
+
+              {/* 버튼 */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false)
+                    setEditingPost(null)
+                    setSelectedImages([])
+                  }}
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg disabled:opacity-50"
+                >
+                  {loading ? '수정 중...' : '수정 완료'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
