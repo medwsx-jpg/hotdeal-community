@@ -22,11 +22,18 @@ export default function Profile() {
   const [myApplications, setMyApplications] = useState([])
   const [applicationSubTab, setApplicationSubTab] = useState('received')
   
-  // 🆕 수정/삭제 관련 State
+  // 🆕 게시물 수정/삭제 관련 State
   const [openMenuId, setOpenMenuId] = useState(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
   const [selectedImages, setSelectedImages] = useState([])
+  
+  // 🆕 댓글 수정/삭제 관련 State
+  const [openCommentMenuId, setOpenCommentMenuId] = useState(null)
+  const [isEditCommentModalOpen, setIsEditCommentModalOpen] = useState(false)
+  const [editingComment, setEditingComment] = useState(null)
+  const [editCommentContent, setEditCommentContent] = useState('')
+  
   const [editFormData, setEditFormData] = useState({
     title: '',
     content: '',
@@ -212,6 +219,63 @@ export default function Profile() {
     } catch (error) {
       console.error('삭제 실패:', error)
       alert('삭제 실패: ' + error.message)
+    }
+  }
+
+  // 🆕 댓글 수정 열기
+  const handleEditComment = (comment) => {
+    setEditingComment(comment)
+    setEditCommentContent(comment.content)
+    setIsEditCommentModalOpen(true)
+    setOpenCommentMenuId(null)
+  }
+
+  // 🆕 댓글 수정 제출
+  const handleEditCommentSubmit = async (e) => {
+    e.preventDefault()
+    if (!editCommentContent.trim()) return
+    
+    try {
+      setLoading(true)
+      
+      const { error } = await supabase
+        .from('comments')
+        .update({ content: editCommentContent.trim() })
+        .eq('id', editingComment.id)
+      
+      if (error) throw error
+      
+      alert('댓글이 수정되었습니다!')
+      setIsEditCommentModalOpen(false)
+      setEditingComment(null)
+      setEditCommentContent('')
+      fetchMyComments()
+    } catch (error) {
+      console.error('댓글 수정 실패:', error)
+      alert('댓글 수정 실패: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 🆕 댓글 삭제
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('댓글을 삭제하시겠습니까?')) return
+    
+    try {
+      const { error } = await supabase
+        .from('comments')
+        .delete()
+        .eq('id', commentId)
+      
+      if (error) throw error
+      
+      alert('댓글이 삭제되었습니다!')
+      setOpenCommentMenuId(null)
+      fetchMyComments()
+    } catch (error) {
+      console.error('댓글 삭제 실패:', error)
+      alert('댓글 삭제 실패: ' + error.message)
     }
   }
 
@@ -575,7 +639,7 @@ export default function Profile() {
               </div>
             )}
 
-            {/* 내 댓글 탭 */}
+            {/* 내 댓글 탭 - 🆕 점 3개 메뉴 추가 */}
             {activeTab === 'comments' && (
               <div className="space-y-3">
                 {myComments.length === 0 ? (
@@ -587,16 +651,63 @@ export default function Profile() {
                   myComments.map((comment) => (
                     <div
                       key={comment.id}
-                      onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all cursor-pointer"
+                      className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs text-gray-500">
+                      <div className="flex items-start justify-between mb-2">
+                        <p 
+                          onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
+                          className="text-xs text-gray-500 cursor-pointer hover:text-teal-600"
+                        >
                           게시물: <span className="font-semibold text-gray-700">{comment.posts.title}</span>
                         </p>
-                        <span className="text-xs text-gray-400">{getTimeAgo(comment.created_at)}</span>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-xs text-gray-400">{getTimeAgo(comment.created_at)}</span>
+                          
+                          {/* 🆕 댓글 점 3개 메뉴 */}
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setOpenCommentMenuId(openCommentMenuId === comment.id ? null : comment.id)
+                              }}
+                              className="p-1 hover:bg-gray-100 rounded transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4 text-gray-600" />
+                            </button>
+                            
+                            {openCommentMenuId === comment.id && (
+                              <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEditComment(comment)
+                                  }}
+                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                  <span>수정</span>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDeleteComment(comment.id)
+                                  }}
+                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>삭제</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-900">{comment.content}</p>
+                      <p 
+                        onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
+                        className="text-sm text-gray-900 cursor-pointer"
+                      >
+                        {comment.content}
+                      </p>
                     </div>
                   ))
                 )}
@@ -689,7 +800,7 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* 🆕 수정 모달 */}
+      {/* 🆕 게시물 수정 모달 */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -898,6 +1009,71 @@ export default function Profile() {
                 <button
                   type="submit"
                   disabled={loading}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg disabled:opacity-50"
+                >
+                  {loading ? '수정 중...' : '수정 완료'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 🆕 댓글 수정 모달 */}
+      {isEditCommentModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full">
+            <div className="border-b border-gray-200 p-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold">댓글 수정</h2>
+              <button 
+                onClick={() => {
+                  setIsEditCommentModalOpen(false)
+                  setEditingComment(null)
+                  setEditCommentContent('')
+                }}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditCommentSubmit} className="p-4 md:p-6 space-y-4">
+              {/* 원본 게시물 정보 */}
+              {editingComment && (
+                <div className="text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
+                  게시물: <span className="font-semibold text-gray-700">{editingComment.posts?.title}</span>
+                </div>
+              )}
+
+              {/* 댓글 내용 */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">댓글 내용 *</label>
+                <textarea
+                  required
+                  value={editCommentContent}
+                  onChange={(e) => setEditCommentContent(e.target.value)}
+                  rows="4"
+                  placeholder="댓글 내용을 입력하세요"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+                />
+              </div>
+
+              {/* 버튼 */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditCommentModalOpen(false)
+                    setEditingComment(null)
+                    setEditCommentContent('')
+                  }}
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading || !editCommentContent.trim()}
                   className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg disabled:opacity-50"
                 >
                   {loading ? '수정 중...' : '수정 완료'}
