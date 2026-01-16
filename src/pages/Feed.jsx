@@ -1167,13 +1167,7 @@ const handleApply = async () => {
                 )}
               </div>
 
-              {/* 챌린지 버튼 */}
-              <button
-                onClick={() => handleActionClick(() => navigate('/challenge'))}
-                className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-purple-100 hover:text-purple-600"
-              >
-                🎯 챌린지
-              </button>
+            
 
               {/* JOB 드롭다운 */}
               <div className="relative">
@@ -1326,6 +1320,14 @@ const handleApply = async () => {
     </div>
   )}
 </div>
+
+ {/* 챌린지 버튼 */}
+ <button
+                onClick={() => handleActionClick(() => navigate('/challenge'))}
+                className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-purple-100 hover:text-purple-600"
+              >
+                🎯 챌린지
+              </button>
 
             {/* 스토어 */}
 <button
