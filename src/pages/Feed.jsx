@@ -1327,24 +1327,13 @@ const handleApply = async () => {
   )}
 </div>
 
-              {/* 공지 */}
-              <button
-                onClick={() => handleActionClick(() => { 
-                  setActiveMainTab('notice')
-                  setActiveTab('notice-all')
-                  setPosts([])
-                  setPage(0)
-                  setHasMore(true)
-                  fetchPosts(0, '', true, 'notice', '')
-                })}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
-                  activeMainTab === 'notice'
-                    ? 'bg-red-500 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                공지
-                </button>
+            {/* 스토어 */}
+<button
+  onClick={() => handleActionClick(() => navigate('/store'))}
+  className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100"
+>
+  스토어
+</button>
             </div>
           </div>
         </div>
