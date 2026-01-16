@@ -7,7 +7,8 @@ import Profile from './pages/Profile'
 import Admin from './pages/Admin'
 import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
-import Challenge from './pages/Challenge'  // 🆕 추가
+import Challenge from './pages/Challenge'
+import Store from './pages/Store'  // 🆕 스토어 추가
 
 function App() {
   return (
@@ -20,7 +21,8 @@ function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/challenge" element={<Challenge />} />  {/* 🆕 추가 */}
+          <Route path="/challenge" element={<Challenge />} />
+          <Route path="/store" element={<Store />} />  {/* 🆕 스토어 추가 */}
           <Route path="/open" element={<Navigate to="/feed" replace />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />

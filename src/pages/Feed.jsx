@@ -5,7 +5,7 @@ import {
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
   Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone,
-  ChevronUp, ChevronDown, Target  // 🆕 Target 추가
+  ChevronUp, ChevronDown, Target, Gift  // 🆕 Gift 추가
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -1016,7 +1016,14 @@ const handleApply = async () => {
   )}
 </div>
               
-              <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative">
+              <button 
+                onClick={() => {
+                  setActiveMainTab('notice')
+                  setActiveTab('notice-all')
+                  setExpandedMenus({...expandedMenus, notice: true})
+                }}
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors relative"
+              >
                 <Bell className="w-4 h-4 text-gray-600" />
                 <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-teal-500 rounded-full"></span>
               </button>
@@ -2246,17 +2253,11 @@ const handleApply = async () => {
     </button>
 
     <button 
-      onClick={() => { 
-        setActiveMainTab('notice'); 
-        setActiveTab('notice-all'); 
-        setExpandedMenus({...expandedMenus, notice: true}) 
-      }}
-      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-        activeMainTab === 'notice' ? 'text-teal-600' : 'text-gray-600'
-      }`}
+      onClick={() => handleActionClick(() => navigate('/store'))}
+      className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
     >
-      <Bell className="w-5 h-5" />
-      <span className="text-[10px] font-medium">공지</span>
+      <Gift className="w-5 h-5" />
+      <span className="text-[10px] font-medium">스토어</span>
     </button>
 
     <button 
