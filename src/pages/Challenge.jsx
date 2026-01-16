@@ -63,7 +63,7 @@ export default function Challenge() {
     setLoading(true)
     try {
       // 1~60 랜덤 포인트
-      const points = Math.floor(Math.random() * 60) + 1
+      const points = Math.floor(Math.random() * 10) + 1
       
       // 출석 기록 저장
       const { error: attendanceError } = await supabase
@@ -223,7 +223,7 @@ export default function Challenge() {
               <div className="bg-cyan-50 rounded-xl p-4 mb-3">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">매일 포인트 랜덤 뽑기</span>
-                  <span className="text-cyan-600 font-bold text-lg">1~60P</span>
+                  <span className="text-cyan-600 font-bold text-lg">1~30P</span>
                 </div>
               </div>
               
