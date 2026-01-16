@@ -1022,9 +1022,10 @@ const handleApply = async () => {
                   setActiveTab('notice-all')
                   setExpandedMenus({...expandedMenus, notice: true})
                 }}
-                className="px-2 py-1 rounded-lg hover:bg-gray-100 transition-colors text-xs font-medium text-gray-600"
+                className="flex items-center space-x-1 px-2.5 py-1 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold transition-colors shadow-sm"
               >
-                공지
+                <Bell className="w-3 h-3" />
+                <span>공지</span>
               </button>
               
               <button 
