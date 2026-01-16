@@ -119,27 +119,57 @@ export default function Profile() {
     }
   }
 
-  // 🆕 받은 지원 내역
+  // ✅ 받은 지원 내역 (수정됨 - 2단계 쿼리)
   const fetchReceivedApplications = async () => {
     try {
-      const { data, error } = await supabase
+      // 1단계: 내가 작성한 구인 게시물 ID들 가져오기
+      const { data: myPosts, error: postsError } = await supabase
+        .from('posts')
+        .select('id, title')
+        .eq('user_id', user.id)
+        .eq('type', 'job')
+        .eq('category', '구인')
+      
+      if (postsError) throw postsError
+      
+      if (!myPosts || myPosts.length === 0) {
+        setReceivedApplications([])
+        return
+      }
+      
+      // 2단계: 해당 게시물들에 대한 지원 가져오기
+      const postIds = myPosts.map(p => p.id)
+      
+      const { data: applications, error: appError } = await supabase
         .from('applications')
-        .select(`
-          *,
-          posts!inner (
-            id,
-            title,
-            user_id
-          ),
-          profiles (
-            username
-          )
-        `)
-        .eq('posts.user_id', user.id)
+        .select('*')
+        .in('post_id', postIds)
         .order('created_at', { ascending: false })
       
-      if (error) throw error
-      setReceivedApplications(data || [])
+      if (appError) throw appError
+      
+      // 3단계: 지원자 정보 가져오기
+      const applicationsWithDetails = await Promise.all(
+        (applications || []).map(async (app) => {
+          // 지원자 프로필
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', app.user_id)
+            .single()
+          
+          // 게시물 정보 매칭
+          const post = myPosts.find(p => p.id === app.post_id)
+          
+          return {
+            ...app,
+            profiles: profileData,
+            posts: post
+          }
+        })
+      )
+      
+      setReceivedApplications(applicationsWithDetails)
     } catch (error) {
       console.error('받은 지원 로드 실패:', error)
     }
@@ -757,7 +787,7 @@ export default function Profile() {
                         >
                           <div className="flex items-start justify-between mb-3">
                             <div>
-                              <p className="text-xs text-gray-500 mb-1">게시물: {app.posts.title}</p>
+                              <p className="text-xs text-gray-500 mb-1">게시물: {app.posts?.title}</p>
                               <p className="font-semibold text-gray-900">{app.profiles?.username || '사용자'}</p>
                             </div>
                             <span className="text-xs text-gray-400">{getTimeAgo(app.created_at)}</span>
