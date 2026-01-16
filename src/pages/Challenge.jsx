@@ -326,17 +326,90 @@ export default function Challenge() {
         
         {/* 챌린지 탭 */}
         {activeTab === 'challenge' && (
-          <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trophy className="w-8 h-8 text-yellow-500" />
+          <div className="space-y-3">
+            {/* 미션 1: UDT79 이벤트미션 */}
+            <button 
+              onClick={() => alert('이벤트 미션 준비 중입니다!')}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-2xl">
+                  🎖️
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900">UDT79이벤트미션</h3>
+                  <p className="text-sm text-gray-500">행운을 잡아라</p>
+                </div>
               </div>
-              <h3 className="text-lg font-bold mb-2">챌린지 준비 중</h3>
-              <p className="text-gray-500 text-sm">
-                더 재미있는 챌린지가 곧 찾아옵니다!<br />
-                기대해 주세요 🎉
-              </p>
-            </div>
+            </button>
+
+            {/* 미션 2: 글작성미션 */}
+            <button 
+              onClick={() => alert('글작성 미션: 핫딜 또는 JOB 게시글을 작성하면 포인트를 받을 수 있어요!')}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">
+                  📝
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900">글작성미션</h3>
+                  <p className="text-sm text-gray-500">(핫딜,JOB)</p>
+                </div>
+                <span className="text-red-500 font-bold text-sm">최대100P</span>
+              </div>
+            </button>
+
+            {/* 미션 3: 영수증 올리기 */}
+            <button 
+              onClick={() => alert('영수증 미션: 영수증을 올리면 포인트를 받을 수 있어요! (하루 최대 3번)')}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center text-2xl">
+                  🧾
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900">영수증 올리기</h3>
+                  <p className="text-sm text-gray-500">최대하루3번</p>
+                </div>
+                <span className="text-red-500 font-bold text-sm">최대100P</span>
+              </div>
+            </button>
+
+            {/* 미션 4: 방문인증영수증 */}
+            <button 
+              onClick={() => alert('방문인증 미션: 매장 방문 후 영수증을 인증하면 포인트를 받을 수 있어요!')}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center text-2xl">
+                  🤳
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900">방문인증영수증</h3>
+                  <p className="text-sm text-gray-500">매장 방문 인증</p>
+                </div>
+                <span className="text-red-500 font-bold text-sm">최대100P</span>
+              </div>
+            </button>
+
+            {/* 미션 5: 동네미션 */}
+            <button 
+              onClick={() => alert('동네미션: 우리 동네 광고를 확인하면 포인트를 받을 수 있어요!')}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
+                  <span className="text-red-500 font-bold text-sm border border-red-400 px-1.5 py-0.5 rounded">광고</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-900">동네미션</h3>
+                  <p className="text-sm text-gray-500">광고 확인하기</p>
+                </div>
+                <span className="text-red-500 font-bold text-sm">최대100P</span>
+              </div>
+            </button>
           </div>
         )}
         
