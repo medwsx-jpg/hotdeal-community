@@ -2303,15 +2303,6 @@ const handleApply = async () => {
   </button>
   <button
     type="button"
-    onClick={() => setNewPost({...newPost, type: 'share', category: ''})}
-    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-      newPost.type === 'share' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-    }`}
-  >
-    쉐어
-  </button>
-  <button
-    type="button"
     onClick={() => setNewPost({...newPost, type: 'job', category: ''})}
     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
       newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -2356,39 +2347,6 @@ const handleApply = async () => {
 >
   행사
 </button>
-      <button
-        type="button"
-        onClick={() => setNewPost({...newPost, category: '기타'})}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          newPost.category === '기타' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
-      >
-        기타
-      </button>
-    </div>
-  )}
-  
-  {/* 쉐어 서브 */}
-  {newPost.type === 'share' && (
-    <div className="grid grid-cols-3 gap-2">
-      <button
-        type="button"
-        onClick={() => setNewPost({...newPost, category: '생활용품'})}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          newPost.category === '생활용품' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
-      >
-        생활용품
-      </button>
-      <button
-        type="button"
-        onClick={() => setNewPost({...newPost, category: '부동산'})}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          newPost.category === '부동산' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
-      >
-        부동산
-      </button>
       <button
         type="button"
         onClick={() => setNewPost({...newPost, category: '기타'})}
