@@ -5,7 +5,7 @@ import {
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
   Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone,
-  ChevronUp, ChevronDown  // 🆕 추가
+  ChevronUp, ChevronDown, Target  // 🆕 Target 추가
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -1377,10 +1377,12 @@ const handleApply = async () => {
       </button>
       
       <button
-        onClick={() => handleActionClick(() => navigate('/challenge'))}
-        className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-50 text-gray-700 hover:bg-purple-100 hover:text-purple-700"
+        onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, hotdeal: false, job: false})}
+        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          expandedMenus.talk || activeTab.startsWith('talk') ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-700'
+        }`}
       >
-        🎯 챌린지
+        톡
       </button>
       
       <button
@@ -1473,6 +1475,60 @@ const handleApply = async () => {
           className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
         >
           JOB썰
+        </button>
+      </div>
+    )}
+
+    {/* 톡 서브메뉴 */}
+    {expandedMenus.talk && (
+      <div className="flex gap-2">
+        <button 
+          onClick={() => { 
+            setActiveTab('talk-chat')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'talk', '수다')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'talk-chat' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          수다
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('talk-comfort')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'talk', '토닥')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'talk-comfort' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          토닥
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('talk-qa')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'talk', 'Q&A')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'talk-qa' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          Q&A
+        </button>
+        <button 
+          onClick={() => { 
+            setActiveTab('talk-tip')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'talk', '꿀팁')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'talk-tip' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          꿀팁
         </button>
       </div>
     )}
@@ -2173,17 +2229,11 @@ const handleApply = async () => {
     </button>
 
     <button 
-      onClick={() => { 
-        setActiveMainTab('talk'); 
-        setActiveTab('talk-all'); 
-        setExpandedMenus({...expandedMenus, talk: true}) 
-      }}
-      className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 ${
-        activeMainTab === 'talk' ? 'text-teal-600' : 'text-gray-600'
-      }`}
+      onClick={() => handleActionClick(() => navigate('/challenge'))}
+      className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
     >
-      <MessageCircle className="w-5 h-5" />
-      <span className="text-[10px] font-medium">톡</span>
+      <Target className="w-5 h-5" />
+      <span className="text-[10px] font-medium">챌린지</span>
     </button>
 
     <button 
