@@ -465,8 +465,8 @@ const getTimeAgo = (timestamp) => {
     
     // JOB
     if (activeTab === 'job-hire') return post.type === 'job' && post.category === '구인'
+    if (activeTab === 'job-tip') return post.type === 'job' && post.category === '일자리제보'
     if (activeTab === 'job-seek') return post.type === 'job' && post.category === '구직'
-    if (activeTab === 'job-story') return post.type === 'job' && post.category === 'JOB썰'
     
     // 톡
     if (activeTab === 'talk-all') return post.type === 'talk'
@@ -1208,6 +1208,20 @@ const handleApply = async () => {
                     <button
                       onClick={() => handleActionClick(() => { 
                         setActiveMainTab('home')
+                        setActiveTab('job-tip')
+                        setPosts([])
+                        setPage(0)
+                        setHasMore(true)
+                        fetchPosts(0, '', true, 'job', '일자리제보')
+                        setExpandedMenus({...expandedMenus, job: false})
+                      })}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      일자리제보
+                    </button>
+                    <button
+                      onClick={() => handleActionClick(() => { 
+                        setActiveMainTab('home')
                         setActiveTab('job-seek')
                         setPosts([])
                         setPage(0)
@@ -1218,20 +1232,6 @@ const handleApply = async () => {
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       구직
-                    </button>
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('job-story')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'job', 'JOB썰')
-                        setExpandedMenus({...expandedMenus, job: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      JOB썰
                     </button>
                   </div>
                 )}
@@ -1461,6 +1461,18 @@ const handleApply = async () => {
         </button>
         <button 
           onClick={() => { 
+            setActiveTab('job-tip')
+            setPosts([])
+            setPage(0)
+            setHasMore(true)
+            fetchPosts(0, '', true, 'job', '일자리제보')
+          }} 
+          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-tip' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+        >
+          일자리제보
+        </button>
+        <button 
+          onClick={() => { 
             setActiveTab('job-seek')
             setPosts([])
             setPage(0)
@@ -1470,18 +1482,6 @@ const handleApply = async () => {
           className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
         >
           구직
-        </button>
-        <button 
-          onClick={() => { 
-            setActiveTab('job-story')
-            setPosts([])
-            setPage(0)
-            setHasMore(true)
-            fetchPosts(0, '', true, 'job', 'JOB썰')
-          }} 
-          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-story' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
-        >
-          JOB썰
         </button>
       </div>
     )}
@@ -2415,21 +2415,21 @@ const handleApply = async () => {
       </button>
       <button
         type="button"
+        onClick={() => setNewPost({...newPost, category: '일자리제보'})}
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          newPost.category === '일자리제보' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
+      >
+        일자리제보
+      </button>
+      <button
+        type="button"
         onClick={() => setNewPost({...newPost, category: '구직'})}
         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
           newPost.category === '구직' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >
         구직
-      </button>
-      <button
-        type="button"
-        onClick={() => setNewPost({...newPost, category: 'JOB썰'})}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-          newPost.category === 'JOB썰' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-        }`}
-      >
-        JOB썰
       </button>
     </div>
   )}
