@@ -1108,7 +1108,7 @@ const handleApply = async () => {
               {/* 핫딜 드롭다운 */}
               <div className="relative">
                 <button
-                  onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false})}
+                  onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false, talk: false})}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
                     activeTab.startsWith('hotdeal')
                       ? 'bg-teal-500 text-white'
@@ -1178,7 +1178,7 @@ const handleApply = async () => {
               {/* JOB 드롭다운 */}
               <div className="relative">
                 <button
-                  onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false})}
+                  onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, talk: false})}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
                     activeTab.startsWith('job')
                       ? 'bg-cyan-500 text-white'
@@ -1375,7 +1375,7 @@ const handleApply = async () => {
       </button>
       
       <button
-        onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false})}
+        onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false, talk: false})}
         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           expandedMenus.hotdeal || activeTab.startsWith('hotdeal') ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
         }`}
@@ -1393,7 +1393,7 @@ const handleApply = async () => {
       </button>
       
       <button
-        onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false})}
+        onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, talk: false})}
         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           expandedMenus.job || activeTab.startsWith('job') ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-50 text-gray-700'
         }`}
