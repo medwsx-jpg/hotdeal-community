@@ -18,7 +18,7 @@ export default function Feed() {
   
   const [activeTab, setActiveTab] = useState('all')
 const [activeMainTab, setActiveMainTab] = useState('home')
-const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, hotdeal: false, share: false, job: false })
+const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, hotdeal: false, job: false })
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
   const [selectedImages, setSelectedImages] = useState([])
@@ -1101,7 +1101,7 @@ const handleApply = async () => {
               {/* 핫딜 드롭다운 */}
               <div className="relative">
                 <button
-                  onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, share: false, job: false})}
+                  onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false})}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
                     activeTab.startsWith('hotdeal')
                       ? 'bg-teal-500 text-white'
@@ -1160,72 +1160,18 @@ const handleApply = async () => {
                 )}
               </div>
 
-              {/* 쉐어 드롭다운 */}
-              <div className="relative">
-                <button
-                  onClick={() => setExpandedMenus({...expandedMenus, share: !expandedMenus.share, hotdeal: false, job: false})}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
-                    activeTab.startsWith('share')
-                      ? 'bg-purple-500 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span>쉐어</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.share ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {expandedMenus.share && (
-                  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('share-living')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'share', '생활용품')
-                        setExpandedMenus({...expandedMenus, share: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      생활용품
-                    </button>
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('share-realestate')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'share', '부동산')
-                        setExpandedMenus({...expandedMenus, share: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      부동산
-                    </button>
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('share-etc')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'share', '기타')
-                        setExpandedMenus({...expandedMenus, share: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      기타
-                    </button>
-                  </div>
-                )}
-              </div>
+              {/* 챌린지 버튼 */}
+              <button
+                onClick={() => handleActionClick(() => navigate('/challenge'))}
+                className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-purple-100 hover:text-purple-600"
+              >
+                🎯 챌린지
+              </button>
 
               {/* JOB 드롭다운 */}
               <div className="relative">
                 <button
-                  onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, share: false})}
+                  onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false})}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
                     activeTab.startsWith('job')
                       ? 'bg-cyan-500 text-white'
@@ -1287,7 +1233,7 @@ const handleApply = async () => {
              {/* 톡 드롭다운 */}
 <div className="relative">
   <button
-    onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, hotdeal: false, share: false, job: false})}
+    onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, hotdeal: false, job: false})}
     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
       activeTab.startsWith('talk')
         ? 'bg-orange-500 text-white'
@@ -1408,7 +1354,7 @@ const handleApply = async () => {
       <button
         onClick={() => { 
           setActiveTab('all')
-          setExpandedMenus({...expandedMenus, hotdeal: false, share: false, job: false})
+          setExpandedMenus({...expandedMenus, hotdeal: false, job: false})
           setPosts([])
           setPage(0)
           setHasMore(true)
@@ -1422,7 +1368,7 @@ const handleApply = async () => {
       </button>
       
       <button
-        onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, share: false, job: false})}
+        onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false})}
         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           expandedMenus.hotdeal || activeTab.startsWith('hotdeal') ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
         }`}
@@ -1431,16 +1377,14 @@ const handleApply = async () => {
       </button>
       
       <button
-        onClick={() => setExpandedMenus({...expandedMenus, share: !expandedMenus.share, hotdeal: false, job: false})}
-        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-          expandedMenus.share || activeTab.startsWith('share') ? 'bg-purple-100 text-purple-700' : 'bg-gray-50 text-gray-700'
-        }`}
+        onClick={() => handleActionClick(() => navigate('/challenge'))}
+        className="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-50 text-gray-700 hover:bg-purple-100 hover:text-purple-700"
       >
-        쉐어
+        🎯 챌린지
       </button>
       
       <button
-        onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, share: false})}
+        onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false})}
         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
           expandedMenus.job || activeTab.startsWith('job') ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-50 text-gray-700'
         }`}
@@ -1485,48 +1429,6 @@ const handleApply = async () => {
             fetchPosts(0, '', true, 'hotdeal', '기타')
           }} 
           className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
-        >
-          기타
-        </button>
-      </div>
-    )}
-
-    {/* 쉐어 서브메뉴 */}
-    {expandedMenus.share && (
-      <div className="flex gap-2">
-        <button 
-          onClick={() => { 
-            setActiveTab('share-living')
-            setPosts([])
-            setPage(0)
-            setHasMore(true)
-            fetchPosts(0, '', true, 'share', '생활용품')
-          }} 
-          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-living' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
-        >
-          생활용품
-        </button>
-        <button 
-          onClick={() => { 
-            setActiveTab('share-realestate')
-            setPosts([])
-            setPage(0)
-            setHasMore(true)
-            fetchPosts(0, '', true, 'share', '부동산')
-          }} 
-          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-realestate' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
-        >
-          부동산
-        </button>
-        <button 
-          onClick={() => { 
-            setActiveTab('share-etc')
-            setPosts([])
-            setPage(0)
-            setHasMore(true)
-            fetchPosts(0, '', true, 'share', '기타')
-          }} 
-          className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'share-etc' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}
         >
           기타
         </button>
