@@ -4,7 +4,7 @@ import {
   Users, FileText, MessageSquare, AlertTriangle, 
   TrendingUp, BarChart3, Shield, Home, Bell, Plus, X, Image as ImageIcon, Edit2, Trash2,
   Award, Trophy, Medal, UserPlus, Eye, Calendar, Search, ChevronLeft, ChevronRight,
-  ShoppingBag, Gift
+  ShoppingBag, Gift, Activity, UserCheck, UserX, Zap
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -46,11 +46,26 @@ export default function Admin() {
   const [newProduct, setNewProduct] = useState({ name: '', price: '', image_url: '', description: '', is_active: true })
   const [productLoading, setProductLoading] = useState(false)
 
+  // 🆕 신규 가입 현황 세분화 상태
+  const [signupStats, setSignupStats] = useState({ today: 0, week: 0, month: 0, total: 0 })
+  const [weeklySignups, setWeeklySignups] = useState([])
+  const [usersWithActivity, setUsersWithActivity] = useState([])
+  const [dormantUsers, setDormantUsers] = useState([])
+
   useEffect(() => {
     if (!user) { navigate('/login'); return }
     if (profile === null) return
     if (profile.role !== '관리자') { alert('관리자만 접근할 수 있습니다.'); navigate('/feed'); return }
-    fetchStats(); fetchNotices(); fetchUserStats(); fetchRecentUsers(); fetchReports(); fetchStoreProducts()
+    fetchStats()
+    fetchNotices()
+    fetchUserStats()
+    fetchRecentUsers()
+    fetchReports()
+    fetchStoreProducts()
+    // 🆕 신규 가입 현황 세분화 데이터 로드
+    fetchSignupStats()
+    fetchWeeklySignups()
+    fetchUsersWithActivity()
   }, [user, profile, navigate])
 
   useEffect(() => {
@@ -58,6 +73,158 @@ export default function Admin() {
     else if (activeTab === 'comments') fetchAllComments(0, '', true)
     else if (activeTab === 'store') fetchStoreProducts()
   }, [activeTab])
+
+  // 🆕 시간대별 가입 통계
+  const fetchSignupStats = async () => {
+    try {
+      const now = new Date()
+      
+      // 오늘 시작
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+      
+      // 이번 주 시작 (일요일 기준)
+      const weekStart = new Date(now)
+      weekStart.setDate(now.getDate() - now.getDay())
+      weekStart.setHours(0, 0, 0, 0)
+      
+      // 이번 달 시작
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+      
+      // 오늘 가입자
+      const { count: todayCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', todayStart)
+      
+      // 이번 주 가입자
+      const { count: weekCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', weekStart.toISOString())
+      
+      // 이번 달 가입자
+      const { count: monthCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', monthStart)
+      
+      // 전체 가입자
+      const { count: totalCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+      
+      setSignupStats({
+        today: todayCount || 0,
+        week: weekCount || 0,
+        month: monthCount || 0,
+        total: totalCount || 0
+      })
+    } catch (error) {
+      console.error('가입 통계 로드 실패:', error)
+    }
+  }
+
+  // 🆕 최근 7일 가입 추이
+  const fetchWeeklySignups = async () => {
+    try {
+      const days = []
+      const dayNames = ['일', '월', '화', '수', '목', '금', '토']
+      
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
+        
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', dayStart.toISOString())
+          .lt('created_at', dayEnd.toISOString())
+        
+        days.push({
+          day: dayNames[date.getDay()],
+          date: `${date.getMonth() + 1}/${date.getDate()}`,
+          count: count || 0,
+          isToday: i === 0
+        })
+      }
+      
+      setWeeklySignups(days)
+    } catch (error) {
+      console.error('주간 가입 추이 로드 실패:', error)
+    }
+  }
+
+  // 🆕 가입자별 활동 상태
+  const fetchUsersWithActivity = async () => {
+    try {
+      // 최근 가입자 20명 가져오기
+      const { data: users, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20)
+      
+      if (error) throw error
+      
+      // 각 사용자별 활동 데이터 가져오기
+      const usersWithStats = await Promise.all(
+        (users || []).map(async (user) => {
+          // 게시물 수
+          const { count: postsCount } = await supabase
+            .from('posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+          
+          // 댓글 수
+          const { count: commentsCount } = await supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+          
+          // 활동 상태 결정
+          let status = 'dormant' // 휴면
+          let statusLabel = '😴 휴면'
+          let statusColor = 'gray'
+          
+          if (postsCount >= 10) {
+            status = 'vip'
+            statusLabel = '⭐ VIP'
+            statusColor = 'yellow'
+          } else if (postsCount > 0 || commentsCount > 0) {
+            status = 'active'
+            statusLabel = '🔥 활발'
+            statusColor = 'green'
+          }
+          
+          return {
+            ...user,
+            postsCount: postsCount || 0,
+            commentsCount: commentsCount || 0,
+            status,
+            statusLabel,
+            statusColor
+          }
+        })
+      )
+      
+      setUsersWithActivity(usersWithStats)
+      
+      // 휴면 사용자 필터링 (가입 후 7일 지났는데 활동 없는 사용자)
+      const sevenDaysAgo = new Date()
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+      
+      const dormant = usersWithStats.filter(u => 
+        u.status === 'dormant' && 
+        new Date(u.created_at) < sevenDaysAgo
+      )
+      setDormantUsers(dormant)
+      
+    } catch (error) {
+      console.error('사용자 활동 로드 실패:', error)
+    }
+  }
 
   const fetchStoreProducts = async () => {
     try {
@@ -329,6 +496,9 @@ export default function Admin() {
     return `${diffDays}일 전`
   }
 
+  // 🆕 주간 가입 추이 최대값 계산 (그래프 높이 기준)
+  const maxWeeklyCount = Math.max(...weeklySignups.map(d => d.count), 1)
+
   if (loading && activeTab === 'dashboard') {
     return (<div className="min-h-screen flex items-center justify-center"><div className="text-center"><div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div><p className="text-sm text-gray-600 mt-2">로딩 중...</p></div></div>)
   }
@@ -368,11 +538,243 @@ export default function Admin() {
           <div className="p-6">
             {activeTab === 'dashboard' && (
               <div>
-                <div className="mb-8"><div className="flex items-center space-x-2 mb-4"><UserPlus className="w-5 h-5 text-teal-600" /><h2 className="text-lg font-bold text-gray-900">🆕 신규 가입 현황</h2></div><div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200">{recentUsers.length === 0 ? (<p className="text-sm text-gray-600 text-center py-4">가입자가 없습니다</p>) : (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">{recentUsers.map((user, index) => (<div key={user.id} className="bg-white rounded-lg p-3 hover:shadow-md transition-shadow"><div className="flex items-center space-x-2"><div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-sm font-bold">{user.username?.[0] || 'U'}</div><div className="flex-1 min-w-0"><p className="text-sm font-semibold text-gray-900 truncate">{user.username || '익명'}</p><p className="text-[10px] text-gray-500">{user.created_at ? getTimeAgo(user.created_at) : '최근'}</p></div>{index < 3 && (<span className="text-lg">{index === 0 ? '🆕' : index === 1 ? '✨' : '👋'}</span>)}</div></div>))}</div>)}</div></div>
-                <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-bold text-gray-900">📊 사용자 활동 통계</h2><div className="flex gap-2">{['all', 'month', 'week', 'today'].map(p => (<button key={p} onClick={() => { setStatsPeriod(p); fetchUserStats(p) }} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${statsPeriod === p ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>{p === 'all' ? '전체' : p === 'month' ? '이번 달' : p === 'week' ? '이번 주' : '오늘'}</button>))}</div></div>
+                {/* 🆕 시간대별 가입 통계 카드 */}
+                <div className="mb-8">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <UserPlus className="w-5 h-5 text-teal-600" />
+                    <h2 className="text-lg font-bold text-gray-900">📊 가입 통계</h2>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-blue-600 font-medium">오늘</p>
+                          <p className="text-2xl font-bold text-blue-700">{signupStats.today}명</p>
+                        </div>
+                        <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                          <Zap className="w-5 h-5 text-blue-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-green-600 font-medium">이번 주</p>
+                          <p className="text-2xl font-bold text-green-700">{signupStats.week}명</p>
+                        </div>
+                        <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-green-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border-2 border-purple-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-purple-600 font-medium">이번 달</p>
+                          <p className="text-2xl font-bold text-purple-700">{signupStats.month}명</p>
+                        </div>
+                        <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
+                          <Calendar className="w-5 h-5 text-purple-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-4 border-2 border-teal-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-teal-600 font-medium">전체</p>
+                          <p className="text-2xl font-bold text-teal-700">{signupStats.total}명</p>
+                        </div>
+                        <div className="w-10 h-10 bg-teal-200 rounded-full flex items-center justify-center">
+                          <Users className="w-5 h-5 text-teal-600" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 🆕 최근 7일 가입 추이 그래프 */}
+                <div className="mb-8">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <BarChart3 className="w-5 h-5 text-cyan-600" />
+                    <h2 className="text-lg font-bold text-gray-900">📈 최근 7일 가입 추이</h2>
+                  </div>
+                  <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-6 border-2 border-cyan-200">
+                    <div className="flex items-end justify-between h-32 gap-2">
+                      {weeklySignups.map((day, index) => (
+                        <div key={index} className="flex-1 flex flex-col items-center">
+                          {/* 막대 그래프 */}
+                          <div className="w-full flex flex-col items-center justify-end h-24">
+                            <span className="text-xs font-bold text-cyan-700 mb-1">{day.count}</span>
+                            <div 
+                              className={`w-full max-w-[40px] rounded-t-lg transition-all ${
+                                day.isToday 
+                                  ? 'bg-gradient-to-t from-cyan-500 to-cyan-400' 
+                                  : 'bg-gradient-to-t from-cyan-300 to-cyan-200'
+                              }`}
+                              style={{ 
+                                height: `${Math.max((day.count / maxWeeklyCount) * 80, 4)}px`,
+                                minHeight: '4px'
+                              }}
+                            />
+                          </div>
+                          {/* 날짜 라벨 */}
+                          <div className="mt-2 text-center">
+                            <p className={`text-xs font-semibold ${day.isToday ? 'text-cyan-600' : 'text-gray-500'}`}>
+                              {day.day}
+                            </p>
+                            <p className={`text-[10px] ${day.isToday ? 'text-cyan-500 font-bold' : 'text-gray-400'}`}>
+                              {day.date}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 🆕 신규 가입자 + 활동 상태 */}
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Activity className="w-5 h-5 text-teal-600" />
+                      <h2 className="text-lg font-bold text-gray-900">🆕 신규 가입 현황</h2>
+                    </div>
+                    {/* 🆕 휴면 사용자 알림 */}
+                    {dormantUsers.length > 0 && (
+                      <div className="flex items-center space-x-2 px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
+                        <UserX className="w-3.5 h-3.5" />
+                        <span>휴면 사용자 {dormantUsers.length}명</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* 활동 상태 범례 */}
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <div className="flex items-center space-x-1.5 text-xs">
+                      <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full"></span>
+                      <span className="text-gray-600">⭐ VIP (글 10개+)</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5 text-xs">
+                      <span className="w-2.5 h-2.5 bg-green-400 rounded-full"></span>
+                      <span className="text-gray-600">🔥 활발 (활동 있음)</span>
+                    </div>
+                    <div className="flex items-center space-x-1.5 text-xs">
+                      <span className="w-2.5 h-2.5 bg-gray-300 rounded-full"></span>
+                      <span className="text-gray-600">😴 휴면 (활동 없음)</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200">
+                    {usersWithActivity.length === 0 ? (
+                      <p className="text-sm text-gray-600 text-center py-4">가입자가 없습니다</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {usersWithActivity.map((user, index) => (
+                          <div 
+                            key={user.id} 
+                            className={`bg-white rounded-lg p-3 hover:shadow-md transition-shadow border-l-4 ${
+                              user.status === 'vip' ? 'border-l-yellow-400' :
+                              user.status === 'active' ? 'border-l-green-400' :
+                              'border-l-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                                user.status === 'vip' ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
+                                user.status === 'active' ? 'bg-gradient-to-br from-green-400 to-teal-500' :
+                                'bg-gradient-to-br from-gray-300 to-gray-400'
+                              }`}>
+                                {user.username?.[0] || 'U'}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center space-x-1.5">
+                                  <p className="text-sm font-semibold text-gray-900 truncate">{user.username || '익명'}</p>
+                                  <span className="text-xs">{user.statusLabel.split(' ')[0]}</span>
+                                </div>
+                                <div className="flex items-center space-x-2 text-[10px] text-gray-500">
+                                  <span>글 {user.postsCount}</span>
+                                  <span>·</span>
+                                  <span>댓글 {user.commentsCount}</span>
+                                </div>
+                              </div>
+                              {index < 3 && (
+                                <span className="text-lg">{index === 0 ? '🆕' : index === 1 ? '✨' : '👋'}</span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-2">
+                              가입: {user.created_at ? getTimeAgo(user.created_at) : '최근'}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 기존 사용자 활동 통계 */}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-bold text-gray-900">📊 사용자 활동 통계</h2>
+                  <div className="flex gap-2">
+                    {['all', 'month', 'week', 'today'].map(p => (
+                      <button 
+                        key={p} 
+                        onClick={() => { setStatsPeriod(p); fetchUserStats(p) }} 
+                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                          statsPeriod === p ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {p === 'all' ? '전체' : p === 'month' ? '이번 달' : p === 'week' ? '이번 주' : '오늘'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200"><div className="flex items-center space-x-2 mb-4"><Trophy className="w-5 h-5 text-teal-600" /><h3 className="font-bold text-gray-900">🏆 게시물 작성 TOP 5</h3></div><div className="space-y-3">{userStats.topPosters.length === 0 ? (<p className="text-sm text-gray-600 text-center py-4">데이터가 없습니다</p>) : (userStats.topPosters.map((user, index) => (<div key={user.id} className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow"><div className="flex items-center space-x-3"><span className="text-2xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}</span><p className="font-semibold text-gray-900">{user.username || '익명'}</p></div><div className="text-right"><p className="text-lg font-bold text-teal-600">{user.postsCount}개</p></div></div>)))}</div></div>
-                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200"><div className="flex items-center space-x-2 mb-4"><MessageSquare className="w-5 h-5 text-purple-600" /><h3 className="font-bold text-gray-900">💬 댓글 작성 TOP 5</h3></div><div className="space-y-3">{userStats.topCommenters.length === 0 ? (<p className="text-sm text-gray-600 text-center py-4">데이터가 없습니다</p>) : (userStats.topCommenters.map((user, index) => (<div key={user.id} className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow"><div className="flex items-center space-x-3"><span className="text-2xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}</span><p className="font-semibold text-gray-900">{user.username || '익명'}</p></div><div className="text-right"><p className="text-lg font-bold text-purple-600">{user.commentsCount}개</p></div></div>)))}</div></div>
+                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Trophy className="w-5 h-5 text-teal-600" />
+                      <h3 className="font-bold text-gray-900">🏆 게시물 작성 TOP 5</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {userStats.topPosters.length === 0 ? (
+                        <p className="text-sm text-gray-600 text-center py-4">데이터가 없습니다</p>
+                      ) : (
+                        userStats.topPosters.map((user, index) => (
+                          <div key={user.id} className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-2xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}</span>
+                              <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-teal-600">{user.postsCount}개</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <MessageSquare className="w-5 h-5 text-purple-600" />
+                      <h3 className="font-bold text-gray-900">💬 댓글 작성 TOP 5</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {userStats.topCommenters.length === 0 ? (
+                        <p className="text-sm text-gray-600 text-center py-4">데이터가 없습니다</p>
+                      ) : (
+                        userStats.topCommenters.map((user, index) => (
+                          <div key={user.id} className="flex items-center justify-between bg-white rounded-lg p-3 hover:shadow-md transition-shadow">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-2xl">{index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}위`}</span>
+                              <p className="font-semibold text-gray-900">{user.username || '익명'}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-purple-600">{user.commentsCount}개</p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
