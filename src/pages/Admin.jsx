@@ -25,7 +25,7 @@ const BatteryIcon = ({ level, size = 32 }) => {
       {/* 외곽 원형 테두리 (연한 빨간색) */}
       <circle cx="20" cy="20" r="19" stroke="#fca5a5" strokeWidth="1.5" fill="none" />
       {/* 회색 배경 원 */}
-      <circle cx="20" cy="20" r="17.5" fill="#6b7280" />
+      <circle cx="20" cy="20" r="17.5" fill="#f3f4f6" />
       
       {/* 배터리 본체 외곽 (세로) */}
       <rect x="13" y="12" width="14" height="20" rx="2" stroke={config.color} strokeWidth="2" fill="none" />
