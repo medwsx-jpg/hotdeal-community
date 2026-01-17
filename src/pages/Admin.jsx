@@ -4,7 +4,7 @@ import {
   Users, FileText, MessageSquare, AlertTriangle, 
   TrendingUp, BarChart3, Shield, Home, Bell, Plus, X, Image as ImageIcon, Edit2, Trash2,
   Award, Trophy, Medal, UserPlus, Eye, Calendar, Search, ChevronLeft, ChevronRight,
-  ShoppingBag, Gift, Activity, UserCheck, UserX, Zap
+  ShoppingBag, Gift, Activity, UserCheck, UserX, Zap, Coins, DollarSign
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -24,7 +24,7 @@ const BatteryIcon = ({ level, size = 32 }) => {
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
       {/* 외곽 원형 테두리 (연한 빨간색) */}
       <circle cx="20" cy="20" r="19" stroke="#fca5a5" strokeWidth="1.5" fill="none" />
-      {/* 회색 배경 원 */}
+      {/* 회색 배경 원 - 밝은 회색으로 수정 */}
       <circle cx="20" cy="20" r="17.5" fill="#f3f4f6" />
       
       {/* 배터리 본체 외곽 (세로) */}
@@ -101,6 +101,13 @@ export default function Admin() {
   const [dormantUsers, setDormantUsers] = useState([])
   const [levelCounts, setLevelCounts] = useState({ vip: 0, gold: 0, silver: 0, dormant: 0 })
 
+  // 사용자 관리용
+  const [allUsersWithPoints, setAllUsersWithPoints] = useState([])
+  const [usersSearch, setUsersSearch] = useState('')
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [pointAction, setPointAction] = useState({ type: 'add', amount: '', reason: '' })
+  const [pointLoading, setPointLoading] = useState(false)
+
   useEffect(() => {
     if (!user) { navigate('/login'); return }
     if (profile === null) return
@@ -120,7 +127,106 @@ export default function Admin() {
     if (activeTab === 'posts') fetchAllPosts(0, '', true)
     else if (activeTab === 'comments') fetchAllComments(0, '', true)
     else if (activeTab === 'store') fetchStoreProducts()
+    else if (activeTab === 'users') fetchAllUsersWithPoints()
   }, [activeTab])
+
+  // 전체 사용자 + 포인트 가져오기
+  const fetchAllUsersWithPoints = async (search = '') => {
+    try {
+      setLoading(true)
+      let query = supabase.from('profiles').select('*').order('created_at', { ascending: false })
+      if (search) query = query.ilike('username', `%${search}%`)
+      
+      const { data: users, error } = await query
+      if (error) throw error
+      
+      const usersWithData = await Promise.all((users || []).map(async (u) => {
+        const { count: postsCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
+        const { count: commentsCount } = await supabase.from('comments').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
+        const level = getUserLevel(postsCount || 0)
+        return { ...u, postsCount: postsCount || 0, commentsCount: commentsCount || 0, level, levelLabel: getLevelLabel(level) }
+      }))
+      
+      setAllUsersWithPoints(usersWithData)
+    } catch (error) {
+      console.error('사용자 목록 로드 실패:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 포인트 지급/차감
+  const handlePointAction = async (e) => {
+    e.preventDefault()
+    if (!selectedUser || !pointAction.amount) return
+    
+    try {
+      setPointLoading(true)
+      const amount = parseInt(pointAction.amount)
+      const finalAmount = pointAction.type === 'add' ? amount : -amount
+      
+      const { data: currentProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('points')
+        .eq('id', selectedUser.id)
+        .single()
+      
+      if (fetchError) throw fetchError
+      
+      const newPoints = Math.max(0, (currentProfile.points || 0) + finalAmount)
+      
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ points: newPoints })
+        .eq('id', selectedUser.id)
+      
+      if (updateError) throw updateError
+      
+      alert(`${pointAction.type === 'add' ? '지급' : '차감'} 완료! (${amount}P)`)
+      setSelectedUser(null)
+      setPointAction({ type: 'add', amount: '', reason: '' })
+      fetchAllUsersWithPoints(usersSearch)
+    } catch (error) {
+      alert('포인트 처리 실패: ' + error.message)
+    } finally {
+      setPointLoading(false)
+    }
+  }
+
+  // 이미지 업로드 (공지용)
+  const handleNoticeImageUpload = async (e) => {
+    const files = Array.from(e.target.files)
+    if (files.length === 0) return
+    
+    try {
+      setNoticeLoading(true)
+      const uploadedUrls = []
+      
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Math.random()}.${fileExt}`
+        const filePath = `notices/${fileName}`
+        
+        const { error: uploadError } = await supabase.storage
+          .from('post-images')
+          .upload(filePath, file)
+        
+        if (uploadError) throw uploadError
+        
+        const { data } = supabase.storage
+          .from('post-images')
+          .getPublicUrl(filePath)
+        
+        uploadedUrls.push(data.publicUrl)
+      }
+      
+      setSelectedImages([...selectedImages, ...uploadedUrls])
+    } catch (error) {
+      alert('이미지 업로드 실패: ' + error.message)
+    } finally {
+      setNoticeLoading(false)
+    }
+  }
 
   const fetchSignupStats = async () => {
     try {
@@ -453,6 +559,7 @@ export default function Admin() {
           <div className="p-6">
             {activeTab === 'dashboard' && (
               <div>
+                {/* 대시보드 내용은 기존과 동일... */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-4"><UserPlus className="w-5 h-5 text-teal-600" /><h2 className="text-lg font-bold text-gray-900">📊 가입 통계</h2></div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -550,6 +657,32 @@ export default function Admin() {
                       <div><label className="block text-sm font-semibold mb-2">카테고리</label><div className="flex gap-2">{['공지', '이벤트'].map(cat => <button key={cat} type="button" onClick={() => setNewNotice({...newNotice, category: cat})} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${newNotice.category === cat ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>{cat}</button>)}</div></div>
                       <div><label className="block text-sm font-semibold mb-2">제목 *</label><input type="text" required value={newNotice.title} onChange={(e) => setNewNotice({...newNotice, title: e.target.value})} placeholder="제목을 입력하세요" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500" /></div>
                       <div><label className="block text-sm font-semibold mb-2">내용 *</label><textarea required value={newNotice.content} onChange={(e) => setNewNotice({...newNotice, content: e.target.value})} placeholder="내용을 입력하세요" rows="6" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none" /></div>
+                      
+                      {/* 이미지 업로드 추가 */}
+                      <div>
+                        <label className="block text-sm font-semibold mb-2">이미지 첨부</label>
+                        <div className="flex items-center gap-4">
+                          <input type="file" id="notice-image-upload" accept="image/*" multiple onChange={handleNoticeImageUpload} className="hidden" />
+                          <label htmlFor="notice-image-upload" className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg cursor-pointer">
+                            <ImageIcon className="w-4 h-4 text-gray-600" />
+                            <span className="text-sm text-gray-700">이미지 선택</span>
+                          </label>
+                          <span className="text-sm text-gray-500">{selectedImages.length}개 선택됨</span>
+                        </div>
+                        {selectedImages.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {selectedImages.map((url, idx) => (
+                              <div key={idx} className="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
+                                <img src={url} alt="" className="w-full h-full object-cover" />
+                                <button type="button" onClick={() => setSelectedImages(selectedImages.filter((_, i) => i !== idx))} className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600">
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
                       <div className="flex gap-3 pt-4"><button type="button" onClick={() => { setIsWriting(false); setEditingNotice(null); setNewNotice({ category: '공지', title: '', content: '' }); setSelectedImages([]) }} className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200">취소</button><button type="submit" disabled={noticeLoading} className="flex-1 px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold shadow-lg disabled:opacity-50">{noticeLoading ? '작성 중...' : editingNotice ? '수정 완료' : '작성 완료'}</button></div>
                     </form>
                   </div>
@@ -624,7 +757,166 @@ export default function Admin() {
               </div>
             )}
 
-            {activeTab === 'users' && <div className="text-center py-12"><Users className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-gray-600">사용자 관리 기능은 곧 추가됩니다</p></div>}
+            {activeTab === 'users' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-bold text-gray-900">👥 사용자 관리</h2>
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      value={usersSearch} 
+                      onChange={(e) => { setUsersSearch(e.target.value); fetchAllUsersWithPoints(e.target.value) }} 
+                      placeholder="사용자 검색..." 
+                      className="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500" 
+                    />
+                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
+                  </div>
+                ) : allUsersWithPoints.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-xl">
+                    <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600">사용자가 없습니다</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {allUsersWithPoints.map((u) => (
+                      <div key={u.id} className="bg-white border-2 border-gray-200 rounded-xl p-4 hover:shadow-md">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0">
+                            <BatteryIcon level={u.level} size={48} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-bold text-gray-900 truncate">{u.username || '익명'}</h3>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${u.level === 'vip' ? 'bg-green-100 text-green-700' : u.level === 'gold' ? 'bg-yellow-100 text-yellow-700' : u.level === 'silver' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
+                                {u.levelLabel}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center gap-4 text-xs text-gray-500 mb-2">
+                              <span>글 {u.postsCount}</span>
+                              <span>댓글 {u.commentsCount}</span>
+                            </div>
+
+                            <div className="flex items-center justify-between bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg p-2">
+                              <div className="flex items-center gap-1">
+                                <Coins className="w-4 h-4 text-teal-600" />
+                                <span className="text-lg font-bold text-teal-700">{(u.points || 0).toLocaleString()}P</span>
+                              </div>
+                              <button 
+                                onClick={() => setSelectedUser(u)}
+                                className="px-3 py-1 bg-teal-500 text-white rounded-lg text-xs font-medium hover:bg-teal-600"
+                              >
+                                관리
+                              </button>
+                            </div>
+
+                            <p className="text-[10px] text-gray-400 mt-2">가입: {u.created_at ? getTimeAgo(u.created_at) : '최근'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 포인트 관리 모달 */}
+                {selectedUser && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-bold text-gray-900">포인트 관리</h3>
+                        <button onClick={() => setSelectedUser(null)} className="p-1 hover:bg-gray-100 rounded-lg">
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                        <div className="flex items-center gap-3">
+                          <BatteryIcon level={selectedUser.level} size={48} />
+                          <div>
+                            <p className="font-bold text-gray-900">{selectedUser.username || '익명'}</p>
+                            <p className="text-sm text-gray-600">{selectedUser.levelLabel}</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              <Coins className="w-4 h-4 text-teal-600" />
+                              <span className="text-lg font-bold text-teal-700">{(selectedUser.points || 0).toLocaleString()}P</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <form onSubmit={handlePointAction} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">액션</label>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setPointAction({...pointAction, type: 'add'})}
+                              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pointAction.type === 'add' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                            >
+                              💰 지급
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPointAction({...pointAction, type: 'subtract'})}
+                              className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pointAction.type === 'subtract' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+                            >
+                              ➖ 차감
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">포인트 *</label>
+                          <input
+                            type="number"
+                            required
+                            min="1"
+                            value={pointAction.amount}
+                            onChange={(e) => setPointAction({...pointAction, amount: e.target.value})}
+                            placeholder="포인트 입력"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold mb-2">사유 (선택)</label>
+                          <input
+                            type="text"
+                            value={pointAction.reason}
+                            onChange={(e) => setPointAction({...pointAction, reason: e.target.value})}
+                            placeholder="예: 이벤트 참여 보상"
+                            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedUser(null)}
+                            className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200"
+                          >
+                            취소
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={pointLoading}
+                            className={`flex-1 px-4 py-2 rounded-lg font-semibold shadow-lg disabled:opacity-50 ${pointAction.type === 'add' ? 'bg-teal-500 hover:bg-teal-600' : 'bg-red-500 hover:bg-red-600'} text-white`}
+                          >
+                            {pointLoading ? '처리 중...' : pointAction.type === 'add' ? '지급하기' : '차감하기'}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
