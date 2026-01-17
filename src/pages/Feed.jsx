@@ -978,13 +978,16 @@ export default function Feed() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-3">
-              <button 
-                onClick={() => handleActionClick(() => navigate('/'))}
-                className="flex items-center space-x-2"
-              >
-                <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
-                <span className="text-lg font-bold gradient-text">UDT79</span>
-              </button>
+            <button 
+  onClick={() => {
+    // feed 페이지로 완전 새로고침
+    window.location.href = '/feed'
+  }}
+  className="flex items-center space-x-2"
+>
+  <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
+  <span className="text-lg font-bold gradient-text">UDT79</span>
+</button>
               <span className="hidden md:block text-sm text-gray-600">우리동네 특공대 친구</span>
             </div>
 
