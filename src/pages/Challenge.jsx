@@ -74,14 +74,21 @@ export default function Challenge() {
           checked_at: new Date().toISOString()
         })
       
-      if (attendanceError) throw attendanceError
-      
-      // 프로필 포인트 업데이트
-      const currentPoints = profile?.points || 0
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ points: currentPoints + points })
-        .eq('id', user.id)
+     // 중복 출석 체크
+     if (attendanceError) {
+      if (attendanceError.code === '23505') {
+        alert('이미 오늘 출석체크를 하셨습니다!')
+        setTodayChecked(true)
+        return
+      }
+      throw attendanceError
+    }
+    
+    // 프로필 포인트 업데이트 (Atomic Update)
+    const { error: profileError } = await supabase.rpc('increment_points', {
+      user_id_param: user.id,
+      points_param: points
+    })
       
       if (profileError) throw profileError
       
