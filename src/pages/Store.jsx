@@ -68,16 +68,16 @@ const handleConfirmExchange = async () => {
   setPurchasing(true)
   try {
     // 1. 교환 내역 저장
-    const { error: exchangeError } = await supabase
-      .from('reward_exchanges')
-      .insert([{
-        user_id: user.id,
-        item_name: selectedProduct.name,
-        item_image: selectedProduct.image_url,
-        points: selectedProduct.price,
-        phone: phoneNumber,
-        status: 'pending'
-      }])
+    // ✅ 올바른 코드 (새 구조)
+const { error } = await supabase
+.from('reward_exchanges')
+.insert([{
+  user_id: user.id,
+  product_id: selectedProduct.id,  // ✅ UUID 전달
+  phone_number: phoneNumber,       // ✅ phone_number
+  points: selectedProduct.price,
+  status: 'pending'
+}])
     
     if (exchangeError) throw exchangeError
     
