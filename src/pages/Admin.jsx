@@ -138,36 +138,57 @@ export default function Admin() {
     else if (activeTab === 'exchanges') fetchExchanges() // 🆕 추가
   }, [activeTab])
 
-  // 🆕 교환 내역 조회
+  // 🆕 교환 내역 조회 (수정됨 - 2단계 조회)
   const fetchExchanges = async (statusFilter = 'all') => {
     try {
       setExchangesLoading(true)
       
       let query = supabase
         .from('reward_exchanges')
-        .select(`
-          *,
-          profiles:user_id (username, points),
-          store_products:product_id (name, price, image_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
       
       if (statusFilter !== 'all') {
         query = query.eq('status', statusFilter)
       }
       
-      const { data, error } = await query
+      const { data: exchangesData, error } = await query
       if (error) throw error
       
-      setExchanges(data || [])
+      // 각 교환 건에 대해 사용자와 상품 정보 가져오기
+      const exchangesWithDetails = await Promise.all(
+        (exchangesData || []).map(async (exchange) => {
+          // 사용자 정보
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('username, points')
+            .eq('id', exchange.user_id)
+            .single()
+          
+          // 상품 정보
+          const { data: productData } = await supabase
+            .from('store_products')
+            .select('name, price, image_url')
+            .eq('id', exchange.product_id)
+            .single()
+          
+          return {
+            ...exchange,
+            profiles: profileData,
+            store_products: productData
+          }
+        })
+      )
+      
+      setExchanges(exchangesWithDetails)
       
       // 통계 계산
       const stats = {
-        total: data?.length || 0,
-        pending: data?.filter(e => e.status === 'pending').length || 0,
-        processing: data?.filter(e => e.status === 'processing').length || 0,
-        completed: data?.filter(e => e.status === 'completed').length || 0,
-        cancelled: data?.filter(e => e.status === 'cancelled').length || 0
+        total: exchangesWithDetails?.length || 0,
+        pending: exchangesWithDetails?.filter(e => e.status === 'pending').length || 0,
+        processing: exchangesWithDetails?.filter(e => e.status === 'processing').length || 0,
+        completed: exchangesWithDetails?.filter(e => e.status === 'completed').length || 0,
+        cancelled: exchangesWithDetails?.filter(e => e.status === 'cancelled').length || 0
       }
       setExchangeStats(stats)
     } catch (error) {

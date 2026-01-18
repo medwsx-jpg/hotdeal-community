@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, Mail, Camera, ArrowLeft, Save, FileText, MessageCircle, Briefcase, MoreVertical, Edit2, Trash2, X, Image as ImageIcon, Plus } from 'lucide-react'
+import { User, Mail, Camera, ArrowLeft, Save, FileText, MessageCircle, Briefcase, MoreVertical, Edit2, Trash2, X, Image as ImageIcon, Plus, ShoppingBag, Package } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
@@ -33,6 +33,10 @@ export default function Profile() {
   const [isEditCommentModalOpen, setIsEditCommentModalOpen] = useState(false)
   const [editingComment, setEditingComment] = useState(null)
   const [editCommentContent, setEditCommentContent] = useState('')
+  
+  // 🆕 교환 내역 관련 State
+  const [myExchanges, setMyExchanges] = useState([])
+  const [exchangesLoading, setExchangesLoading] = useState(false)
   
   const [editFormData, setEditFormData] = useState({
     title: '',
@@ -77,8 +81,47 @@ export default function Profile() {
       } else {
         fetchMyApplications()
       }
+    } else if (activeTab === 'exchanges') {
+      fetchMyExchanges()
     }
   }, [activeTab, applicationSubTab, user])
+
+  // 🆕 내가 신청한 교환 내역
+  const fetchMyExchanges = async () => {
+    try {
+      setExchangesLoading(true)
+      
+      const { data: exchangesData, error } = await supabase
+        .from('reward_exchanges')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      
+      // 각 교환 건에 대해 상품 정보 가져오기
+      const exchangesWithProducts = await Promise.all(
+        (exchangesData || []).map(async (exchange) => {
+          const { data: productData } = await supabase
+            .from('store_products')
+            .select('name, price, image_url')
+            .eq('id', exchange.product_id)
+            .single()
+          
+          return {
+            ...exchange,
+            store_products: productData
+          }
+        })
+      )
+      
+      setMyExchanges(exchangesWithProducts)
+    } catch (error) {
+      console.error('교환 내역 로드 실패:', error)
+    } finally {
+      setExchangesLoading(false)
+    }
+  }
 
   // 🆕 내가 작성한 글
   const fetchMyPosts = async () => {
@@ -211,6 +254,28 @@ export default function Profile() {
     if (diffMins < 60) return `${diffMins}분 전`
     if (diffHours < 24) return `${diffHours}시간 전`
     return `${diffDays}일 전`
+  }
+
+  // 🆕 상태 라벨
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: '대기중',
+      processing: '처리중',
+      completed: '완료',
+      cancelled: '취소'
+    }
+    return labels[status] || status
+  }
+
+  // 🆕 상태 색상
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+      processing: 'bg-blue-100 text-blue-700 border-blue-300',
+      completed: 'bg-green-100 text-green-700 border-green-300',
+      cancelled: 'bg-red-100 text-red-700 border-red-300'
+    }
+    return colors[status] || 'bg-gray-100 text-gray-700 border-gray-300'
   }
 
   // 🆕 게시물 수정
@@ -495,6 +560,17 @@ export default function Profile() {
               >
                 지원
               </button>
+              {/* 🆕 교환 내역 탭 */}
+              <button
+                onClick={() => setActiveTab('exchanges')}
+                className={`flex-1 min-w-[100px] px-4 py-4 text-sm font-semibold transition-colors ${
+                  activeTab === 'exchanges'
+                    ? 'text-teal-600 border-b-2 border-teal-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                교환 내역
+              </button>
             </div>
           </div>
 
@@ -681,7 +757,7 @@ export default function Profile() {
               </div>
             )}
 
-            {/* 내 댓글 탭 - 🆕 점 3개 메뉴 추가 */}
+            {/* 내 댓글 탭 */}
             {activeTab === 'comments' && (
               <div className="space-y-3">
                 {myComments.length === 0 ? (
@@ -838,11 +914,111 @@ export default function Profile() {
                 )}
               </div>
             )}
+
+            {/* 🆕 교환 내역 탭 */}
+            {activeTab === 'exchanges' && (
+              <div>
+                {exchangesLoading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
+                  </div>
+                ) : myExchanges.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">교환 신청 내역이 없습니다</p>
+                    <button
+                      onClick={() => navigate('/store')}
+                      className="mt-4 px-6 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg"
+                    >
+                      스토어 바로가기
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myExchanges.map((exchange) => (
+                      <div
+                        key={exchange.id}
+                        className={`p-4 border-2 rounded-xl hover:shadow-md transition-all ${getStatusColor(exchange.status)}`}
+                      >
+                        <div className="flex items-start gap-4">
+                          {/* 상품 이미지 */}
+                          <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                            {exchange.store_products?.image_url?.startsWith('http') ? (
+                              <img 
+                                src={exchange.store_products.image_url} 
+                                alt="" 
+                                className="w-full h-full object-cover" 
+                              />
+                            ) : (
+                              <span className="text-3xl">{exchange.store_products?.image_url || '🎁'}</span>
+                            )}
+                          </div>
+                          
+                          {/* 교환 정보 */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-bold text-gray-900 truncate">
+                                {exchange.store_products?.name || '삭제된 상품'}
+                              </h3>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(exchange.status)}`}>
+                                {getStatusLabel(exchange.status)}
+                              </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div>
+                                <p className="text-gray-500 text-xs">포인트</p>
+                                <p className="font-semibold text-gray-900">
+                                  {exchange.store_products?.price?.toLocaleString()}P
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500 text-xs">연락처</p>
+                                <p className="font-semibold text-teal-600">{exchange.phone_number}</p>
+                              </div>
+                              <div className="col-span-2">
+                                <p className="text-gray-500 text-xs">신청일시</p>
+                                <p className="font-semibold text-gray-900">
+                                  {new Date(exchange.created_at).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {/* 상태별 안내 메시지 */}
+                            {exchange.status === 'pending' && (
+                              <div className="mt-2 text-xs text-yellow-600 bg-yellow-50 rounded-lg p-2">
+                                ⏳ 관리자 확인 대기 중입니다
+                              </div>
+                            )}
+                            {exchange.status === 'processing' && (
+                              <div className="mt-2 text-xs text-blue-600 bg-blue-50 rounded-lg p-2">
+                                🔄 처리 중입니다. 곧 연락드리겠습니다!
+                              </div>
+                            )}
+                            {exchange.status === 'completed' && (
+                              <div className="mt-2 text-xs text-green-600 bg-green-50 rounded-lg p-2">
+                                ✅ 교환이 완료되었습니다!
+                              </div>
+                            )}
+                            {exchange.status === 'cancelled' && (
+                              <div className="mt-2 text-xs text-red-600 bg-red-50 rounded-lg p-2">
+                                ❌ 교환이 취소되었습니다
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 🆕 게시물 수정 모달 */}
+      {/* 🆕 게시물 수정 모달 (기존 코드 유지) */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
