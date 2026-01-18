@@ -61,37 +61,24 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe()
   }, [])
   
-  // 포인트 실시간 업데이트
+  // 30초마다 포인트 자동 확인
   useEffect(() => {
     if (!user?.id) return
 
-    console.log('🔔 Realtime 구독 시작:', user.id)
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      
+      if (data && data.points !== profile?.points) {
+        setProfile(data)
+      }
+    }, 30000)
 
-    const channel = supabase
-      .channel(`profile:${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('💰 포인트 업데이트 받음!', payload)
-          console.log('새 포인트:', payload.new.points)
-          setProfile(payload.new)
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 구독 상태:', status)
-      })
-
-    return () => {
-      console.log('🔕 Realtime 구독 해제')
-      supabase.removeChannel(channel)
-    }
-  }, [user?.id])
+    return () => clearInterval(interval)
+  }, [user?.id, profile?.points])
   
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
