@@ -61,32 +61,6 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe()
   }, [])
   
-  // 포인트 실시간 업데이트 구독
-  useEffect(() => {
-    if (!user) return
-
-    const channel = supabase
-      .channel('profile-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('💰 포인트 업데이트:', payload.new.points)
-          setProfile(payload.new)
-        }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [user])
-  
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -153,7 +127,7 @@ export const AuthProvider = ({ children }) => {
       loading, 
       signInWithGoogle, 
       signInWithGitHub,
-      signInWithKakao,  // ← 추가!
+      signInWithKakao,
       signInWithEmail, 
       signUpWithEmail, 
       signOut 

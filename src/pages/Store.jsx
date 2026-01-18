@@ -264,11 +264,17 @@ export default function Store() {
               마이페이지에서 확인해주세요.
             </p>
             <button
-              onClick={() => {
-                setShowSuccessModal(false)
-                setSelectedProduct(null)
-                window.location.reload() // 포인트 갱신
-              }}
+             onClick={async () => {
+              setShowSuccessModal(false)
+              setSelectedProduct(null)
+              // 프로필 다시 불러오기
+              const { data } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single()
+              if (data) window.location.href = '/store' // 페이지 새로고침 대신
+            }}
               className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold"
             >
               확인
