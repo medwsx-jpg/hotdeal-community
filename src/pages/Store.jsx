@@ -16,11 +16,21 @@ export default function Store() {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [purchasing, setPurchasing] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+const [showPhoneModal, setShowPhoneModal] = useState(false)  // 🆕 추가
+const [phoneNumber, setPhoneNumber] = useState('')           // 🆕 추가
   
   // 상품 목록 가져오기
   useEffect(() => {
     fetchProducts()
   }, [])
+
+  // 🆕 전화번호 포맷팅 함수
+const formatPhoneNumber = (value) => {
+  const numbers = value.replace(/[^\d]/g, '')
+  if (numbers.length <= 3) return numbers
+  if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`
+  return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`
+}
   
   const fetchProducts = async () => {
     try {
@@ -48,50 +58,49 @@ export default function Store() {
     }
   }
   
-  // 상품 구매
-  const handlePurchase = async () => {
-    if (!user || !selectedProduct) return
+ // 🆕 교환 확인 (전화번호 입력 포함)
+const handleConfirmExchange = async () => {
+  if (!phoneNumber || phoneNumber.length < 12) {
+    alert('올바른 전화번호를 입력해주세요.')
+    return
+  }
+  
+  setPurchasing(true)
+  try {
+    // 1. 교환 내역 저장
+    const { error: exchangeError } = await supabase
+      .from('reward_exchanges')
+      .insert([{
+        user_id: user.id,
+        item_name: selectedProduct.name,
+        item_image: selectedProduct.image_url,
+        points: selectedProduct.price,
+        phone: phoneNumber,
+        status: 'pending'
+      }])
     
-    const userPoints = profile?.points || 0
+    if (exchangeError) throw exchangeError
     
-    if (userPoints < selectedProduct.price) {
-      alert('포인트가 부족합니다!')
-      setShowConfirmModal(false)
-      return
-    }
-    
-    setPurchasing(true)
-    try {
-    // 포인트 차감 (Atomic Update)
+    // 2. 포인트 차감
     const { error: pointError } = await supabase.rpc('increment_points', {
       user_id_param: user.id,
       points_param: -selectedProduct.price
     })
-      
-      if (pointError) throw pointError
-      
-      // 구매 기록 저장
-      const { error: purchaseError } = await supabase
-        .from('store_purchases')
-        .insert({
-          user_id: user.id,
-          product_id: selectedProduct.id,
-          product_name: selectedProduct.name,
-          price: selectedProduct.price
-        })
-      
-      if (purchaseError) throw purchaseError
-      
-      setShowConfirmModal(false)
-      setShowSuccessModal(true)
-    } catch (error) {
-      console.error('구매 실패:', error)
-      alert('구매에 실패했습니다. 다시 시도해주세요.')
-    } finally {
-      setPurchasing(false)
-    }
+    
+    if (pointError) throw pointError
+    
+    // 3. 성공 모달 표시
+    setShowPhoneModal(false)
+    setPhoneNumber('')
+    setShowSuccessModal(true)
+    
+  } catch (error) {
+    console.error('교환 실패:', error)
+    alert('교환 실패: ' + error.message)
+  } finally {
+    setPurchasing(false)
   }
-  
+}
   const userPoints = profile?.points || 0
   
   if (!user) {
@@ -155,11 +164,23 @@ export default function Store() {
           <div className="grid grid-cols-2 gap-3">
             {products.map((product) => (
               <button
-                key={product.id}
-                onClick={() => {
-                  setSelectedProduct(product)
-                  setShowConfirmModal(true)
-                }}
+              key={product.id}
+              onClick={() => {
+                if (!user) {
+                  alert('로그인이 필요합니다.')
+                  navigate('/login')
+                  return
+                }
+                
+                const userPoints = profile?.points || 0
+                if (userPoints < product.price) {
+                  alert('포인트가 부족합니다.')
+                  return
+                }
+                
+                setSelectedProduct(product)
+                setShowPhoneModal(true)  // 🆕 변경: 전화번호 모달 표시
+              }}
                 className="bg-red-50 rounded-2xl p-4 text-center hover:shadow-lg transition-all border-2 border-red-100 hover:border-red-300"
               >
                 {/* 상품 이미지 */}
@@ -184,72 +205,90 @@ export default function Store() {
         )}
       </div>
       
-      {/* 구매 확인 모달 */}
-      {showConfirmModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6">
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-red-50 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                {selectedProduct.image_url?.startsWith('http') ? (
-                  <img 
-                    src={selectedProduct.image_url} 
-                    alt={selectedProduct.name}
-                    className="w-full h-full object-cover rounded-2xl"
-                  />
-                ) : (
-                  <span className="text-4xl">{selectedProduct.image_url || '🎁'}</span>
-                )}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedProduct.name}</h3>
-              <p className="text-2xl font-bold text-teal-600">{selectedProduct.price?.toLocaleString()}P</p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-xl p-4 mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">보유 포인트</span>
-                <span className="font-bold">{userPoints.toLocaleString()}P</span>
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-600">필요 포인트</span>
-                <span className="font-bold text-red-500">-{selectedProduct.price?.toLocaleString()}P</span>
-              </div>
-              <div className="border-t border-gray-200 pt-2 mt-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">잔여 포인트</span>
-                  <span className={`font-bold ${userPoints - selectedProduct.price >= 0 ? 'text-teal-600' : 'text-red-500'}`}>
-                    {(userPoints - selectedProduct.price).toLocaleString()}P
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            {userPoints < selectedProduct.price ? (
-              <div className="text-center text-red-500 text-sm mb-4">
-                ⚠️ 포인트가 부족합니다
-              </div>
-            ) : null}
-            
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowConfirmModal(false)
-                  setSelectedProduct(null)
-                }}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold"
-              >
-                취소
-              </button>
-              <button
-                onClick={handlePurchase}
-                disabled={purchasing || userPoints < selectedProduct.price}
-                className="flex-1 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold disabled:opacity-50"
-              >
-                {purchasing ? '처리 중...' : '교환하기'}
-              </button>
-            </div>
+      {/* 🆕 전화번호 입력 모달 */}
+{showPhoneModal && selectedProduct && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">기프티콘 받을 번호</h2>
+        <button
+          onClick={() => {
+            setShowPhoneModal(false)
+            setPhoneNumber('')
+          }}
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-400" />
+        </button>
+      </div>
+
+      {/* 선택한 상품 정보 */}
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 mb-6">
+        <div className="flex items-center space-x-4">
+          <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+            {selectedProduct.image_url?.startsWith('http') ? (
+              <img src={selectedProduct.image_url} alt={selectedProduct.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-4xl">{selectedProduct.image_url || '🎁'}</span>
+            )}
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-gray-900">{selectedProduct.name}</h3>
+            <p className="text-sm text-teal-600 font-semibold">{selectedProduct.price?.toLocaleString()}P</p>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* 전화번호 입력 */}
+      <div className="mb-6">
+        <label className="block text-sm font-semibold text-gray-900 mb-2">
+          전화번호 *
+        </label>
+        <input
+          type="tel"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(formatPhoneNumber(e.target.value))}
+          placeholder="010-1234-5678"
+          maxLength="13"
+          className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 transition-colors"
+        />
+        <p className="text-xs text-gray-500 mt-2">
+          💬 입력하신 번호로 카카오톡 기프티콘이 발송됩니다
+        </p>
+      </div>
+
+      {/* 주의사항 */}
+      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4 mb-6">
+        <p className="text-sm text-gray-700 font-medium mb-2">⚠️ 확인해주세요</p>
+        <ul className="text-xs text-gray-600 space-y-1">
+          <li>• 전화번호를 정확히 입력해주세요</li>
+          <li>• 교환 후 1-3일 내 발송됩니다</li>
+          <li>• 발송 후에는 취소가 불가능합니다</li>
+        </ul>
+      </div>
+
+      {/* 버튼 */}
+      <div className="flex gap-3">
+        <button
+          onClick={() => {
+            setShowPhoneModal(false)
+            setPhoneNumber('')
+          }}
+          className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+        >
+          취소
+        </button>
+        <button
+          onClick={handleConfirmExchange}
+          disabled={purchasing || phoneNumber.length < 12}
+          className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {purchasing ? '처리 중...' : '교환하기'}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       
       {/* 구매 성공 모달 */}
       {showSuccessModal && (
@@ -259,10 +298,13 @@ export default function Store() {
               <Check className="w-10 h-10 text-green-500" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">교환 완료!</h3>
-            <p className="text-gray-600 mb-6">
-              {selectedProduct?.name} 교환이 완료되었습니다.<br />
-              마이페이지에서 확인해주세요.
-            </p>
+            <p className="text-gray-600 mb-2">
+  {selectedProduct?.name}
+</p>
+<p className="text-sm text-gray-500 mb-8">
+  {phoneNumber}로<br />
+  1-3일 내 기프티콘이 발송됩니다
+</p>
             <button
              onClick={async () => {
               setShowSuccessModal(false)

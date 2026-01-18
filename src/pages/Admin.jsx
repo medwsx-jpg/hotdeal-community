@@ -108,6 +108,12 @@ export default function Admin() {
   const [pointAction, setPointAction] = useState({ type: 'add', amount: '', reason: '' })
   const [pointLoading, setPointLoading] = useState(false)
 
+  // 🆕 교환 내역 관리용
+  const [exchanges, setExchanges] = useState([])
+  const [exchangesFilter, setExchangesFilter] = useState('all') // all, pending, processing, completed, cancelled
+  const [exchangesLoading, setExchangesLoading] = useState(false)
+  const [exchangeStats, setExchangeStats] = useState({ total: 0, pending: 0, processing: 0, completed: 0, cancelled: 0 })
+
   useEffect(() => {
     if (!user) { navigate('/login'); return }
     if (profile === null) return
@@ -121,6 +127,7 @@ export default function Admin() {
     fetchSignupStats()
     fetchWeeklySignups()
     fetchUsersWithActivity()
+    fetchExchanges() // 🆕 추가
   }, [user, profile, navigate])
 
   useEffect(() => {
@@ -128,7 +135,88 @@ export default function Admin() {
     else if (activeTab === 'comments') fetchAllComments(0, '', true)
     else if (activeTab === 'store') fetchStoreProducts()
     else if (activeTab === 'users') fetchAllUsersWithPoints()
+    else if (activeTab === 'exchanges') fetchExchanges() // 🆕 추가
   }, [activeTab])
+
+  // 🆕 교환 내역 조회
+  const fetchExchanges = async (statusFilter = 'all') => {
+    try {
+      setExchangesLoading(true)
+      
+      let query = supabase
+        .from('reward_exchanges')
+        .select(`
+          *,
+          profiles:user_id (username, points),
+          store_products:product_id (name, price, image_url)
+        `)
+        .order('created_at', { ascending: false })
+      
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter)
+      }
+      
+      const { data, error } = await query
+      if (error) throw error
+      
+      setExchanges(data || [])
+      
+      // 통계 계산
+      const stats = {
+        total: data?.length || 0,
+        pending: data?.filter(e => e.status === 'pending').length || 0,
+        processing: data?.filter(e => e.status === 'processing').length || 0,
+        completed: data?.filter(e => e.status === 'completed').length || 0,
+        cancelled: data?.filter(e => e.status === 'cancelled').length || 0
+      }
+      setExchangeStats(stats)
+    } catch (error) {
+      console.error('교환 내역 로드 실패:', error)
+    } finally {
+      setExchangesLoading(false)
+    }
+  }
+
+  // 🆕 교환 상태 변경
+  const handleUpdateExchangeStatus = async (exchangeId, newStatus) => {
+    if (!window.confirm(`상태를 '${getStatusLabel(newStatus)}'(으)로 변경하시겠습니까?`)) return
+    
+    try {
+      const { error } = await supabase
+        .from('reward_exchanges')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', exchangeId)
+      
+      if (error) throw error
+      
+      alert('상태가 변경되었습니다!')
+      fetchExchanges(exchangesFilter)
+    } catch (error) {
+      alert('상태 변경 실패: ' + error.message)
+    }
+  }
+
+  // 🆕 상태 라벨 변환
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: '대기중',
+      processing: '처리중',
+      completed: '완료',
+      cancelled: '취소'
+    }
+    return labels[status] || status
+  }
+
+  // 🆕 상태 색상
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+      processing: 'bg-blue-100 text-blue-700 border-blue-300',
+      completed: 'bg-green-100 text-green-700 border-green-300',
+      cancelled: 'bg-red-100 text-red-700 border-red-300'
+    }
+    return colors[status] || 'bg-gray-100 text-gray-700 border-gray-300'
+  }
 
   // 전체 사용자 + 포인트 가져오기
   const fetchAllUsersWithPoints = async (search = '') => {
@@ -533,7 +621,7 @@ export default function Admin() {
         <div className="bg-white rounded-xl border border-gray-200">
           <div className="border-b border-gray-200 overflow-x-auto">
             <div className="flex space-x-4 md:space-x-8 px-6 min-w-max">
-              {['dashboard', 'notices', 'store', 'posts', 'comments', 'reports', 'users'].map(tab => (
+              {['dashboard', 'notices', 'store', 'posts', 'comments', 'reports', 'users', 'exchanges'].map(tab => (
                 <button key={tab} onClick={() => setActiveTab(tab)} className={`py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab ? (tab === 'reports' ? 'border-red-500 text-red-600' : 'border-teal-500 text-teal-600') : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
                   {tab === 'dashboard' && '대시보드'}
                   {tab === 'notices' && '공지 관리'}
@@ -542,6 +630,7 @@ export default function Admin() {
                   {tab === 'comments' && '댓글 관리'}
                   {tab === 'reports' && <span className="flex items-center space-x-1"><span>신고 관리</span>{stats.totalReports > 0 && <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs rounded-full">{stats.totalReports}</span>}</span>}
                   {tab === 'users' && '사용자 관리'}
+                  {tab === 'exchanges' && <span className="flex items-center space-x-1"><ShoppingBag className="w-4 h-4" /><span>교환 내역</span>{exchangeStats.pending > 0 && <span className="px-1.5 py-0.5 bg-yellow-500 text-white text-xs rounded-full">{exchangeStats.pending}</span>}</span>}
                 </button>
               ))}
             </div>
@@ -550,7 +639,6 @@ export default function Admin() {
           <div className="p-6">
             {activeTab === 'dashboard' && (
               <div>
-                {/* 대시보드 내용은 기존과 동일... */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-4"><UserPlus className="w-5 h-5 text-teal-600" /><h2 className="text-lg font-bold text-gray-900">📊 가입 통계</h2></div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -649,7 +737,6 @@ export default function Admin() {
                       <div><label className="block text-sm font-semibold mb-2">제목 *</label><input type="text" required value={newNotice.title} onChange={(e) => setNewNotice({...newNotice, title: e.target.value})} placeholder="제목을 입력하세요" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500" /></div>
                       <div><label className="block text-sm font-semibold mb-2">내용 *</label><textarea required value={newNotice.content} onChange={(e) => setNewNotice({...newNotice, content: e.target.value})} placeholder="내용을 입력하세요" rows="6" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none" /></div>
                       
-                      {/* 이미지 업로드 추가 */}
                       <div>
                         <label className="block text-sm font-semibold mb-2">이미지 첨부</label>
                         <div className="flex items-center gap-4">
@@ -904,6 +991,208 @@ export default function Admin() {
                         </div>
                       </form>
                     </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 🆕 교환 내역 탭 */}
+            {activeTab === 'exchanges' && (
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-lg font-bold text-gray-900">🛒 교환 신청 내역</h2>
+                  <button 
+                    onClick={() => fetchExchanges(exchangesFilter)} 
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200"
+                  >
+                    새로고침
+                  </button>
+                </div>
+
+                {/* 통계 카드 */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border-2 border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-gray-600 font-medium">전체</p>
+                        <p className="text-2xl font-bold text-gray-700">{exchangeStats.total}</p>
+                      </div>
+                      <ShoppingBag className="w-8 h-8 text-gray-500" />
+                    </div>
+                  </div>
+                  
+                  <div 
+                    onClick={() => { setExchangesFilter('pending'); fetchExchanges('pending') }}
+                    className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-200 cursor-pointer hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-yellow-600 font-medium">대기중</p>
+                        <p className="text-2xl font-bold text-yellow-700">{exchangeStats.pending}</p>
+                      </div>
+                      <Zap className="w-8 h-8 text-yellow-500" />
+                    </div>
+                  </div>
+                  
+                  <div 
+                    onClick={() => { setExchangesFilter('processing'); fetchExchanges('processing') }}
+                    className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-200 cursor-pointer hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-blue-600 font-medium">처리중</p>
+                        <p className="text-2xl font-bold text-blue-700">{exchangeStats.processing}</p>
+                      </div>
+                      <Activity className="w-8 h-8 text-blue-500" />
+                    </div>
+                  </div>
+                  
+                  <div 
+                    onClick={() => { setExchangesFilter('completed'); fetchExchanges('completed') }}
+                    className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-200 cursor-pointer hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-green-600 font-medium">완료</p>
+                        <p className="text-2xl font-bold text-green-700">{exchangeStats.completed}</p>
+                      </div>
+                      <UserCheck className="w-8 h-8 text-green-500" />
+                    </div>
+                  </div>
+                  
+                  <div 
+                    onClick={() => { setExchangesFilter('cancelled'); fetchExchanges('cancelled') }}
+                    className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border-2 border-red-200 cursor-pointer hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-red-600 font-medium">취소</p>
+                        <p className="text-2xl font-bold text-red-700">{exchangeStats.cancelled}</p>
+                      </div>
+                      <UserX className="w-8 h-8 text-red-500" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 필터 버튼 */}
+                <div className="flex gap-2 mb-4">
+                  {['all', 'pending', 'processing', 'completed', 'cancelled'].map(status => (
+                    <button
+                      key={status}
+                      onClick={() => { setExchangesFilter(status); fetchExchanges(status) }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        exchangesFilter === status 
+                          ? 'bg-teal-500 text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {status === 'all' ? '전체' : getStatusLabel(status)}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 교환 내역 리스트 */}
+                {exchangesLoading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
+                  </div>
+                ) : exchanges.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-xl">
+                    <ShoppingBag className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-600">교환 신청 내역이 없습니다</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {exchanges.map((exchange) => (
+                      <div key={exchange.id} className={`bg-white border-2 rounded-xl p-5 hover:shadow-md ${getStatusColor(exchange.status)}`}>
+                        <div className="flex items-start justify-between gap-4">
+                          {/* 왼쪽: 상품 정보 */}
+                          <div className="flex items-start gap-4 flex-1">
+                            <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                              {exchange.store_products?.image_url?.startsWith('http') ? (
+                                <img src={exchange.store_products.image_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-3xl">{exchange.store_products?.image_url || '🎁'}</span>
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-bold text-gray-900">{exchange.store_products?.name || '삭제된 상품'}</h3>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(exchange.status)}`}>
+                                  {getStatusLabel(exchange.status)}
+                                </span>
+                              </div>
+                              
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <p className="text-gray-500 text-xs">신청자</p>
+                                  <p className="font-semibold text-gray-900">{exchange.profiles?.username || '익명'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500 text-xs">연락처</p>
+                                  <p className="font-semibold text-teal-600">{exchange.phone_number}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500 text-xs">포인트</p>
+                                  <p className="font-semibold text-gray-900">{exchange.store_products?.price?.toLocaleString()}P</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500 text-xs">신청일시</p>
+                                  <p className="font-semibold text-gray-900">{new Date(exchange.created_at).toLocaleString()}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 오른쪽: 상태 변경 버튼 */}
+                          <div className="flex flex-col gap-2">
+                            {exchange.status === 'pending' && (
+                              <>
+                                <button
+                                  onClick={() => handleUpdateExchangeStatus(exchange.id, 'processing')}
+                                  className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 whitespace-nowrap"
+                                >
+                                  처리중으로
+                                </button>
+                                <button
+                                  onClick={() => handleUpdateExchangeStatus(exchange.id, 'cancelled')}
+                                  className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 whitespace-nowrap"
+                                >
+                                  취소
+                                </button>
+                              </>
+                            )}
+                            
+                            {exchange.status === 'processing' && (
+                              <>
+                                <button
+                                  onClick={() => handleUpdateExchangeStatus(exchange.id, 'completed')}
+                                  className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 whitespace-nowrap"
+                                >
+                                  완료
+                                </button>
+                                <button
+                                  onClick={() => handleUpdateExchangeStatus(exchange.id, 'cancelled')}
+                                  className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 whitespace-nowrap"
+                                >
+                                  취소
+                                </button>
+                              </>
+                            )}
+                            
+                            {(exchange.status === 'completed' || exchange.status === 'cancelled') && (
+                              <div className="flex items-center justify-center h-full">
+                                <span className="text-2xl">
+                                  {exchange.status === 'completed' ? '✅' : '❌'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
