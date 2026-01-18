@@ -65,6 +65,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (!user?.id) return
 
+    console.log('🔔 Realtime 구독 시작:', user.id)
+
     const channel = supabase
       .channel(`profile:${user.id}`)
       .on(
@@ -76,13 +78,17 @@ export const AuthProvider = ({ children }) => {
           filter: `id=eq.${user.id}`
         },
         (payload) => {
-          console.log('💰 포인트 업데이트:', payload.new.points)
+          console.log('💰 포인트 업데이트 받음!', payload)
+          console.log('새 포인트:', payload.new.points)
           setProfile(payload.new)
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('📡 구독 상태:', status)
+      })
 
     return () => {
+      console.log('🔕 Realtime 구독 해제')
       supabase.removeChannel(channel)
     }
   }, [user?.id])
