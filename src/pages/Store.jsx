@@ -68,18 +68,18 @@ const handleConfirmExchange = async () => {
   setPurchasing(true)
   try {
     // 1. 교환 내역 저장
-    // ✅ 올바른 코드 (새 구조)
-const { error } = await supabase
-.from('reward_exchanges')
-.insert([{
-  user_id: user.id,
-  product_id: selectedProduct.id,  // ✅ UUID 전달
-  phone_number: phoneNumber,       // ✅ phone_number
-  points: selectedProduct.price,
-  status: 'pending'
-}])
-    
-    if (exchangeError) throw exchangeError
+// ✅ 올바른 코드
+const { error: exchangeError } = await supabase  // ← 이렇게 변경!
+  .from('reward_exchanges')
+  .insert([{
+    user_id: user.id,
+    product_id: selectedProduct.id,
+    phone_number: phoneNumber,
+    points: selectedProduct.price,
+    status: 'pending'
+  }])
+
+if (exchangeError) throw exchangeError
     
     // 2. 포인트 차감
     const { error: pointError } = await supabase.rpc('increment_points', {
