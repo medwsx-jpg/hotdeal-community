@@ -62,11 +62,11 @@ export default function Store() {
     
     setPurchasing(true)
     try {
-      // 포인트 차감
-      const { error: pointError } = await supabase
-        .from('profiles')
-        .update({ points: userPoints - selectedProduct.price })
-        .eq('id', user.id)
+    // 포인트 차감 (Atomic Update)
+    const { error: pointError } = await supabase.rpc('increment_points', {
+      user_id_param: user.id,
+      points_param: -selectedProduct.price
+    })
       
       if (pointError) throw pointError
       

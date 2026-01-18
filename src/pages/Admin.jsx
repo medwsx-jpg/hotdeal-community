@@ -165,20 +165,11 @@ export default function Admin() {
       const amount = parseInt(pointAction.amount)
       const finalAmount = pointAction.type === 'add' ? amount : -amount
       
-      const { data: currentProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('points')
-        .eq('id', selectedUser.id)
-        .single()
-      
-      if (fetchError) throw fetchError
-      
-      const newPoints = Math.max(0, (currentProfile.points || 0) + finalAmount)
-      
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ points: newPoints })
-        .eq('id', selectedUser.id)
+      // Atomic Update 사용
+      const { error: updateError } = await supabase.rpc('increment_points', {
+        user_id_param: selectedUser.id,
+        points_param: finalAmount
+      })
       
       if (updateError) throw updateError
       
