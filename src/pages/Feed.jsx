@@ -2161,14 +2161,13 @@ export default function Feed() {
 
                 {showBusinessInfo && (
                   <div className="mt-3 space-y-1 text-[10px] text-gray-600 leading-relaxed animate-slide-down">
-                    <p>상호명: UDT79</p>
-                    <p>대표자: [대표자명]</p>
-                    <p>사업자등록번호: [000-00-00000]</p>
+                    <p>상호명: 별경</p>
+                    <p>대표자: [유소현]</p>
+                    <p>사업자등록번호: [798-63-00757]</p>
                     <p>통신판매업신고: [제0000-서울-00000호]</p>
-                    <p>주소: [사업자 주소]</p>
-                    <p>이메일: support@udt79.com</p>
-                    <p>고객센터: 1234-5678</p>
-                    <p className="pt-2 text-gray-500">© 2025 UDT79</p>
+                    <p>주소: [충청남도 천안시 동남구 풍세로801]</p>
+                    <p>이메일: asd024@naver.com</p>
+                     <p className="pt-2 text-gray-500">© 2025 UDT79</p>
                   </div>
                 )}
               </div>
