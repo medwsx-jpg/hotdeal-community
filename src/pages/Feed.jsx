@@ -1030,20 +1030,15 @@ export default function Feed() {
               </button>
               
               <button 
-                onClick={() => navigate('/profile')}
-                className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full" />
-                ) : (
-                  <div className="w-6 h-6 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {profile?.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                )}
-                <span className="text-xs font-medium text-gray-700">
-                  {profile?.username || (user?.email?.split('@')[0]) || '사용자'}
-                </span>
-              </button>
+  onClick={() => navigate('/profile')}
+  className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+>
+  {/* 🆕 배터리 아이콘으로 변경 */}
+  <BatteryIcon level={getUserLevel(profile?.posts_count || 0)} size={24} />
+  <span className="text-xs font-medium text-gray-700">
+    {profile?.username || (user?.email?.split('@')[0]) || '사용자'}
+  </span>
+</button>
 
               {profile?.role === '관리자' && (
                 <button
