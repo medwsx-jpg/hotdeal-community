@@ -558,8 +558,20 @@ export default function Profile() {
                   </button>
                 </div>
 
-                {/* Logout */}
+                {/* 🆕 1:1 문의 */}
                 <div className="pt-6 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => window.open('https://open.kakao.com/o/sNlIAtbi', '_blank')}
+                    className="w-full px-4 py-3 bg-yellow-50 hover:bg-yellow-100 text-gray-900 rounded-lg font-semibold transition-colors border-2 border-yellow-200 flex items-center justify-center space-x-2"
+                  >
+                    <MessageCircle className="w-5 h-5 text-yellow-600" />
+                    <span>1:1 문의 (카카오톡)</span>
+                  </button>
+                </div>
+
+                {/* Logout */}
+                <div className="pt-2">
                   <button
                     type="button"
                     onClick={async () => {
