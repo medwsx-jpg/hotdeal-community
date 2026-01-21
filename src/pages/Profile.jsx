@@ -4,6 +4,57 @@ import { User, Mail, Camera, ArrowLeft, Save, FileText, MessageCircle, Briefcase
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
+// 🆕 배터리 아이콘 컴포넌트 (Admin.jsx와 동일)
+const BatteryIcon = ({ level, size = 32 }) => {
+  const colors = {
+    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸
+    gold: { color: '#eab308', bars: 2 },     // 노랑 - 2칸
+    silver: { color: '#f97316', bars: 1 },   // 주황 - 1칸
+    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸
+  }
+  
+  const config = colors[level] || colors.dormant
+  
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+      {/* 외곽 원형 테두리 (연한 빨간색) */}
+      <circle cx="20" cy="20" r="19" stroke="#fca5a5" strokeWidth="1.5" fill="none" />
+      {/* 회색 배경 원 - 밝은 회색으로 수정 */}
+      <circle cx="20" cy="20" r="17.5" fill="#f3f4f6" />
+      
+      {/* 배터리 본체 외곽 (세로) */}
+      <rect x="13" y="12" width="14" height="20" rx="2" stroke={config.color} strokeWidth="2" fill="none" />
+      {/* 배터리 단자 (위쪽) */}
+      <rect x="16" y="8" width="8" height="4" rx="1" fill={config.color} />
+      
+      {/* 배터리 바들 (아래서부터 채워짐) */}
+      {config.bars >= 1 && (
+        <rect x="15" y="25" width="10" height="5" rx="1" fill={config.color} />
+      )}
+      {config.bars >= 2 && (
+        <rect x="15" y="19" width="10" height="5" rx="1" fill={config.color} />
+      )}
+      {config.bars >= 3 && (
+        <rect x="15" y="13" width="10" height="5" rx="1" fill={config.color} />
+      )}
+    </svg>
+  )
+}
+
+// 🆕 사용자 등급 계산 함수
+const getUserLevel = (postsCount) => {
+  if (postsCount >= 30) return 'vip'
+  if (postsCount >= 11) return 'gold'
+  if (postsCount >= 1) return 'silver'
+  return 'dormant'
+}
+
+// 🆕 등급 라벨
+const getLevelLabel = (level) => {
+  const labels = { vip: '🟢 VIP', gold: '🟡 골드', silver: '🟠 실버', dormant: '🔴 휴면' }
+  return labels[level] || labels.dormant
+}
+
 export default function Profile() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
@@ -13,6 +64,9 @@ export default function Profile() {
     bio: '',
     avatar_url: ''
   })
+   // 🆕 사용자 등급 관련
+   const [userPostsCount, setUserPostsCount] = useState(0)
+   const [userLevel, setUserLevel] = useState('dormant')
 
   // 🆕 탭 관련 State
   const [activeTab, setActiveTab] = useState('profile')
@@ -66,6 +120,25 @@ export default function Profile() {
       navigate('/login')
     }
   }, [user, navigate])
+  useEffect(() => {
+    if (!user) return
+    
+    const fetchUserPostsCount = async () => {
+      try {
+        const { count } = await supabase
+          .from('posts')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+        
+        setUserPostsCount(count || 0)
+        setUserLevel(getUserLevel(count || 0))
+      } catch (error) {
+        console.error('글 개수 조회 실패:', error)
+      }
+    }
+    
+    fetchUserPostsCount()
+  }, [user])
 
   // 🆕 탭 변경 시 데이터 로드
   useEffect(() => {
@@ -579,16 +652,25 @@ export default function Profile() {
             {/* 프로필수정 탭 */}
             {activeTab === 'profile' && (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Avatar */}
-                <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                    {formData.username?.[0] || user?.email?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{user?.email}</p>
-                    <p className="text-xs text-gray-500">가입일: {new Date(user?.created_at).toLocaleDateString()}</p>
-                  </div>
-                </div>
+                {/* 🆕 Avatar - 배터리 아이콘으로 변경 */}
+<div className="flex items-center space-x-4">
+  <BatteryIcon level={userLevel} size={80} />
+  <div>
+    <div className="flex items-center gap-2 mb-1">
+      <p className="text-sm font-semibold text-gray-900">{formData.username || user?.email}</p>
+      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+        userLevel === 'vip' ? 'bg-green-100 text-green-700' : 
+        userLevel === 'gold' ? 'bg-yellow-100 text-yellow-700' : 
+        userLevel === 'silver' ? 'bg-orange-100 text-orange-700' : 
+        'bg-red-100 text-red-700'
+      }`}>
+        {getLevelLabel(userLevel)}
+      </span>
+    </div>
+    <p className="text-xs text-gray-500">글 {userPostsCount}개 작성</p>
+    <p className="text-xs text-gray-500">가입일: {new Date(user?.created_at).toLocaleDateString()}</p>
+  </div>
+</div>
 
                 {/* Username */}
                 <div>
