@@ -69,7 +69,7 @@ export default function Profile() {
    const [userLevel, setUserLevel] = useState('dormant')
 
   // 🆕 탭 관련 State
-  const [activeTab, setActiveTab] = useState('profile')
+  const [activeTab, setActiveTab] = useState('main')
   const [myPosts, setMyPosts] = useState([])
   const [myComments, setMyComments] = useState([])
   const [receivedApplications, setReceivedApplications] = useState([])
@@ -575,530 +575,600 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => navigate('/feed')}
-            className="flex items-center space-x-2 text-gray-600 hover:text-teal-600 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium">돌아가기</span>
-          </button>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* 🆕 메인 화면 */}
+      {activeTab === 'main' && (
+        <div className="max-w-lg mx-auto">
+          {/* 프로필 카드 */}
+          <div className="bg-white border-b border-gray-200 p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <BatteryIcon level={userLevel} size={80} />
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-lg font-bold text-gray-900">{formData.username || user?.email}</p>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                    userLevel === 'vip' ? 'bg-green-100 text-green-700' : 
+                    userLevel === 'gold' ? 'bg-yellow-100 text-yellow-700' : 
+                    userLevel === 'silver' ? 'bg-orange-100 text-orange-700' : 
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {getLevelLabel(userLevel)}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600">{user?.email}</p>
+                <p className="text-xs text-gray-500">글 {userPostsCount}개 작성 · {profile?.points || 0}P</p>
+              </div>
+            </div>
+          </div>
+  
+          {/* 🆕 세로 메뉴 리스트 */}
+          <div className="bg-white">
+            {/* 프로필 수정 */}
+            <button
+              onClick={() => setActiveTab('profile')}
+              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <User className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">프로필 수정</span>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+            </button>
+  
+            {/* 내가 쓴 글 */}
+            <button
+              onClick={() => setActiveTab('posts')}
+              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <FileText className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">내가 쓴 글</span>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+            </button>
+  
+            {/* 내가 쓴 댓글 */}
+            <button
+              onClick={() => setActiveTab('comments')}
+              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <MessageCircle className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">내가 쓴 댓글</span>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+            </button>
+  
+            {/* 지원 내역 */}
+            <button
+              onClick={() => setActiveTab('applications')}
+              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <Briefcase className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">지원 내역</span>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+            </button>
+  
+            {/* 교환 내역 */}
+            <button
+              onClick={() => setActiveTab('exchanges')}
+              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <ShoppingBag className="w-5 h-5 text-gray-600" />
+                <span className="font-medium text-gray-900">교환 내역</span>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+            </button>
+  
+            {/* 1:1 문의 */}
+            <button
+              onClick={() => window.open('https://open.kakao.com/o/sNlIAtbi', '_blank')}
+              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <MessageCircle className="w-5 h-5 text-yellow-600" />
+                <span className="font-medium text-gray-900">1:1 문의 (카카오톡)</span>
+              </div>
+              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+            </button>
+  
+            {/* 로그아웃 */}
+            <button
+              onClick={async () => {
+                if (window.confirm('로그아웃 하시겠습니까?')) {
+                  await signOut()
+                  window.location.href = '/'
+                }
+              }}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-red-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <ArrowLeft className="w-5 h-5 text-red-600" />
+                <span className="font-medium text-red-600">로그아웃</span>
+              </div>
+            </button>
+          </div>
         </div>
-
-        {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* 🆕 탭 메뉴 */}
-          <div className="border-b border-gray-200">
-            <div className="flex overflow-x-auto">
+      )}
+  
+      {/* 🆕 프로필 수정 화면 */}
+      {activeTab === 'profile' && (
+        <div className="max-w-lg mx-auto">
+          {/* 헤더 */}
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="px-4 py-3 flex items-center">
+              <button onClick={() => setActiveTab('main')} className="mr-3">
+                <ArrowLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <h1 className="text-lg font-bold">프로필 수정</h1>
+            </div>
+          </div>
+  
+          {/* 프로필 수정 폼 */}
+          <div className="bg-white p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Avatar */}
+              <div className="flex items-center space-x-4">
+                <BatteryIcon level={userLevel} size={80} />
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-semibold text-gray-900">{formData.username || user?.email}</p>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                      userLevel === 'vip' ? 'bg-green-100 text-green-700' : 
+                      userLevel === 'gold' ? 'bg-yellow-100 text-yellow-700' : 
+                      userLevel === 'silver' ? 'bg-orange-100 text-orange-700' : 
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {getLevelLabel(userLevel)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">글 {userPostsCount}개 작성</p>
+                  <p className="text-xs text-gray-500">가입일: {new Date(user?.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+  
+              {/* Username */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">사용자 이름 *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.username}
+                  onChange={(e) => setFormData({...formData, username: e.target.value})}
+                  placeholder="사용자 이름을 입력하세요"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                />
+              </div>
+  
+              {/* Bio */}
+              <div>
+                <label className="block text-sm font-semibold mb-2">소개</label>
+                <textarea
+                  value={formData.bio}
+                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                  placeholder="자기소개를 입력하세요"
+                  rows="4"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+                />
+              </div>
+  
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('main')}
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{loading ? '저장 중...' : '저장'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+  
+      {/* 🆕 내가 쓴 글 화면 */}
+      {activeTab === 'posts' && (
+        <div className="max-w-lg mx-auto">
+          {/* 헤더 */}
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="px-4 py-3 flex items-center">
+              <button onClick={() => setActiveTab('main')} className="mr-3">
+                <ArrowLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <h1 className="text-lg font-bold">내가 쓴 글</h1>
+            </div>
+          </div>
+  
+          {/* 내용 */}
+          <div className="p-4 space-y-3">
+            {myPosts.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">작성한 게시물이 없습니다</p>
+              </div>
+            ) : (
+              myPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="p-4 bg-white border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 
+                      onClick={() => navigate(`/feed#post-${post.id}`)}
+                      className="font-semibold text-gray-900 flex-1 cursor-pointer hover:text-teal-600 transition-colors"
+                    >
+                      {post.title}
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        post.type === 'hotdeal' ? 'bg-teal-100 text-teal-700' :
+                        post.type === 'share' ? 'bg-purple-100 text-purple-700' :
+                        post.type === 'job' ? 'bg-cyan-100 text-cyan-700' :
+                        post.type === 'talk' ? 'bg-orange-100 text-orange-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {post.category}
+                      </span>
+                      
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setOpenMenuId(openMenuId === post.id ? null : post.id)
+                          }}
+                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                        >
+                          <MoreVertical className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        {openMenuId === post.id && (
+                          <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEdit(post)
+                                setOpenMenuId(null)
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              <span>수정</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDelete(post.id)
+                                setOpenMenuId(null)
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>삭제</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p 
+                    onClick={() => navigate(`/feed#post-${post.id}`)}
+                    className="text-sm text-gray-600 line-clamp-2 mb-2 cursor-pointer"
+                  >
+                    {post.content}
+                  </p>
+                  <div 
+                    onClick={() => navigate(`/feed#post-${post.id}`)}
+                    className="flex items-center space-x-4 text-xs text-gray-500 cursor-pointer"
+                  >
+                    <span>👍 {post.likes_count || 0}</span>
+                    <span>💬 {post.comments_count || 0}</span>
+                    <span className="ml-auto">{getTimeAgo(post.created_at)}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+  
+      {/* 🆕 내가 쓴 댓글 화면 */}
+      {activeTab === 'comments' && (
+        <div className="max-w-lg mx-auto">
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="px-4 py-3 flex items-center">
+              <button onClick={() => setActiveTab('main')} className="mr-3">
+                <ArrowLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <h1 className="text-lg font-bold">내가 쓴 댓글</h1>
+            </div>
+          </div>
+  
+          <div className="p-4 space-y-3">
+            {myComments.length === 0 ? (
+              <div className="text-center py-12">
+                <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">작성한 댓글이 없습니다</p>
+              </div>
+            ) : (
+              myComments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="p-4 bg-white border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <p 
+                      onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
+                      className="text-xs text-gray-500 cursor-pointer hover:text-teal-600"
+                    >
+                      게시물: <span className="font-semibold text-gray-700">{comment.posts.title}</span>
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs text-gray-400">{getTimeAgo(comment.created_at)}</span>
+                      
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setOpenCommentMenuId(openCommentMenuId === comment.id ? null : comment.id)
+                          }}
+                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                        >
+                          <MoreVertical className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        {openCommentMenuId === comment.id && (
+                          <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEditComment(comment)
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              <span>수정</span>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteComment(comment.id)
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>삭제</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p 
+                    onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
+                    className="text-sm text-gray-900 cursor-pointer"
+                  >
+                    {comment.content}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+  
+      {/* 🆕 지원 내역 화면 */}
+      {activeTab === 'applications' && (
+        <div className="max-w-lg mx-auto">
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="px-4 py-3 flex items-center">
+              <button onClick={() => setActiveTab('main')} className="mr-3">
+                <ArrowLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <h1 className="text-lg font-bold">지원 내역</h1>
+            </div>
+          </div>
+  
+          {/* 서브탭 */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="flex">
               <button
-                onClick={() => setActiveTab('profile')}
-                className={`flex-1 min-w-[100px] px-4 py-4 text-sm font-semibold transition-colors ${
-                  activeTab === 'profile'
+                onClick={() => setApplicationSubTab('received')}
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  applicationSubTab === 'received'
                     ? 'text-teal-600 border-b-2 border-teal-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600'
                 }`}
               >
-                프로필수정
+                받은 지원
               </button>
               <button
-                onClick={() => setActiveTab('posts')}
-                className={`flex-1 min-w-[100px] px-4 py-4 text-sm font-semibold transition-colors ${
-                  activeTab === 'posts'
+                onClick={() => setApplicationSubTab('sent')}
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  applicationSubTab === 'sent'
                     ? 'text-teal-600 border-b-2 border-teal-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600'
                 }`}
               >
-                내 글
-              </button>
-              <button
-                onClick={() => setActiveTab('comments')}
-                className={`flex-1 min-w-[100px] px-4 py-4 text-sm font-semibold transition-colors ${
-                  activeTab === 'comments'
-                    ? 'text-teal-600 border-b-2 border-teal-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                내 댓글
-              </button>
-              <button
-                onClick={() => setActiveTab('applications')}
-                className={`flex-1 min-w-[100px] px-4 py-4 text-sm font-semibold transition-colors ${
-                  activeTab === 'applications'
-                    ? 'text-teal-600 border-b-2 border-teal-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                지원
-              </button>
-              {/* 🆕 교환 내역 탭 */}
-              <button
-                onClick={() => setActiveTab('exchanges')}
-                className={`flex-1 min-w-[100px] px-4 py-4 text-sm font-semibold transition-colors ${
-                  activeTab === 'exchanges'
-                    ? 'text-teal-600 border-b-2 border-teal-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                교환 내역
+                내가 지원한 내역
               </button>
             </div>
           </div>
-
-          {/* 🆕 탭 콘텐츠 */}
-          <div className="p-6 md:p-8">
-            {/* 프로필수정 탭 */}
-            {activeTab === 'profile' && (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* 🆕 Avatar - 배터리 아이콘으로 변경 */}
-<div className="flex items-center space-x-4">
-  <BatteryIcon level={userLevel} size={80} />
-  <div>
-    <div className="flex items-center gap-2 mb-1">
-      <p className="text-sm font-semibold text-gray-900">{formData.username || user?.email}</p>
-      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-        userLevel === 'vip' ? 'bg-green-100 text-green-700' : 
-        userLevel === 'gold' ? 'bg-yellow-100 text-yellow-700' : 
-        userLevel === 'silver' ? 'bg-orange-100 text-orange-700' : 
-        'bg-red-100 text-red-700'
-      }`}>
-        {getLevelLabel(userLevel)}
-      </span>
-    </div>
-    <p className="text-xs text-gray-500">글 {userPostsCount}개 작성</p>
-    <p className="text-xs text-gray-500">가입일: {new Date(user?.created_at).toLocaleDateString()}</p>
-  </div>
-</div>
-
-                {/* Username */}
-                <div>
-                  <label className="block text-sm font-semibold mb-2">사용자 이름 *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    placeholder="사용자 이름을 입력하세요"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                  />
-                </div>
-
-                {/* Bio */}
-                <div>
-                  <label className="block text-sm font-semibold mb-2">소개</label>
-                  <textarea
-                    value={formData.bio}
-                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                    placeholder="자기소개를 입력하세요"
-                    rows="4"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => navigate('/feed')}
-                    className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>{loading ? '저장 중...' : '저장'}</span>
-                  </button>
-                </div>
-
-                {/* 🆕 1:1 문의 */}
-                <div className="pt-6 border-t border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => window.open('https://open.kakao.com/o/sNlIAtbi', '_blank')}
-                    className="w-full px-4 py-3 bg-yellow-50 hover:bg-yellow-100 text-gray-900 rounded-lg font-semibold transition-colors border-2 border-yellow-200 flex items-center justify-center space-x-2"
-                  >
-                    <MessageCircle className="w-5 h-5 text-yellow-600" />
-                    <span>1:1 문의 (카카오톡)</span>
-                  </button>
-                </div>
-
-                {/* Logout */}
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (window.confirm('로그아웃 하시겠습니까?')) {
-                        await signOut()
-                        window.location.href = '/'
-                      }
-                    }}
-                    className="w-full px-4 py-3 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition-colors"
-                  >
-                    로그아웃
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* 내 글 탭 */}
-            {activeTab === 'posts' && (
+  
+          <div className="p-4">
+            {applicationSubTab === 'received' && (
               <div className="space-y-3">
-                {myPosts.length === 0 ? (
+                {receivedApplications.length === 0 ? (
                   <div className="text-center py-12">
-                    <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">작성한 게시물이 없습니다</p>
+                    <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">받은 지원이 없습니다</p>
                   </div>
                 ) : (
-                  myPosts.map((post) => (
+                  receivedApplications.map((app) => (
                     <div
-                      key={post.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
+                      key={app.id}
+                      className="p-4 bg-white border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 
-                          onClick={() => navigate(`/feed#post-${post.id}`)}
-                          className="font-semibold text-gray-900 flex-1 cursor-pointer hover:text-teal-600 transition-colors"
-                        >
-                          {post.title}
-                        </h3>
-                        <div className="flex items-center space-x-2">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                            post.type === 'hotdeal' ? 'bg-teal-100 text-teal-700' :
-                            post.type === 'share' ? 'bg-purple-100 text-purple-700' :
-                            post.type === 'job' ? 'bg-cyan-100 text-cyan-700' :
-                            post.type === 'talk' ? 'bg-orange-100 text-orange-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
-                            {post.category}
-                          </span>
-                          
-                          {/* 🆕 점 3개 메뉴 */}
-                          <div className="relative">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setOpenMenuId(openMenuId === post.id ? null : post.id)
-                              }}
-                              className="p-1 hover:bg-gray-100 rounded transition-colors"
-                            >
-                              <MoreVertical className="w-4 h-4 text-gray-600" />
-                            </button>
-                            
-                            {openMenuId === post.id && (
-                              <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleEdit(post)
-                                    setOpenMenuId(null)
-                                  }}
-                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
-                                >
-                                  <Edit2 className="w-3.5 h-3.5" />
-                                  <span>수정</span>
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleDelete(post.id)
-                                    setOpenMenuId(null)
-                                  }}
-                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  <span>삭제</span>
-                                </button>
-                              </div>
-                            )}
-                          </div>
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">게시물: {app.posts?.title}</p>
+                          <p className="font-semibold text-gray-900">{app.profiles?.username || '사용자'}</p>
                         </div>
+                        <span className="text-xs text-gray-400">{getTimeAgo(app.created_at)}</span>
                       </div>
-                      <p 
-                        onClick={() => navigate(`/feed#post-${post.id}`)}
-                        className="text-sm text-gray-600 line-clamp-2 mb-2 cursor-pointer"
-                      >
-                        {post.content}
-                      </p>
-                      <div 
-                        onClick={() => navigate(`/feed#post-${post.id}`)}
-                        className="flex items-center space-x-4 text-xs text-gray-500 cursor-pointer"
-                      >
-                        <span>👍 {post.likes_count || 0}</span>
-                        <span>💬 {post.comments_count || 0}</span>
-                        <span className="ml-auto">{getTimeAgo(post.created_at)}</span>
-                      </div>
+                      <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{app.message}</p>
                     </div>
                   ))
                 )}
               </div>
             )}
-
-            {/* 내 댓글 탭 */}
-            {activeTab === 'comments' && (
+  
+            {applicationSubTab === 'sent' && (
               <div className="space-y-3">
-                {myComments.length === 0 ? (
+                {myApplications.length === 0 ? (
                   <div className="text-center py-12">
-                    <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">작성한 댓글이 없습니다</p>
+                    <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">지원한 내역이 없습니다</p>
                   </div>
                 ) : (
-                  myComments.map((comment) => (
+                  myApplications.map((app) => (
                     <div
-                      key={comment.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
+                      key={app.id}
+                      onClick={() => navigate(`/feed#post-${app.posts.id}`)}
+                      className="p-4 bg-white border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all cursor-pointer"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <p 
-                          onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
-                          className="text-xs text-gray-500 cursor-pointer hover:text-teal-600"
-                        >
-                          게시물: <span className="font-semibold text-gray-700">{comment.posts.title}</span>
-                        </p>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-400">{getTimeAgo(comment.created_at)}</span>
-                          
-                          {/* 🆕 댓글 점 3개 메뉴 */}
-                          <div className="relative">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setOpenCommentMenuId(openCommentMenuId === comment.id ? null : comment.id)
-                              }}
-                              className="p-1 hover:bg-gray-100 rounded transition-colors"
-                            >
-                              <MoreVertical className="w-4 h-4 text-gray-600" />
-                            </button>
-                            
-                            {openCommentMenuId === comment.id && (
-                              <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleEditComment(comment)
-                                  }}
-                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 flex items-center space-x-2"
-                                >
-                                  <Edit2 className="w-3.5 h-3.5" />
-                                  <span>수정</span>
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleDeleteComment(comment.id)
-                                  }}
-                                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center space-x-2"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  <span>삭제</span>
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                      <div className="flex items-start justify-between mb-3">
+                        <p className="font-semibold text-gray-900">{app.posts.title}</p>
+                        <span className="text-xs text-gray-400">{getTimeAgo(app.created_at)}</span>
                       </div>
-                      <p 
-                        onClick={() => navigate(`/feed#post-${comment.posts.id}`)}
-                        className="text-sm text-gray-900 cursor-pointer"
-                      >
-                        {comment.content}
-                      </p>
+                      <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{app.message}</p>
                     </div>
                   ))
-                )}
-              </div>
-            )}
-
-            {/* 지원 탭 */}
-            {activeTab === 'applications' && (
-              <div>
-                {/* 서브탭 */}
-                <div className="flex space-x-2 mb-6 border-b border-gray-200">
-                  <button
-                    onClick={() => setApplicationSubTab('received')}
-                    className={`px-4 py-2 text-sm font-medium transition-colors ${
-                      applicationSubTab === 'received'
-                        ? 'text-teal-600 border-b-2 border-teal-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    받은 지원
-                  </button>
-                  <button
-                    onClick={() => setApplicationSubTab('sent')}
-                    className={`px-4 py-2 text-sm font-medium transition-colors ${
-                      applicationSubTab === 'sent'
-                        ? 'text-teal-600 border-b-2 border-teal-600'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    내가 지원한 내역
-                  </button>
-                </div>
-
-                {/* 받은 지원 */}
-                {applicationSubTab === 'received' && (
-                  <div className="space-y-3">
-                    {receivedApplications.length === 0 ? (
-                      <div className="text-center py-12">
-                        <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">받은 지원이 없습니다</p>
-                      </div>
-                    ) : (
-                      receivedApplications.map((app) => (
-                        <div
-                          key={app.id}
-                          className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="text-xs text-gray-500 mb-1">게시물: {app.posts?.title}</p>
-                              <p className="font-semibold text-gray-900">{app.profiles?.username || '사용자'}</p>
-                            </div>
-                            <span className="text-xs text-gray-400">{getTimeAgo(app.created_at)}</span>
-                          </div>
-                          <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{app.message}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-
-                {/* 내가 지원한 내역 */}
-                {applicationSubTab === 'sent' && (
-                  <div className="space-y-3">
-                    {myApplications.length === 0 ? (
-                      <div className="text-center py-12">
-                        <Briefcase className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">지원한 내역이 없습니다</p>
-                      </div>
-                    ) : (
-                      myApplications.map((app) => (
-                        <div
-                          key={app.id}
-                          onClick={() => navigate(`/feed#post-${app.posts.id}`)}
-                          className="p-4 border border-gray-200 rounded-lg hover:border-teal-500 hover:shadow-md transition-all cursor-pointer"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <p className="font-semibold text-gray-900">{app.posts.title}</p>
-                            <span className="text-xs text-gray-400">{getTimeAgo(app.created_at)}</span>
-                          </div>
-                          <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{app.message}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 🆕 교환 내역 탭 */}
-            {activeTab === 'exchanges' && (
-              <div>
-                {exchangesLoading ? (
-                  <div className="text-center py-12">
-                    <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
-                  </div>
-                ) : myExchanges.length === 0 ? (
-                  <div className="text-center py-12">
-                    <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">교환 신청 내역이 없습니다</p>
-                    <button
-                      onClick={() => navigate('/store')}
-                      className="mt-4 px-6 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg"
-                    >
-                      스토어 바로가기
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {myExchanges.map((exchange) => (
-                      <div
-                        key={exchange.id}
-                        className={`p-4 border-2 rounded-xl hover:shadow-md transition-all ${getStatusColor(exchange.status)}`}
-                      >
-                        <div className="flex items-start gap-4">
-                          {/* 상품 이미지 */}
-                          <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-                            {exchange.store_products?.image_url?.startsWith('http') ? (
-                              <img 
-                                src={exchange.store_products.image_url} 
-                                alt="" 
-                                className="w-full h-full object-cover" 
-                              />
-                            ) : (
-                              <span className="text-3xl">{exchange.store_products?.image_url || '🎁'}</span>
-                            )}
-                          </div>
-                          
-                          {/* 교환 정보 */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-bold text-gray-900 truncate">
-                                {exchange.store_products?.name || '삭제된 상품'}
-                              </h3>
-                              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(exchange.status)}`}>
-                                {getStatusLabel(exchange.status)}
-                              </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div>
-                                <p className="text-gray-500 text-xs">포인트</p>
-                                <p className="font-semibold text-gray-900">
-                                  {exchange.store_products?.price?.toLocaleString()}P
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-gray-500 text-xs">연락처</p>
-                                <p className="font-semibold text-teal-600">{exchange.phone_number}</p>
-                              </div>
-                              <div className="col-span-2">
-                                <p className="text-gray-500 text-xs">신청일시</p>
-                                <p className="font-semibold text-gray-900">
-                                  {new Date(exchange.created_at).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            {/* 상태별 안내 메시지 */}
-                            {exchange.status === 'pending' && (
-                              <div className="mt-2 text-xs text-yellow-600 bg-yellow-50 rounded-lg p-2">
-                                ⏳ 관리자 확인 대기 중입니다
-                              </div>
-                            )}
-                            {exchange.status === 'processing' && (
-                              <div className="mt-2 text-xs text-blue-600 bg-blue-50 rounded-lg p-2">
-                                🔄 처리 중입니다. 곧 연락드리겠습니다!
-                              </div>
-                            )}
-                            {exchange.status === 'completed' && (
-                              <div className="mt-2 text-xs text-green-600 bg-green-50 rounded-lg p-2">
-                                ✅ 교환이 완료되었습니다!
-                              </div>
-                            )}
-                            {exchange.status === 'cancelled' && (
-                              <div className="mt-2 text-xs text-red-600 bg-red-50 rounded-lg p-2">
-                                ❌ 교환이 취소되었습니다
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 )}
               </div>
             )}
           </div>
         </div>
-      </div>
+      )}
+  
+      {/* 🆕 교환 내역 화면 */}
+      {activeTab === 'exchanges' && (
+        <div className="max-w-lg mx-auto">
+          <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div className="px-4 py-3 flex items-center">
+              <button onClick={() => setActiveTab('main')} className="mr-3">
+                <ArrowLeft className="w-6 h-6 text-gray-700" />
+              </button>
+              <h1 className="text-lg font-bold">교환 내역</h1>
+            </div>
+          </div>
+  
+          <div className="p-4">
+            {exchangesLoading ? (
+              <div className="text-center py-12">
+                <div className="inline-block w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm text-gray-600 mt-2">로딩 중...</p>
+              </div>
+            ) : myExchanges.length === 0 ? (
+              <div className="text-center py-12">
+                <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">교환 신청 내역이 없습니다</p>
+                <button
+                  onClick={() => navigate('/store')}
+                  className="mt-4 px-6 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover-lift shadow-lg"
+                >
+                  스토어 바로가기
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {myExchanges.map((exchange) => (
+                  <div
+                    key={exchange.id}
+                    className={`p-4 bg-white border-2 rounded-xl hover:shadow-md transition-all ${getStatusColor(exchange.status)}`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {exchange.store_products?.image_url?.startsWith('http') ? (
+                          <img 
+                            src={exchange.store_products.image_url} 
+                            alt="" 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <span className="text-3xl">{exchange.store_products?.image_url || '🎁'}</span>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-bold text-gray-900 truncate">
+                            {exchange.store_products?.name || '삭제된 상품'}
+                          </h3>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getStatusColor(exchange.status)}`}>
+                            {getStatusLabel(exchange.status)}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <p className="text-gray-500 text-xs">포인트</p>
+                            <p className="font-semibold text-gray-900">
+                              {exchange.store_products?.price?.toLocaleString()}P
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500 text-xs">연락처</p>
+                            <p className="font-semibold text-teal-600">{exchange.phone_number}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-gray-500 text-xs">신청일시</p>
+                            <p className="font-semibold text-gray-900">
+                              {new Date(exchange.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {exchange.status === 'pending' && (
+                          <div className="mt-2 text-xs text-yellow-600 bg-yellow-50 rounded-lg p-2">
+                            ⏳ 관리자 확인 대기 중입니다
+                          </div>
+                        )}
+                        {exchange.status === 'processing' && (
+                          <div className="mt-2 text-xs text-blue-600 bg-blue-50 rounded-lg p-2">
+                            🔄 처리 중입니다. 곧 연락드리겠습니다!
+                          </div>
+                        )}
+                        {exchange.status === 'completed' && (
+                          <div className="mt-2 text-xs text-green-600 bg-green-50 rounded-lg p-2">
+                            ✅ 교환이 완료되었습니다!
+                          </div>
+                        )}
+                        {exchange.status === 'cancelled' && (
+                          <div className="mt-2 text-xs text-red-600 bg-red-50 rounded-lg p-2">
+                            ❌ 교환이 취소되었습니다
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 🆕 게시물 수정 모달 (기존 코드 유지) */}
       {isEditModalOpen && (
