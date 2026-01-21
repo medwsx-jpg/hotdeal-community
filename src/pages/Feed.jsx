@@ -5,7 +5,7 @@ import {
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
   Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone,
-  ChevronUp, ChevronDown, Target, Gift
+  ChevronUp, ChevronDown, Target, Gift, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -76,7 +76,12 @@ export default function Feed() {
   const [expandedPosts, setExpandedPosts] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null)
+  
+  // 🆕 이미지 갤러리용 state
+  const [galleryImages, setGalleryImages] = useState([])
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [showGallery, setShowGallery] = useState(false)
+  
   const [imageZoom, setImageZoom] = useState(100)
   const [topPosts, setTopPosts] = useState({ byComments: [], byLikes: [] })
   const [page, setPage] = useState(0)
@@ -108,6 +113,31 @@ export default function Feed() {
     location: '',
     period: ''
   })
+
+  // 🆕 이미지 갤러리 키보드 이벤트
+  useEffect(() => {
+    if (!showGallery) return
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setShowGallery(false)
+        setGalleryImages([])
+        setCurrentImageIndex(0)
+        setImageZoom(100)
+      } else if (e.key === 'ArrowLeft') {
+        setCurrentImageIndex(prev => 
+          prev > 0 ? prev - 1 : galleryImages.length - 1
+        )
+      } else if (e.key === 'ArrowRight') {
+        setCurrentImageIndex(prev => 
+          prev < galleryImages.length - 1 ? prev + 1 : 0
+        )
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showGallery, galleryImages.length])
 
   // 인앱 브라우저 감지 & PWA 설치 프롬프트 감지
   useEffect(() => {
@@ -971,6 +1001,29 @@ export default function Feed() {
     fetchPosts(0, value, true)
   }
 
+  // 🆕 이미지 갤러리 열기
+  const openGallery = (images, startIndex) => {
+    setGalleryImages(images)
+    setCurrentImageIndex(startIndex)
+    setShowGallery(true)
+    setImageZoom(100)
+  }
+
+  // 🆕 이전/다음 이미지
+  const goToPrevImage = () => {
+    setCurrentImageIndex(prev => 
+      prev > 0 ? prev - 1 : galleryImages.length - 1
+    )
+    setImageZoom(100)
+  }
+
+  const goToNextImage = () => {
+    setCurrentImageIndex(prev => 
+      prev < galleryImages.length - 1 ? prev + 1 : 0
+    )
+    setImageZoom(100)
+  }
+
   return (
     <div className="min-h-screen pb-24 md:pb-20">
       {/* Navigation */}
@@ -1748,7 +1801,7 @@ export default function Feed() {
                         )}
                       </div>
 
-                      {/* Images */}
+                      {/* 🆕 Images - 갤러리로 열기 */}
                       {post.images && post.images.length > 0 && (
                         <div className={`mb-3 grid gap-2 ${
                           post.images.length === 1 ? 'grid-cols-1' : 
@@ -1760,7 +1813,7 @@ export default function Feed() {
                                 src={img} 
                                 alt="" 
                                 className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity" 
-                                onClick={() => handleActionClick(() => setSelectedImageUrl(img))}
+                                onClick={() => handleActionClick(() => openGallery(post.images, i))}
                               />
                               {i === 3 && post.images.length > 4 && (
                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -2558,12 +2611,14 @@ export default function Feed() {
         </div>
       )}
 
-      {/* Image Lightbox Modal */}
-      {selectedImageUrl && (
+      {/* 🆕 Image Gallery Lightbox Modal */}
+      {showGallery && (
         <div 
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center overflow-hidden"
           onClick={() => {
-            setSelectedImageUrl(null)
+            setShowGallery(false)
+            setGalleryImages([])
+            setCurrentImageIndex(0)
             setImageZoom(100)
           }}
           onWheel={(e) => {
@@ -2572,9 +2627,13 @@ export default function Feed() {
             setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
           }}
         >
+          {/* 닫기 버튼 */}
           <button
-            onClick={() => {
-              setSelectedImageUrl(null)
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowGallery(false)
+              setGalleryImages([])
+              setCurrentImageIndex(0)
               setImageZoom(100)
             }}
             className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
@@ -2582,6 +2641,42 @@ export default function Feed() {
             <X className="w-6 h-6 text-white" />
           </button>
           
+          {/* 🆕 좌측 화살표 */}
+          {galleryImages.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                goToPrevImage()
+              }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 rounded-full transition-all z-10 group"
+            >
+              <ChevronLeft className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+            </button>
+          )}
+
+          {/* 🆕 우측 화살표 */}
+          {galleryImages.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                goToNextImage()
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 rounded-full transition-all z-10 group"
+            >
+              <ChevronRight className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+            </button>
+          )}
+
+          {/* 🆕 이미지 카운터 */}
+          {galleryImages.length > 1 && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 backdrop-blur-sm rounded-full z-10">
+              <span className="text-white text-sm font-medium">
+                {currentImageIndex + 1} / {galleryImages.length}
+              </span>
+            </div>
+          )}
+          
+          {/* 하단 컨트롤 */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full z-10">
             <button
               onClick={(e) => {
@@ -2618,12 +2713,13 @@ export default function Feed() {
             </button>
           </div>
           
+          {/* 이미지 */}
           <div 
             className="relative w-full h-full flex items-center justify-center overflow-auto p-4"
             onClick={(e) => e.stopPropagation()}
           >
             <img 
-              src={selectedImageUrl} 
+              src={galleryImages[currentImageIndex]} 
               alt="" 
               className="transition-transform duration-200 cursor-move"
               style={{
