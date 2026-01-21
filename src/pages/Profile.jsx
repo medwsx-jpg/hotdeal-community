@@ -576,11 +576,22 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* 🆕 메인 화면 */}
-      {activeTab === 'main' && (
-        <div className="max-w-lg mx-auto">
-          {/* 프로필 카드 */}
-          <div className="bg-white border-b border-gray-200 p-6">
+     {/* 🆕 메인 화면 */}
+{activeTab === 'main' && (
+  <div className="max-w-lg mx-auto">
+    {/* 🆕 돌아가기 버튼 */}
+    <div className="px-4 py-3">
+      <button
+        onClick={() => navigate('/feed')}
+        className="flex items-center space-x-2 text-gray-600 hover:text-teal-600 transition-colors"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="text-sm font-medium">돌아가기</span>
+      </button>
+    </div>
+
+    {/* 프로필 카드 */}
+    <div className="bg-white border-b border-gray-200 p-6">
             <div className="flex items-center space-x-4 mb-4">
               <BatteryIcon level={userLevel} size={80} />
               <div className="flex-1">
