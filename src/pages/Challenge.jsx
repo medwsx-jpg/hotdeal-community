@@ -958,6 +958,7 @@ export default function Challenge() {
               </div>
             </button>
 
+
             {/* 미션 4: 방문인증영수증 */}
             <button 
               onClick={() => alert('방문인증 미션: 매장 방문 후 영수증을 인증하면 포인트를 받을 수 있어요!')}
