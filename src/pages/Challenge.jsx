@@ -1220,7 +1220,10 @@ export default function Challenge() {
                   🧾
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">영수증 올리기</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900">영수증 올리기</h3>
+                    <span className="px-2 py-0.5 bg-gray-400 text-white text-xs font-bold rounded-full">준비중</span>
+                  </div>
                   <p className="text-sm text-gray-500">최대하루3번</p>
                 </div>
                 <span className="text-red-500 font-bold text-sm">최대100P</span>
@@ -1238,7 +1241,10 @@ export default function Challenge() {
                   🤳
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">방문인증영수증</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900">방문인증영수증</h3>
+                    <span className="px-2 py-0.5 bg-gray-400 text-white text-xs font-bold rounded-full">준비중</span>
+                  </div>
                   <p className="text-sm text-gray-500">매장 방문 인증</p>
                 </div>
                 <span className="text-red-500 font-bold text-sm">최대100P</span>
@@ -1255,7 +1261,10 @@ export default function Challenge() {
                   <span className="text-red-500 font-bold text-sm border border-red-400 px-1.5 py-0.5 rounded">광고</span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">동네미션</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900">동네미션</h3>
+                    <span className="px-2 py-0.5 bg-gray-400 text-white text-xs font-bold rounded-full">준비중</span>
+                  </div>
                   <p className="text-sm text-gray-500">광고 확인하기</p>
                 </div>
                 <span className="text-red-500 font-bold text-sm">최대100P</span>
