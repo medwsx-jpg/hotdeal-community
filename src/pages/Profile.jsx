@@ -110,6 +110,10 @@ export default function Profile() {
     bio: '',
     avatar_url: ''
   })
+  // 🆕 닉네임 중복 체크
+  const [isUsernameChecked, setIsUsernameChecked] = useState(false)
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(false)
+  const [checkingUsername, setCheckingUsername] = useState(false)
   // 🆕 사용자 등급 관련
 const [userConsecutiveDays, setUserConsecutiveDays] = useState(0)
 const [userLevel, setUserLevel] = useState('dormant')
@@ -396,6 +400,50 @@ useEffect(() => {
     }
   }
 
+  // 🆕 닉네임 중복 체크
+  const checkUsernameAvailability = async () => {
+    if (!formData.username.trim()) {
+      alert('닉네임을 입력해주세요')
+      return
+    }
+    
+    // 현재 본인 닉네임과 같으면 패스
+    if (formData.username.trim() === profile?.username) {
+      setIsUsernameChecked(true)
+      setIsUsernameAvailable(true)
+      alert('현재 사용 중인 닉네임입니다')
+      return
+    }
+    
+    try {
+      setCheckingUsername(true)
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', formData.username.trim())
+        .neq('id', user.id)
+        .single()
+      
+      if (error && error.code === 'PGRST116') {
+        // 결과 없음 = 사용 가능
+        setIsUsernameAvailable(true)
+        setIsUsernameChecked(true)
+        alert('✅ 사용 가능한 닉네임입니다!')
+      } else if (data) {
+        // 중복됨
+        setIsUsernameAvailable(false)
+        setIsUsernameChecked(true)
+        alert('❌ 이미 사용 중인 닉네임입니다')
+      }
+    } catch (error) {
+      console.error('닉네임 체크 실패:', error)
+      alert('닉네임 확인에 실패했습니다')
+    } finally {
+      setCheckingUsername(false)
+    }
+  }
+
   // 🆕 시간 표시
   const getTimeAgo = (timestamp) => {
     const now = new Date()
@@ -612,6 +660,17 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
+    // 🆕 닉네임이 변경되었는데 중복 체크 안했으면 차단
+    if (formData.username.trim() !== profile?.username && !isUsernameChecked) {
+      alert('닉네임 중복 확인을 해주세요')
+      return
+    }
+    
+    if (formData.username.trim() !== profile?.username && !isUsernameAvailable) {
+      alert('이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요')
+      return
+    }
+    
     try {
       setLoading(true)
       
@@ -823,17 +882,36 @@ useEffect(() => {
                 </div>
               </div>
   
-              {/* Username */}
-              <div>
-                <label className="block text-sm font-semibold mb-2">사용자 이름 *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={(e) => setFormData({...formData, username: e.target.value})}
-                  placeholder="사용자 이름을 입력하세요"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                />
+             {/* Username */}
+             <div>
+                <label className="block text-sm font-semibold mb-2">닉네임 *</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    required
+                    value={formData.username}
+                    onChange={(e) => {
+                      setFormData({...formData, username: e.target.value})
+                      setIsUsernameChecked(false)
+                      setIsUsernameAvailable(false)
+                    }}
+                    placeholder="닉네임을 입력하세요"
+                    className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={checkUsernameAvailability}
+                    disabled={checkingUsername || !formData.username.trim()}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {checkingUsername ? '확인중...' : '중복확인'}
+                  </button>
+                </div>
+                {isUsernameChecked && (
+                  <p className={`text-xs mt-1 ${isUsernameAvailable ? 'text-green-600' : 'text-red-600'}`}>
+                    {isUsernameAvailable ? '✅ 사용 가능한 닉네임입니다' : '❌ 이미 사용 중인 닉네임입니다'}
+                  </p>
+                )}
               </div>
   
               {/* Bio */}
