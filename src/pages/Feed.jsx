@@ -985,12 +985,25 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
   
       if (error) throw error
   
-      // UI 즉시 업데이트
+      // 🆕 UI 즉시 업데이트 (부모 댓글 + 대댓글 모두 처리)
       setComments(prev => ({
         ...prev,
-        [postId]: prev[postId]?.map(c => 
-          c.id === commentId ? { ...c, content: editCommentText.trim() } : c
-        )
+        [postId]: prev[postId]?.map(c => {
+          // 부모 댓글인 경우
+          if (c.id === commentId) {
+            return { ...c, content: editCommentText.trim() }
+          }
+          // 대댓글인 경우 replies 배열에서 찾기
+          if (c.replies && c.replies.length > 0) {
+            return {
+              ...c,
+              replies: c.replies.map(r => 
+                r.id === commentId ? { ...r, content: editCommentText.trim() } : r
+              )
+            }
+          }
+          return c
+        })
       }))
   
       setEditingComment(null)
@@ -1006,9 +1019,15 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
     if (!window.confirm('댓글을 삭제하시겠습니까?')) return
   
     try {
+      // 🆕 UI 즉시 업데이트 (부모 댓글 + 대댓글 모두 처리)
       setComments(prev => ({
         ...prev,
-        [postId]: prev[postId].filter(c => c.id !== commentId)
+        [postId]: prev[postId]
+          .filter(c => c.id !== commentId)  // 부모 댓글 삭제
+          .map(c => ({
+            ...c,
+            replies: c.replies ? c.replies.filter(r => r.id !== commentId) : []  // 대댓글 삭제
+          }))
       }))
   
       setPosts(prevPosts =>
