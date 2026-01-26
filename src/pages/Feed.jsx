@@ -871,19 +871,12 @@ export default function Feed() {
     }
   
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('comments')
         .update({ content: editCommentText.trim() })
         .eq('id', commentId)
-        .eq('user_id', user.id)
-        .select()
   
       if (error) throw error
-      
-      if (!data || data.length === 0) {
-        alert('댓글 수정 권한이 없습니다.')
-        return
-      }
   
       // UI 즉시 업데이트
       setComments(prev => ({
