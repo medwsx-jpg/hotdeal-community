@@ -297,9 +297,9 @@ if (exchangeError) throw exchangeError
             <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
               <Check className="w-10 h-10 text-green-500" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">교환 완료!</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">교환 신청!</h3>
             <p className="text-sm text-gray-500 mb-8">
-              {phoneNumber}로<br />
+              {phoneNumber}<br />
               1-3일 내 기프티콘이 발송됩니다
             </p>
             <button
