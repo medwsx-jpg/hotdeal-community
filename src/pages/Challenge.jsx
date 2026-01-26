@@ -683,7 +683,7 @@ export default function Challenge() {
                   <span className="font-bold text-orange-600">10명</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-3">💡 복권 당첨금: 7P ~ 79P 랜덤 지급</p>
+              <p className="text-xs text-gray-500 text-center mt-3">💡 복권 당첨금: 최대 5000P 랜덤 지급</p>
             </div>
 
             <div className="mt-3 bg-purple-50 rounded-xl p-3 border-2 border-purple-200">
