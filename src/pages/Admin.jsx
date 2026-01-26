@@ -145,6 +145,11 @@ const [selectedUserForPosts, setSelectedUserForPosts] = useState(null)
 const [userPosts, setUserPosts] = useState([])
 const [userPostsLoading, setUserPostsLoading] = useState(false)
 
+  // 🆕 복권 지급용
+  const [lotteryUsername, setLotteryUsername] = useState('')
+  const [lotteryAmount, setLotteryAmount] = useState(1)
+  const [lotteryLoading, setLotteryLoading] = useState(false)
+
   // 🆕 교환 내역 관리용
   const [exchanges, setExchanges] = useState([])
   const [exchangesFilter, setExchangesFilter] = useState('all') // all, pending, processing, completed, cancelled
@@ -326,6 +331,44 @@ const [userPostsLoading, setUserPostsLoading] = useState(false)
       alert('포인트 처리 실패: ' + error.message)
     } finally {
       setPointLoading(false)
+    }
+  }
+
+  // 🆕 복권 지급
+  const handleGiveLottery = async () => {
+    if (!lotteryUsername.trim()) {
+      alert('닉네임을 입력해주세요')
+      return
+    }
+    
+    setLotteryLoading(true)
+    try {
+      const { data: user, error: findError } = await supabase
+        .from('profiles')
+        .select('id, username, lottery_tickets')
+        .eq('username', lotteryUsername.trim())
+        .single()
+      
+      if (findError || !user) {
+        alert('해당 닉네임의 사용자를 찾을 수 없습니다')
+        return
+      }
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ lottery_tickets: (user.lottery_tickets || 0) + lotteryAmount })
+        .eq('id', user.id)
+      
+      if (error) throw error
+      
+      alert(`${user.username}님에게 복권 ${lotteryAmount}개 지급 완료!`)
+      setLotteryUsername('')
+      setLotteryAmount(1)
+    } catch (error) {
+      console.error('복권 지급 실패:', error)
+      alert('복권 지급에 실패했습니다')
+    } finally {
+      setLotteryLoading(false)
     }
   }
 
@@ -909,8 +952,51 @@ const handleDeleteUserPost = async (postId) => {
               </div>
             )}
 
-            {activeTab === 'store' && (
+{activeTab === 'store' && (
               <div>
+                {/* 🆕 복권 지급 섹션 */}
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-5 border-2 border-purple-200 mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    🎰 복권 지급
+                    <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">테스트중</span>
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">닉네임</label>
+                      <input
+                        type="text"
+                        value={lotteryUsername}
+                        onChange={(e) => setLotteryUsername(e.target.value)}
+                        placeholder="닉네임 입력"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">지급 개수</label>
+                      <input
+                        type="number"
+                        value={lotteryAmount}
+                        onChange={(e) => setLotteryAmount(parseInt(e.target.value) || 1)}
+                        min="1"
+                        max="100"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div className="flex items-end">
+                      <button
+                        onClick={handleGiveLottery}
+                        disabled={lotteryLoading}
+                        className="w-full py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-bold disabled:opacity-50 hover:from-purple-600 hover:to-pink-600"
+                      >
+                        {lotteryLoading ? '처리 중...' : '🎫 복권 지급하기'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-bold text-gray-900">🎁 스토어 상품 관리</h2><button onClick={() => { setIsAddingProduct(true); setEditingProduct(null); setNewProduct({ name: '', price: '', image_url: '', description: '', is_active: true }) }} className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold shadow-md"><Plus className="w-4 h-4" /><span>상품 추가</span></button></div>
                 {isAddingProduct && (
                   <div className="bg-gray-50 rounded-xl p-6 mb-6 border-2 border-teal-200">

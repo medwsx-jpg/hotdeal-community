@@ -722,7 +722,7 @@ export default function Challenge() {
               </div>
             </div>
             <p className="text-center text-purple-200 mt-6 text-sm">👆 마우스를 꾹 누르고 문질러주세요!</p>
-            <button onClick={() => setLotteryView('main')} className="mt-4 w-full py-3 bg-white/20 text-white rounded-xl font-semibold">취소하고 돌아가기</button>
+           
           </div>
         </div>
       )
