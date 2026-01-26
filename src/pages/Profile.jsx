@@ -115,9 +115,12 @@ const [userConsecutiveDays, setUserConsecutiveDays] = useState(0)
 const [userLevel, setUserLevel] = useState('dormant')
 
   // 🆕 탭 관련 State
-  const [activeTab, setActiveTab] = useState('main')
-  const [myPosts, setMyPosts] = useState([])
-  const [myComments, setMyComments] = useState([])
+  // 🆕 탭 관련 State
+const [activeTab, setActiveTab] = useState('main')
+const [myPosts, setMyPosts] = useState([])
+const [myComments, setMyComments] = useState([])
+const [myPostsCount, setMyPostsCount] = useState(0)
+const [myCommentsCount, setMyCommentsCount] = useState(0)
   const [receivedApplications, setReceivedApplications] = useState([])
   const [myApplications, setMyApplications] = useState([])
   const [applicationSubTab, setApplicationSubTab] = useState('received')
@@ -190,24 +193,53 @@ const [userLevel, setUserLevel] = useState('dormant')
     fetchUserLevel()
   }, [user])
 
-  // 🆕 탭 변경 시 데이터 로드
-  useEffect(() => {
-    if (!user) return
-    
-    if (activeTab === 'posts') {
-      fetchMyPosts()
-    } else if (activeTab === 'comments') {
-      fetchMyComments()
-    } else if (activeTab === 'applications') {
-      if (applicationSubTab === 'received') {
-        fetchReceivedApplications()
-      } else {
-        fetchMyApplications()
-      }
-    } else if (activeTab === 'exchanges') {
-      fetchMyExchanges()
+  // 🆕 메인 화면에서 글/댓글 카운트 조회
+useEffect(() => {
+  if (!user) return
+  
+  const fetchCounts = async () => {
+    try {
+      // 내가 쓴 글 개수
+      const { count: postsCount } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      
+      setMyPostsCount(postsCount || 0)
+      
+      // 내가 쓴 댓글 개수
+      const { count: commentsCount } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      
+      setMyCommentsCount(commentsCount || 0)
+    } catch (error) {
+      console.error('카운트 조회 실패:', error)
     }
-  }, [activeTab, applicationSubTab, user])
+  }
+  
+  fetchCounts()
+}, [user])
+
+// 🆕 탭 변경 시 데이터 로드
+useEffect(() => {
+  if (!user) return
+  
+  if (activeTab === 'posts') {
+    fetchMyPosts()
+  } else if (activeTab === 'comments') {
+    fetchMyComments()
+  } else if (activeTab === 'applications') {
+    if (applicationSubTab === 'received') {
+      fetchReceivedApplications()
+    } else {
+      fetchMyApplications()
+    }
+  } else if (activeTab === 'exchanges') {
+    fetchMyExchanges()
+  }
+}, [activeTab, applicationSubTab, user])
 
   // 🆕 내가 신청한 교환 내역
   const fetchMyExchanges = async () => {
@@ -676,29 +708,29 @@ const [userLevel, setUserLevel] = useState('dormant')
               <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
             </button>
   
-            {/* 내가 쓴 글 */}
-            <button
-              onClick={() => setActiveTab('posts')}
-              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center space-x-3">
-                <FileText className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-900">내가 쓴 글</span>
-              </div>
-              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
-            </button>
-  
-            {/* 내가 쓴 댓글 */}
-            <button
-              onClick={() => setActiveTab('comments')}
-              className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center space-x-3">
-                <MessageCircle className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-900">내가 쓴 댓글</span>
-              </div>
-              <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
-            </button>
+{/* 내가 쓴 글 */}
+<button
+  onClick={() => setActiveTab('posts')}
+  className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+>
+  <div className="flex items-center space-x-3">
+    <FileText className="w-5 h-5 text-gray-600" />
+    <span className="font-medium text-gray-900">내가 쓴 글 ({myPostsCount})</span>
+  </div>
+  <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+</button>
+
+{/* 내가 쓴 댓글 */}
+<button
+  onClick={() => setActiveTab('comments')}
+  className="w-full px-6 py-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
+>
+  <div className="flex items-center space-x-3">
+    <MessageCircle className="w-5 h-5 text-gray-600" />
+    <span className="font-medium text-gray-900">내가 쓴 댓글 ({myCommentsCount})</span>
+  </div>
+  <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+</button>
   
             {/* 지원 내역 */}
             <button
