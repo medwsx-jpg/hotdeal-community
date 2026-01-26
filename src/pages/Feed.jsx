@@ -138,6 +138,8 @@ export default function Feed() {
   const [showApplicationModal, setShowApplicationModal] = useState(false)
   const [applicationMessage, setApplicationMessage] = useState('')
   const [applyingPostId, setApplyingPostId] = useState(null)
+  const [showPostPointModal, setShowPostPointModal] = useState(false)
+const [postEarnedPoints, setPostEarnedPoints] = useState(0)
   const [showBusinessInfo, setShowBusinessInfo] = useState(false)
   const [hasNewPosts, setHasNewPosts] = useState(false)
   const [latestPostId, setLatestPostId] = useState(null)
@@ -647,7 +649,24 @@ export default function Feed() {
           ])
         
         if (error) throw error
-        alert('게시물이 작성되었습니다!')
+        
+        // 🆕 핫딜 글 작성 시 랜덤 포인트 지급 (7~47P)
+        if (newPost.type === 'hotdeal') {
+          const randomPoints = Math.floor(Math.random() * 41) + 7  // 7~47
+          
+          // 포인트 지급
+          const { error: pointError } = await supabase
+            .from('profiles')
+            .update({ points: (profile?.points || 0) + randomPoints })
+            .eq('id', user.id)
+          
+          if (!pointError) {
+            setPostEarnedPoints(randomPoints)
+            setShowPostPointModal(true)
+          }
+        } else {
+          alert('게시물이 작성되었습니다!')
+        }
       }
       
       setIsWriteModalOpen(false)
@@ -3074,6 +3093,39 @@ return {
           </div>
         </div>
       )}
+      {/* 🆕 글작성 포인트 모달 */}
+{showPostPointModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
+      <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span className="text-4xl">🎉</span>
+      </div>
+      
+      <h2 className="text-xl font-bold mb-2">글작성 완료!</h2>
+      <p className="text-teal-600 text-3xl font-black mb-2">
+        +{postEarnedPoints}P
+      </p>
+      <p className="text-gray-500 text-sm mb-6">
+        핫딜 게시글 작성 보상으로<br />
+        포인트를 획득했어요! 🎁
+      </p>
+      
+      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 mb-6">
+        <p className="text-sm text-gray-700">
+          💡 핫딜 게시글을 작성하면<br />
+          <span className="font-bold text-teal-600">7~47P</span>를 랜덤으로 받을 수 있어요!
+        </p>
+      </div>
+      
+      <button
+        onClick={() => setShowPostPointModal(false)}
+        className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl font-bold text-lg hover-lift shadow-lg"
+      >
+        확인
+      </button>
+    </div>
+  </div>
+)}
     </div>
   )
 }

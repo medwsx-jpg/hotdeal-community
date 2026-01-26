@@ -339,7 +339,7 @@ export default function Challenge() {
     setLoading(true)
     try {
       // 1~30 랜덤 포인트
-      const points = Math.floor(Math.random() * 30) + 1
+      const points = Math.floor(Math.random() * 10) + 1
       
       // 출석 기록 저장
       const { error: attendanceError } = await supabase
@@ -925,21 +925,21 @@ export default function Challenge() {
             </button>
 
             {/* 미션 2: 글작성미션 */}
-            <button 
-              onClick={() => alert('글작성 미션: 핫딜 또는 JOB 게시글을 작성하면 포인트를 받을 수 있어요!')}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">
-                  📝
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">글작성미션</h3>
-                  <p className="text-sm text-gray-500">(핫딜,JOB)</p>
-                </div>
-                <span className="text-red-500 font-bold text-sm">최대100P</span>
-              </div>
-            </button>
+<button 
+  onClick={() => alert('글작성 미션: 핫딜 게시글을 작성하면 최대 300P를 랜덤으로 받을 수 있어요!')}
+  className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
+>
+  <div className="flex items-center space-x-4">
+    <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">
+      📝
+    </div>
+    <div className="flex-1">
+      <h3 className="font-bold text-gray-900">글작성미션</h3>
+      <p className="text-sm text-gray-500">(핫딜)</p>
+    </div>
+    <span className="text-red-500 font-bold text-sm">최대300P</span>
+  </div>
+</button>
 
             {/* 미션 3: 영수증 올리기 */}
             <button 
