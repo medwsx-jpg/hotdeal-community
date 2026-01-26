@@ -1191,21 +1191,7 @@ export default function Challenge() {
               </div>
             </button>
 
-            {/* 미션 1: UDT79 이벤트미션 - 🆕 게임으로 연결 */}
-            <button 
-              onClick={() => setShowGame(true)}
-              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-red-200 hover:border-red-400 transition-colors text-left"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-2xl">
-                  🎖️
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">UDT79이벤트미션</h3>
-                  <p className="text-sm text-gray-500">행운을 잡아라</p>
-                </div>
-              </div>
-            </button>
+          
 
             {/* 미션 2: 글작성미션 */}
 <button 
@@ -1273,6 +1259,25 @@ export default function Challenge() {
                   <p className="text-sm text-gray-500">광고 확인하기</p>
                 </div>
                 <span className="text-red-500 font-bold text-sm">최대100P</span>
+              </div>
+            </button>
+
+            {/* 미션 6: UDT79 이벤트미션 - 맨 아래로 이동 */}
+            <button 
+              onClick={() => setShowGame(true)}
+              className="w-full bg-white rounded-2xl p-4 shadow-sm border-2 border-gray-200 hover:border-gray-400 transition-colors text-left"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-2xl">
+                  🎖️
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-900">UDT79이벤트미션</h3>
+                    <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">테스트중</span>
+                  </div>
+                  <p className="text-sm text-gray-500">행운을 잡아라</p>
+                </div>
               </div>
             </button>
           </div>
