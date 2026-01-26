@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   ArrowLeft, Calendar, Gift, Star, Target, Trophy,
@@ -101,12 +101,22 @@ export default function Challenge() {
   const [floatingNumbers, setFloatingNumbers] = useState([])
   const [rankings, setRankings] = useState([])
   const [showLevelUp, setShowLevelUp] = useState(false)
+  // 🆕 행운복권 관련 state
+  const [showLottery, setShowLottery] = useState(false)
+  const [lotteryView, setLotteryView] = useState('main') // main, scratch, result
+  const [lotteryTickets, setLotteryTickets] = useState(0)
+  const [scratchProgress, setScratchProgress] = useState(0)
+  const [lotteryWonPoints, setLotteryWonPoints] = useState(0)
+  const [isScratching, setIsScratching] = useState(false)
+  const [isRevealed, setIsRevealed] = useState(false)
+  const canvasRef = useRef(null)
   
   // 이번 달 출석 데이터 가져오기
   useEffect(() => {
     if (user) {
       fetchAttendanceData()
-      loadGameData() // 🆕 게임 데이터도 로드
+      loadGameData()
+      loadLotteryTickets() // 🆕 복권 데이터 로드
     }
   }, [user, currentMonth])
   
@@ -130,6 +140,34 @@ export default function Challenge() {
     const percentage = (currentLevelEnergy / energyForNextLevel) * 100
     setBatteryLevel(Math.min(percentage, 100))
   }, [gameStats.energy, gameStats.level])
+
+  // 🆕 복권 긁기 캔버스 초기화
+  useEffect(() => {
+    if (lotteryView === 'scratch' && canvasRef.current) {
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext('2d')
+      
+      canvas.width = 280
+      canvas.height = 120
+      
+      ctx.fillStyle = '#9CA3AF'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      ctx.fillStyle = '#D1D5DB'
+      for (let i = 0; i < 50; i++) {
+        const x = Math.random() * canvas.width
+        const y = Math.random() * canvas.height
+        ctx.beginPath()
+        ctx.arc(x, y, 2, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      
+      ctx.fillStyle = '#6B7280'
+      ctx.font = 'bold 18px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText('여기를 긁어주세요! 👆', canvas.width / 2, canvas.height / 2 + 6)
+    }
+  }, [lotteryView])
   
   const fetchAttendanceData = async () => {
     try {
@@ -331,6 +369,105 @@ export default function Challenge() {
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
     return num.toLocaleString()
   }
+
+  // 🆕 복권 보유 개수 로드
+  const loadLotteryTickets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('lottery_tickets')
+        .eq('id', user.id)
+        .single()
+      
+      if (error) throw error
+      setLotteryTickets(data?.lottery_tickets || 0)
+    } catch (error) {
+      console.error('복권 데이터 로드 실패:', error)
+      setLotteryTickets(0)
+    }
+  }
+
+  // 🆕 복권 긁기 시작
+  const handleStartScratch = () => {
+    if (lotteryTickets <= 0) {
+      alert('복권이 없습니다!')
+      return
+    }
+    const points = Math.floor(Math.random() * 73) + 7 // 7~79P
+    setLotteryWonPoints(points)
+    setScratchProgress(0)
+    setIsRevealed(false)
+    setLotteryView('scratch')
+  }
+
+  // 🆕 복권 긁기 함수
+  const scratch = (x, y) => {
+    if (!canvasRef.current || isRevealed) return
+    
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    const rect = canvas.getBoundingClientRect()
+    
+    const canvasX = (x - rect.left) * (canvas.width / rect.width)
+    const canvasY = (y - rect.top) * (canvas.height / rect.height)
+    
+    ctx.globalCompositeOperation = 'destination-out'
+    ctx.beginPath()
+    ctx.arc(canvasX, canvasY, 25, 0, Math.PI * 2)
+    ctx.fill()
+    
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    let transparentPixels = 0
+    for (let i = 3; i < imageData.data.length; i += 4) {
+      if (imageData.data[i] === 0) transparentPixels++
+    }
+    const totalPixels = canvas.width * canvas.height
+    const percent = Math.round((transparentPixels / totalPixels) * 100)
+    setScratchProgress(percent)
+    
+    if (percent >= 70 && !isRevealed) {
+      setIsRevealed(true)
+      handleLotteryComplete()
+    }
+  }
+
+  // 🆕 복권 완료 처리
+  const handleLotteryComplete = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          lottery_tickets: lotteryTickets - 1,
+          points: (profile?.points || 0) + lotteryWonPoints
+        })
+        .eq('id', user.id)
+      
+      if (error) throw error
+      
+      setLotteryTickets(prev => prev - 1)
+      setTimeout(() => setLotteryView('result'), 800)
+    } catch (error) {
+      console.error('복권 처리 실패:', error)
+    }
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isScratching) return
+    scratch(e.clientX, e.clientY)
+  }
+
+  const handleTouchMove = (e) => {
+    e.preventDefault()
+    const touch = e.touches[0]
+    scratch(touch.clientX, touch.clientY)
+  }
+
+  const handleCloseLotteryResult = () => {
+    setLotteryView('main')
+    setScratchProgress(0)
+    setLotteryWonPoints(0)
+    setIsRevealed(false)
+  }
   
   // 출석체크 하기
   const handleCheckIn = async () => {
@@ -487,6 +624,129 @@ export default function Challenge() {
         </div>
       </div>
     )
+  }
+
+  // 🆕 행운복권 화면
+  if (showLottery) {
+    if (lotteryView === 'main') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-50 pb-20">
+          <div className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+            <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center">
+                <button onClick={() => setShowLottery(false)} className="mr-3">
+                  <ArrowLeft className="w-6 h-6 text-gray-700" />
+                </button>
+                <h1 className="text-lg font-bold">🎰 특공대 행운복권</h1>
+              </div>
+              <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">테스트중</span>
+            </div>
+          </div>
+
+          <div className="max-w-lg mx-auto px-4 py-4">
+            <div className="bg-white rounded-2xl p-5 shadow-lg border-2 border-purple-200 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-gray-700 font-semibold">복권 보유현황:</span>
+                <span className="text-3xl font-black text-purple-600">{lotteryTickets}개</span>
+              </div>
+
+              <div className="relative bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 rounded-2xl p-4 mb-4">
+                <div className="relative text-center py-4">
+                  <div className="text-8xl mb-2">🎰</div>
+                  <div className="flex justify-center gap-3">
+                    <span className="text-4xl animate-bounce" style={{animationDelay: '0ms'}}>💰</span>
+                    <span className="text-4xl animate-bounce" style={{animationDelay: '100ms'}}>💎</span>
+                    <span className="text-4xl animate-bounce" style={{animationDelay: '200ms'}}>⭐</span>
+                    <span className="text-4xl animate-bounce" style={{animationDelay: '300ms'}}>🪙</span>
+                  </div>
+                </div>
+              </div>
+
+              <button onClick={handleStartScratch} disabled={lotteryTickets <= 0} className={`w-full py-4 rounded-xl text-lg font-bold ${lotteryTickets > 0 ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg active:scale-95' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
+                {lotteryTickets > 0 ? '🎫 복권 당첨 확인하기' : '복권이 없습니다'}
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow-lg border-2 border-yellow-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-3 text-center">🏆 행운복권 상금</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between bg-yellow-50 rounded-xl p-3 border-2 border-yellow-300">
+                  <div className="flex items-center gap-2"><span className="text-2xl">🥇</span><div><p className="font-bold text-yellow-700 text-xs">1등</p><p className="text-lg font-black text-yellow-600">5000P</p></div></div>
+                  <span className="font-bold text-yellow-600">2명</span>
+                </div>
+                <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 border-2 border-gray-300">
+                  <div className="flex items-center gap-2"><span className="text-2xl">🥈</span><div><p className="font-bold text-gray-700 text-xs">2등</p><p className="text-lg font-black text-gray-600">3000P</p></div></div>
+                  <span className="font-bold text-gray-600">5명</span>
+                </div>
+                <div className="flex items-center justify-between bg-orange-50 rounded-xl p-3 border-2 border-orange-300">
+                  <div className="flex items-center gap-2"><span className="text-2xl">🥉</span><div><p className="font-bold text-orange-700 text-xs">3등</p><p className="text-lg font-black text-orange-600">1000P</p></div></div>
+                  <span className="font-bold text-orange-600">10명</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 text-center mt-3">💡 복권 당첨금: 7P ~ 79P 랜덤 지급</p>
+            </div>
+
+            <div className="mt-3 bg-purple-50 rounded-xl p-3 border-2 border-purple-200">
+              <p className="text-sm text-purple-700 text-center">📌 복권이 있어야 열어볼 수 있어요</p>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    if (lotteryView === 'scratch') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900 p-4 flex items-center justify-center">
+          <div className="max-w-md w-full">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-black text-white mb-2">🎫 복권 긁기</h2>
+              <p className="text-purple-200">회색 부분을 문질러서 긁어주세요!</p>
+            </div>
+
+            <div className="relative bg-gradient-to-br from-yellow-300 to-orange-400 rounded-3xl p-6 shadow-2xl">
+              <div className="text-center">
+                <div className="text-5xl mb-4">🎰</div>
+                <div className="relative mx-auto rounded-xl overflow-hidden bg-white" style={{width: 280, height: 120}}>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
+                    <p className="text-sm text-purple-600 font-semibold">🎉 당첨금</p>
+                    <p className="text-4xl font-black text-purple-700">{lotteryWonPoints}P</p>
+                  </div>
+                  <canvas ref={canvasRef} className="absolute inset-0 cursor-pointer touch-none" style={{width: '100%', height: '100%'}} onMouseDown={() => setIsScratching(true)} onMouseUp={() => setIsScratching(false)} onMouseLeave={() => setIsScratching(false)} onMouseMove={handleMouseMove} onTouchStart={() => setIsScratching(true)} onTouchEnd={() => setIsScratching(false)} onTouchMove={handleTouchMove} />
+                </div>
+                <div className="mt-4">
+                  <div className="w-full h-3 bg-yellow-600/30 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" style={{ width: `${scratchProgress}%` }}></div>
+                  </div>
+                  <p className="text-yellow-800 text-sm mt-2 font-semibold">{scratchProgress < 70 ? `${scratchProgress}% (70% 이상 긁으면 완료!)` : '✨ 완료!'}</p>
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-purple-200 mt-6 text-sm">👆 마우스를 꾹 누르고 문질러주세요!</p>
+            <button onClick={() => setLotteryView('main')} className="mt-4 w-full py-3 bg-white/20 text-white rounded-xl font-semibold">취소하고 돌아가기</button>
+          </div>
+        </div>
+      )
+    }
+
+    if (lotteryView === 'result') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-4">
+          <div className="max-w-sm w-full bg-white rounded-3xl p-8 text-center shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl">🎉</span>
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 mb-2">행운복권 당첨!</h2>
+            <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">{lotteryWonPoints}P</p>
+            <p className="text-purple-600 font-semibold mb-6">를 뽑았어요.</p>
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-6 border-2 border-purple-200">
+              <p className="text-sm text-purple-700">매일 매일 챌린저에 도전하세요! 🚀</p>
+            </div>
+            <button onClick={handleCloseLotteryResult} className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-lg shadow-lg active:scale-95">{lotteryWonPoints}P 받기</button>
+            <p className="text-xs text-gray-500 mt-4">남은 복권: {lotteryTickets}개</p>
+          </div>
+        </div>
+      )
+    }
   }
 
   // 🆕 게임 화면
@@ -908,6 +1168,29 @@ export default function Challenge() {
         {/* 챌린지 탭 */}
         {activeTab === 'challenge' && (
           <div className="space-y-3">
+            {/* 🆕 미션 0: 특공대 행운복권 */}
+            <button 
+              onClick={() => setShowLottery(true)}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all text-left relative overflow-hidden"
+            >
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-2 left-4 text-xl">✨</div>
+                <div className="absolute bottom-2 right-8 text-xl">⭐</div>
+                <div className="absolute top-4 right-4 text-lg">💎</div>
+              </div>
+              <div className="relative flex items-center space-x-4">
+                <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center text-4xl">🎰</div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-white text-lg">특공대 행운복권</h3>
+                    <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">테스트중</span>
+                  </div>
+                  <p className="text-sm text-white/80">복권을 긁어 포인트를 획득하세요!</p>
+                </div>
+                <span className="text-yellow-300 font-bold text-sm">7~79P</span>
+              </div>
+            </button>
+
             {/* 미션 1: UDT79 이벤트미션 - 🆕 게임으로 연결 */}
             <button 
               onClick={() => setShowGame(true)}
