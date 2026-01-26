@@ -839,7 +839,8 @@ return {
         post_id: postId,
         created_at: new Date().toISOString(),
         author: profile?.username || '사용자',
-        authorPostsCount: 0,
+        authorRole: profile?.role || '회원',
+        authorConsecutiveDays: profile?.consecutive_days || 0,
         timeAgo: '방금 전'
       }
   
