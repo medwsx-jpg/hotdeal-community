@@ -863,24 +863,39 @@ export default function Feed() {
     }
   }
 
-  const handleEditComment = async (commentId) => {
+  const handleEditComment = async (commentId, postId) => {
     if (!editCommentText.trim()) return
+    if (!user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
   
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('comments')
         .update({ content: editCommentText.trim() })
         .eq('id', commentId)
+        .eq('user_id', user.id)
+        .select()
   
       if (error) throw error
+      
+      if (!data || data.length === 0) {
+        alert('댓글 수정 권한이 없습니다.')
+        return
+      }
+  
+      // UI 즉시 업데이트
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId]?.map(c => 
+          c.id === commentId ? { ...c, content: editCommentText.trim() } : c
+        )
+      }))
   
       setEditingComment(null)
       setEditCommentText('')
       
-      const comment = Object.values(comments).flat().find(c => c.id === commentId)
-      if (comment) {
-        fetchComments(comment.post_id)
-      }
     } catch (error) {
       console.error('댓글 수정 실패:', error)
       alert('댓글 수정 실패: ' + error.message)
@@ -1950,12 +1965,12 @@ export default function Feed() {
                                         autoFocus
                                       />
                                       <div className="flex gap-2">
-                                        <button
-                                          onClick={() => handleEditComment(comment.id)}
-                                          className="px-3 py-1 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors"
-                                        >
-                                          수정 완료
-                                        </button>
+                                      <button
+  onClick={() => handleEditComment(comment.id, post.id)}
+  className="px-3 py-1 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors"
+>
+  수정 완료
+</button>
                                         <button
                                           onClick={() => {
                                             setEditingComment(null)
