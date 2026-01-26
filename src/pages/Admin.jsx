@@ -460,18 +460,29 @@ const handleDeleteUserPost = async (postId) => {
 
   const fetchUsersWithActivity = async () => {
     try {
+      // 1. 전체 사용자의 등급별 현황 집계 (전체 회원 기준)
+      const { data: allProfiles, error: allError } = await supabase.from('profiles').select('consecutive_days')
+      if (allError) throw allError
+      
+      const counts = { vip: 0, gold: 0, silver: 0, bronze: 0, dormant: 0 }
+      ;(allProfiles || []).forEach(p => {
+        const level = getUserLevel(p.consecutive_days || 0)
+        counts[level]++
+      })
+      setLevelCounts(counts)
+      
+      // 2. 최근 가입자 20명 (신규 가입 현황용)
       const { data: users, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(20)
       if (error) throw error
-      const counts = { vip: 0, gold: 0, silver: 0, bronze: 0, dormant: 0 }
+      
       const usersWithStats = await Promise.all((users || []).map(async (user) => {
         const { count: postsCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
         const { count: commentsCount } = await supabase.from('comments').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
         const level = getUserLevel(user.consecutive_days || 0)
-        counts[level]++
         return { ...user, postsCount: postsCount || 0, commentsCount: commentsCount || 0, level, levelLabel: getLevelLabel(level) }
       }))
       setUsersWithActivity(usersWithStats)
-      setLevelCounts(counts)
+      
       const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
       const dormant = usersWithStats.filter(u => u.level === 'dormant' && new Date(u.created_at) < sevenDaysAgo)
       setDormantUsers(dormant)
