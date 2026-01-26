@@ -3113,7 +3113,7 @@ return {
       <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 mb-6">
         <p className="text-sm text-gray-700">
           💡 핫딜 게시글을 작성하면<br />
-          <span className="font-bold text-teal-600">7~47P</span>를 랜덤으로 받을 수 있어요!
+          <span className="font-bold text-teal-600">최대 300P</span>를 랜덤으로 받을 수 있어요!
         </p>
       </div>
       
