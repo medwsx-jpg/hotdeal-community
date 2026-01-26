@@ -393,7 +393,7 @@ export default function Challenge() {
       alert('복권이 없습니다!')
       return
     }
-    const points = Math.floor(Math.random() * 73) + 7 // 7~79P
+    const points = Math.floor(Math.random() * 14) + 7 // 7~20P
     setLotteryWonPoints(points)
     setScratchProgress(0)
     setIsRevealed(false)
@@ -671,19 +671,19 @@ export default function Challenge() {
               <h3 className="text-lg font-bold text-gray-900 mb-3 text-center">🏆 행운복권 상금</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between bg-yellow-50 rounded-xl p-3 border-2 border-yellow-300">
-                  <div className="flex items-center gap-2"><span className="text-2xl">🥇</span><div><p className="font-bold text-yellow-700 text-xs">1등</p><p className="text-lg font-black text-yellow-600">5000P</p></div></div>
+                  <div className="flex items-center gap-2"><span className="text-2xl">🥇</span><div><p className="font-bold text-yellow-700 text-xs">1등</p><p className="text-lg font-black text-yellow-600">5,000P</p></div></div>
                   <span className="font-bold text-yellow-600">2명</span>
                 </div>
                 <div className="flex items-center justify-between bg-gray-50 rounded-xl p-3 border-2 border-gray-300">
-                  <div className="flex items-center gap-2"><span className="text-2xl">🥈</span><div><p className="font-bold text-gray-700 text-xs">2등</p><p className="text-lg font-black text-gray-600">3000P</p></div></div>
+                  <div className="flex items-center gap-2"><span className="text-2xl">🥈</span><div><p className="font-bold text-gray-700 text-xs">2등</p><p className="text-lg font-black text-gray-600">3,000P</p></div></div>
                   <span className="font-bold text-gray-600">5명</span>
                 </div>
                 <div className="flex items-center justify-between bg-orange-50 rounded-xl p-3 border-2 border-orange-300">
-                  <div className="flex items-center gap-2"><span className="text-2xl">🥉</span><div><p className="font-bold text-orange-700 text-xs">3등</p><p className="text-lg font-black text-orange-600">1000P</p></div></div>
+                  <div className="flex items-center gap-2"><span className="text-2xl">🥉</span><div><p className="font-bold text-orange-700 text-xs">3등</p><p className="text-lg font-black text-orange-600">1,000P</p></div></div>
                   <span className="font-bold text-orange-600">10명</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-3">💡 복권 당첨금: 최대 5000P 랜덤 지급</p>
+              <p className="text-xs text-gray-500 text-center mt-3">💡 복권 당첨금: 최대 5,000P 랜덤 지급</p>
             </div>
 
             <div className="mt-3 bg-purple-50 rounded-xl p-3 border-2 border-purple-200">
@@ -1187,7 +1187,7 @@ export default function Challenge() {
                   </div>
                   <p className="text-sm text-white/80">복권을 긁어 포인트를 획득하세요!</p>
                 </div>
-                <span className="text-yellow-300 font-bold text-sm">7~79P</span>
+                <span className="text-yellow-300 font-bold text-sm">최대 5,000P</span>
               </div>
             </button>
 
