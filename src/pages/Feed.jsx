@@ -871,6 +871,7 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
         content: content.trim(),
         user_id: user.id,
         post_id: postId,
+        parent_id: parentId || null,
         created_at: new Date().toISOString(),
         author: profile?.username || '사용자',
         authorRole: profile?.role || '회원',
@@ -878,10 +879,27 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
         timeAgo: '방금 전'
       }
   
-      setComments(prev => ({
-        ...prev,
-        [postId]: [...(prev[postId] || []), tempComment]
-      }))
+      // 🆕 대댓글인 경우 부모 댓글의 replies에 추가
+      if (parentId) {
+        setComments(prev => ({
+          ...prev,
+          [postId]: prev[postId].map(comment => {
+            if (comment.id === parentId) {
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), tempComment]
+              }
+            }
+            return comment
+          })
+        }))
+      } else {
+        // 일반 댓글인 경우
+        setComments(prev => ({
+          ...prev,
+          [postId]: [...(prev[postId] || []), { ...tempComment, replies: [] }]
+        }))
+      }
   
       setPosts(prevPosts =>
         prevPosts.map(p => {
@@ -909,19 +927,37 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
           user_id: user.id,
           post_id: postId,
           content: content.trim(),
-          parent_id: parentId || null  // 🆕 대댓글이면 parent_id 포함
+          parent_id: parentId || null
         }])
         .select()
         .single()
   
       if (error) throw error
   
-      setComments(prev => ({
-        ...prev,
-        [postId]: prev[postId].map(c => 
-          c.id === tempComment.id ? { ...tempComment, id: data.id } : c
-        )
-      }))
+      // 🆕 실제 데이터로 업데이트
+      if (parentId) {
+        setComments(prev => ({
+          ...prev,
+          [postId]: prev[postId].map(comment => {
+            if (comment.id === parentId) {
+              return {
+                ...comment,
+                replies: comment.replies.map(r => 
+                  r.id === tempComment.id ? { ...tempComment, id: data.id } : r
+                )
+              }
+            }
+            return comment
+          })
+        }))
+      } else {
+        setComments(prev => ({
+          ...prev,
+          [postId]: prev[postId].map(c => 
+            c.id === tempComment.id ? { ...tempComment, id: data.id, replies: [] } : c
+          )
+        }))
+      }
   
       fetchTopPosts()
     } catch (error) {
