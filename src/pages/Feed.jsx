@@ -407,9 +407,17 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
       const start = pageNum * POSTS_PER_PAGE
       const end = start + POSTS_PER_PAGE - 1
       
+      // 🚀 단일 쿼리로 게시물 + 작성자 정보 가져오기
       let query = supabase
         .from('posts')
-        .select('*')
+        .select(`
+          *,
+          profiles:user_id (
+            username,
+            role,
+            consecutive_days
+          )
+        `)
         .order('created_at', { ascending: false })
         .range(start, end)
       
@@ -434,36 +442,16 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
       
       if (error) throw error
       
-      // 작성자 정보 + 게시물 수(등급용) 가져오기
-      const postsWithData = await Promise.all(
-        (data || []).map(async (post) => {
-          const { data: authorData } = await supabase
-          .from('profiles')
-          .select('username, role, consecutive_days')
-          .eq('id', post.user_id)
-          .single()
-          
-          const { count: commentsCount } = await supabase
-            .from('comments')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-          
-          const { count: likesCount } = await supabase
-            .from('likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-          
-            return {
-              ...post,
-              author: authorData?.username || '사용자',
-              authorRole: authorData?.role || '회원',
-              authorConsecutiveDays: authorData?.consecutive_days || 0,
-              timeAgo: getTimeAgo(post.created_at),
-              comments_count: commentsCount || 0,
-              likes_count: likesCount || 0
-            }
-        })
-      )
+      // 🚀 추가 쿼리 없이 바로 데이터 가공
+      const postsWithData = (data || []).map((post) => ({
+        ...post,
+        author: post.profiles?.username || '사용자',
+        authorRole: post.profiles?.role || '회원',
+        authorConsecutiveDays: post.profiles?.consecutive_days || 0,
+        timeAgo: getTimeAgo(post.created_at),
+        comments_count: post.comments_count || 0,
+        likes_count: post.likes_count || 0
+      }))
       
       if (pageNum === 0 || reset) {
         setPosts(postsWithData)
