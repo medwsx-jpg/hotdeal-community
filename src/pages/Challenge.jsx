@@ -338,8 +338,8 @@ export default function Challenge() {
     
     setLoading(true)
     try {
-      // 1~10 랜덤 포인트
-      const points = Math.floor(Math.random() * 10) + 1
+      // 1~30 랜덤 포인트
+      const points = Math.floor(Math.random() * 30) + 1
       
       // 출석 기록 저장
       const { error: attendanceError } = await supabase
@@ -350,21 +350,72 @@ export default function Challenge() {
           checked_at: new Date().toISOString()
         })
       
-     // 중복 출석 체크
-     if (attendanceError) {
-      if (attendanceError.code === '23505') {
-        alert('이미 오늘 출석체크를 하셨습니다!')
-        setTodayChecked(true)
-        return
+      // 중복 출석 체크
+      if (attendanceError) {
+        if (attendanceError.code === '23505') {
+          alert('이미 오늘 출석체크를 하셨습니다!')
+          setTodayChecked(true)
+          return
+        }
+        throw attendanceError
       }
-      throw attendanceError
-    }
-    
-    // 프로필 포인트 업데이트 (Atomic Update)
-    const { error: profileError } = await supabase.rpc('increment_points', {
-      user_id_param: user.id,
-      points_param: points
-    })
+      
+      // 현재 프로필 정보 가져오기
+      const { data: currentProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('consecutive_days, last_attendance_date')
+        .eq('id', user.id)
+        .single()
+      
+      if (fetchError) throw fetchError
+      
+      // 연속 출석일 계산
+      const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+      const lastDate = currentProfile?.last_attendance_date
+      let newConsecutiveDays = 1
+      
+      if (lastDate) {
+        const lastDateObj = new Date(lastDate)
+        const todayObj = new Date(today)
+        const diffTime = todayObj - lastDateObj
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+        
+        if (diffDays === 1) {
+          // 어제 출석했으면 연속 출석 +1
+          newConsecutiveDays = (currentProfile?.consecutive_days || 0) + 1
+        } else if (diffDays === 0) {
+          // 같은 날 (이미 출석) - 유지
+          newConsecutiveDays = currentProfile?.consecutive_days || 1
+        } else if (diffDays >= 10) {
+          // 10일 이상 결석 → 브론즈로 리셋
+          newConsecutiveDays = 1
+        } else if (diffDays >= 9) {
+          // 9일 결석 → 한 단계 강등 (최소 1)
+          const currentDays = currentProfile?.consecutive_days || 1
+          if (currentDays >= 10) {
+            newConsecutiveDays = 5  // VIP → 골드
+          } else if (currentDays >= 5) {
+            newConsecutiveDays = 2  // 골드 → 실버
+          } else if (currentDays >= 2) {
+            newConsecutiveDays = 1  // 실버 → 브론즈
+          } else {
+            newConsecutiveDays = 1
+          }
+        } else {
+          // 2~8일 결석 → 1일부터 다시 시작
+          newConsecutiveDays = 1
+        }
+      }
+      
+      // 프로필 업데이트 (포인트 + 연속 출석일 + 마지막 출석일)
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          points: (profile?.points || 0) + points,
+          consecutive_days: newConsecutiveDays,
+          last_attendance_date: today
+        })
+        .eq('id', user.id)
       
       if (profileError) throw profileError
       

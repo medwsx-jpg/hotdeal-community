@@ -11,15 +11,54 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
 // 🆕 배터리 아이콘 컴포넌트 (동그라미 배경 + 세로 배터리)
-const BatteryIcon = ({ level, size = 32 }) => {
+const BatteryIcon = ({ level, size = 32, isAdmin = false }) => {
   const colors = {
-    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸
-    gold: { color: '#eab308', bars: 2 },     // 노랑 - 2칸
-    silver: { color: '#f97316', bars: 1 },   // 주황 - 1칸
-    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸
+    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸 (10일 연속)
+    gold: { color: '#eab308', bars: 3 },     // 노랑 - 3칸 (5일 연속)
+    silver: { color: '#f97316', bars: 2 },   // 주황 - 2칸 (2일 연속)
+    bronze: { color: '#f97316', bars: 1 },   // 주황 - 1칸 (1일 출석)
+    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸 (휴면)
   }
   
   const config = colors[level] || colors.dormant
+  
+  // 관리자용 무지개 그라데이션
+  if (isAdmin) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+        <defs>
+          <linearGradient id="rainbowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="17%" stopColor="#ff8000" />
+            <stop offset="33%" stopColor="#ffff00" />
+            <stop offset="50%" stopColor="#00ff00" />
+            <stop offset="67%" stopColor="#0080ff" />
+            <stop offset="83%" stopColor="#8000ff" />
+            <stop offset="100%" stopColor="#ff0080" />
+          </linearGradient>
+          <linearGradient id="rainbowBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="50%" stopColor="#00ff00" />
+            <stop offset="100%" stopColor="#0000ff" />
+          </linearGradient>
+        </defs>
+        {/* 외곽 원형 테두리 (무지개) */}
+        <circle cx="20" cy="20" r="19" stroke="url(#rainbowBorder)" strokeWidth="2" fill="none" />
+        {/* 배경 원 */}
+        <circle cx="20" cy="20" r="17.5" fill="#fefefe" />
+        
+        {/* 배터리 본체 외곽 (세로) */}
+        <rect x="13" y="12" width="14" height="20" rx="2" stroke="url(#rainbowGradient)" strokeWidth="2" fill="none" />
+        {/* 배터리 단자 (위쪽) */}
+        <rect x="16" y="8" width="8" height="4" rx="1" fill="url(#rainbowGradient)" />
+        
+        {/* 배터리 바들 - 무지개 색상 */}
+        <rect x="15" y="25" width="10" height="5" rx="1" fill="#22c55e" />
+        <rect x="15" y="19" width="10" height="5" rx="1" fill="#eab308" />
+        <rect x="15" y="13" width="10" height="5" rx="1" fill="#ef4444" />
+      </svg>
+    )
+  }
   
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
@@ -47,12 +86,13 @@ const BatteryIcon = ({ level, size = 32 }) => {
   )
 }
 
-// 🆕 사용자 등급 계산 함수
-const getUserLevel = (postsCount) => {
-  if (postsCount >= 30) return 'vip'
-  if (postsCount >= 11) return 'gold'
-  if (postsCount >= 1) return 'silver'
-  return 'dormant'
+// 🆕 사용자 등급 계산 함수 (연속 출석 기준)
+const getUserLevel = (consecutiveDays) => {
+  if (consecutiveDays >= 10) return 'vip'       // 10일 연속 → VIP
+  if (consecutiveDays >= 5) return 'gold'       // 5일 연속 → 골드
+  if (consecutiveDays >= 2) return 'silver'     // 2일 연속 → 실버
+  if (consecutiveDays >= 1) return 'bronze'     // 1일 출석 → 브론즈
+  return 'dormant'                               // 0일 → 휴면
 }
 
 export default function Feed() {
@@ -393,16 +433,10 @@ export default function Feed() {
       const postsWithData = await Promise.all(
         (data || []).map(async (post) => {
           const { data: authorData } = await supabase
-            .from('profiles')
-            .select('username, role')
-            .eq('id', post.user_id)
-            .single()
-          
-          // 🆕 작성자의 총 게시물 수 가져오기 (등급 계산용)
-          const { count: authorPostsCount } = await supabase
-            .from('posts')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', post.user_id)
+          .from('profiles')
+          .select('username, role, consecutive_days')
+          .eq('id', post.user_id)
+          .single()
           
           const { count: commentsCount } = await supabase
             .from('comments')
@@ -414,15 +448,15 @@ export default function Feed() {
             .select('*', { count: 'exact', head: true })
             .eq('post_id', post.id)
           
-          return {
-            ...post,
-            author: authorData?.username || '사용자',
-            authorRole: authorData?.role || '회원',
-            authorPostsCount: authorPostsCount || 0, // 🆕 등급 계산용
-            timeAgo: getTimeAgo(post.created_at),
-            comments_count: commentsCount || 0,
-            likes_count: likesCount || 0
-          }
+            return {
+              ...post,
+              author: authorData?.username || '사용자',
+              authorRole: authorData?.role || '회원',
+              authorConsecutiveDays: authorData?.consecutive_days || 0,
+              timeAgo: getTimeAgo(post.created_at),
+              comments_count: commentsCount || 0,
+              likes_count: likesCount || 0
+            }
         })
       )
       
@@ -765,23 +799,18 @@ export default function Feed() {
       const commentsWithAuthors = await Promise.all(
         (data || []).map(async (comment) => {
           const { data: authorData } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('id', comment.user_id)
-            .single()
-          
-          // 🆕 댓글 작성자의 총 게시물 수 가져오기
-          const { count: authorPostsCount } = await supabase
-            .from('posts')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', comment.user_id)
-          
-          return {
-            ...comment,
-            author: authorData?.username || '사용자',
-            authorPostsCount: authorPostsCount || 0,
-            timeAgo: getTimeAgo(comment.created_at)
-          }
+  .from('profiles')
+  .select('username, role, consecutive_days')
+  .eq('id', comment.user_id)
+  .single()
+
+return {
+  ...comment,
+  author: authorData?.username || '사용자',
+  authorRole: authorData?.role || '회원',
+  authorConsecutiveDays: authorData?.consecutive_days || 0,
+  timeAgo: getTimeAgo(comment.created_at)
+}
         })
       )
       
@@ -1094,8 +1123,11 @@ export default function Feed() {
   onClick={() => navigate('/profile')}
   className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
 >
-  {/* 🆕 배터리 아이콘으로 변경 */}
-  <BatteryIcon level={getUserLevel(profile?.posts_count || 0)} size={24} />
+  <BatteryIcon 
+    level={getUserLevel(profile?.consecutive_days || 0)} 
+    size={24} 
+    isAdmin={profile?.role === '관리자'}
+  />
   <span className="text-xs font-medium text-gray-700">
     {profile?.username || (user?.email?.split('@')[0]) || '사용자'}
   </span>
@@ -1704,8 +1736,12 @@ export default function Feed() {
                         <div className="flex items-center space-x-2.5">
                           {/* 🆕 배터리 아이콘으로 변경 */}
                           <div className="w-8 h-8 flex items-center justify-center">
-                            <BatteryIcon level={getUserLevel(post.authorPostsCount || 0)} size={32} />
-                          </div>
+  <BatteryIcon 
+    level={getUserLevel(post.authorConsecutiveDays || 0)} 
+    size={32} 
+    isAdmin={post.authorRole === '관리자'}
+  />
+</div>
                           <div>
                             <div className="flex items-center space-x-1.5">
                               <span className="font-semibold text-sm text-gray-900">{post.author}</span>
@@ -1945,8 +1981,12 @@ export default function Feed() {
                               <div key={comment.id} className="flex space-x-2">
                                 {/* 🆕 댓글에도 배터리 아이콘 적용 */}
                                 <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-                                  <BatteryIcon level={getUserLevel(comment.authorPostsCount || 0)} size={24} />
-                                </div>
+  <BatteryIcon 
+    level={getUserLevel(comment.authorConsecutiveDays || 0)} 
+    size={24} 
+    isAdmin={comment.authorRole === '관리자'}
+  />
+</div>
                                 <div className="flex-1">
                                   {editingComment === comment.id ? (
                                     <div className="space-y-2">

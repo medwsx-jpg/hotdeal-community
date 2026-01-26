@@ -4,22 +4,61 @@ import { User, Mail, Camera, ArrowLeft, Save, FileText, MessageCircle, Briefcase
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
-// 🆕 배터리 아이콘 컴포넌트 (Admin.jsx와 동일)
-const BatteryIcon = ({ level, size = 32 }) => {
+// 🆕 배터리 아이콘 컴포넌트
+const BatteryIcon = ({ level, size = 32, isAdmin = false }) => {
   const colors = {
-    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸
-    gold: { color: '#eab308', bars: 2 },     // 노랑 - 2칸
-    silver: { color: '#f97316', bars: 1 },   // 주황 - 1칸
-    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸
+    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸 (10일 연속)
+    gold: { color: '#eab308', bars: 3 },     // 노랑 - 3칸 (5일 연속)
+    silver: { color: '#f97316', bars: 2 },   // 주황 - 2칸 (2일 연속)
+    bronze: { color: '#f97316', bars: 1 },   // 주황 - 1칸 (1일 출석)
+    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸 (휴면)
   }
   
   const config = colors[level] || colors.dormant
+  
+  // 관리자용 무지개 그라데이션
+  if (isAdmin) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+        <defs>
+          <linearGradient id="rainbowGradientProfile" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="17%" stopColor="#ff8000" />
+            <stop offset="33%" stopColor="#ffff00" />
+            <stop offset="50%" stopColor="#00ff00" />
+            <stop offset="67%" stopColor="#0080ff" />
+            <stop offset="83%" stopColor="#8000ff" />
+            <stop offset="100%" stopColor="#ff0080" />
+          </linearGradient>
+          <linearGradient id="rainbowBorderProfile" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="50%" stopColor="#00ff00" />
+            <stop offset="100%" stopColor="#0000ff" />
+          </linearGradient>
+        </defs>
+        {/* 외곽 원형 테두리 (무지개) */}
+        <circle cx="20" cy="20" r="19" stroke="url(#rainbowBorderProfile)" strokeWidth="2" fill="none" />
+        {/* 배경 원 */}
+        <circle cx="20" cy="20" r="17.5" fill="#fefefe" />
+        
+        {/* 배터리 본체 외곽 (세로) */}
+        <rect x="13" y="12" width="14" height="20" rx="2" stroke="url(#rainbowGradientProfile)" strokeWidth="2" fill="none" />
+        {/* 배터리 단자 (위쪽) */}
+        <rect x="16" y="8" width="8" height="4" rx="1" fill="url(#rainbowGradientProfile)" />
+        
+        {/* 배터리 바들 - 무지개 색상 */}
+        <rect x="15" y="25" width="10" height="5" rx="1" fill="#22c55e" />
+        <rect x="15" y="19" width="10" height="5" rx="1" fill="#eab308" />
+        <rect x="15" y="13" width="10" height="5" rx="1" fill="#ef4444" />
+      </svg>
+    )
+  }
   
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
       {/* 외곽 원형 테두리 (연한 빨간색) */}
       <circle cx="20" cy="20" r="19" stroke="#fca5a5" strokeWidth="1.5" fill="none" />
-      {/* 회색 배경 원 - 밝은 회색으로 수정 */}
+      {/* 회색 배경 원 */}
       <circle cx="20" cy="20" r="17.5" fill="#f3f4f6" />
       
       {/* 배터리 본체 외곽 (세로) */}
@@ -41,17 +80,24 @@ const BatteryIcon = ({ level, size = 32 }) => {
   )
 }
 
-// 🆕 사용자 등급 계산 함수
-const getUserLevel = (postsCount) => {
-  if (postsCount >= 30) return 'vip'
-  if (postsCount >= 11) return 'gold'
-  if (postsCount >= 1) return 'silver'
-  return 'dormant'
+// 🆕 사용자 등급 계산 함수 (연속 출석 기준)
+const getUserLevel = (consecutiveDays) => {
+  if (consecutiveDays >= 10) return 'vip'       // 10일 연속 → VIP
+  if (consecutiveDays >= 5) return 'gold'       // 5일 연속 → 골드
+  if (consecutiveDays >= 2) return 'silver'     // 2일 연속 → 실버
+  if (consecutiveDays >= 1) return 'bronze'     // 1일 출석 → 브론즈
+  return 'dormant'                               // 0일 → 휴면
 }
 
 // 🆕 등급 라벨
 const getLevelLabel = (level) => {
-  const labels = { vip: '🟢 VIP', gold: '🟡 골드', silver: '🟠 실버', dormant: '🔴 휴면' }
+  const labels = { 
+    vip: '🟢 VIP', 
+    gold: '🟡 골드', 
+    silver: '🟠 실버', 
+    bronze: '🟤 브론즈',
+    dormant: '🔴 휴면' 
+  }
   return labels[level] || labels.dormant
 }
 
@@ -64,9 +110,9 @@ export default function Profile() {
     bio: '',
     avatar_url: ''
   })
-   // 🆕 사용자 등급 관련
-   const [userPostsCount, setUserPostsCount] = useState(0)
-   const [userLevel, setUserLevel] = useState('dormant')
+  // 🆕 사용자 등급 관련
+const [userConsecutiveDays, setUserConsecutiveDays] = useState(0)
+const [userLevel, setUserLevel] = useState('dormant')
 
   // 🆕 탭 관련 State
   const [activeTab, setActiveTab] = useState('main')
@@ -123,21 +169,25 @@ export default function Profile() {
   useEffect(() => {
     if (!user) return
     
-    const fetchUserPostsCount = async () => {
+    const fetchUserLevel = async () => {
       try {
-        const { count } = await supabase
-          .from('posts')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('consecutive_days')
+          .eq('id', user.id)
+          .single()
         
-        setUserPostsCount(count || 0)
-        setUserLevel(getUserLevel(count || 0))
+        if (error) throw error
+        
+        const days = data?.consecutive_days || 0
+        setUserConsecutiveDays(days)
+        setUserLevel(getUserLevel(days))
       } catch (error) {
-        console.error('글 개수 조회 실패:', error)
+        console.error('등급 조회 실패:', error)
       }
     }
     
-    fetchUserPostsCount()
+    fetchUserLevel()
   }, [user])
 
   // 🆕 탭 변경 시 데이터 로드
@@ -593,7 +643,7 @@ export default function Profile() {
     {/* 프로필 카드 */}
     <div className="bg-white border-b border-gray-200 p-6">
             <div className="flex items-center space-x-4 mb-4">
-              <BatteryIcon level={userLevel} size={80} />
+            <BatteryIcon level={userLevel} size={80} isAdmin={profile?.role === '관리자'} />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-lg font-bold text-gray-900">{formData.username || user?.email}</p>
@@ -607,7 +657,7 @@ export default function Profile() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">{user?.email}</p>
-                <p className="text-xs text-gray-500">글 {userPostsCount}개 작성 · {profile?.points || 0}P</p>
+                <p className="text-xs text-gray-500">연속 {userConsecutiveDays}일 출석 · {profile?.points || 0}P</p>
               </div>
             </div>
           </div>
@@ -723,7 +773,7 @@ export default function Profile() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Avatar */}
               <div className="flex items-center space-x-4">
-                <BatteryIcon level={userLevel} size={80} />
+              <BatteryIcon level={userLevel} size={80} isAdmin={profile?.role === '관리자'} />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-semibold text-gray-900">{formData.username || user?.email}</p>
@@ -736,7 +786,7 @@ export default function Profile() {
                       {getLevelLabel(userLevel)}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">글 {userPostsCount}개 작성</p>
+                  <p className="text-xs text-gray-500">연속 {userConsecutiveDays}일 출석</p>
                   <p className="text-xs text-gray-500">가입일: {new Date(user?.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
