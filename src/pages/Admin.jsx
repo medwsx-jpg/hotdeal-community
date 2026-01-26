@@ -10,29 +10,54 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
 // 배터리 아이콘 컴포넌트 (동그라미 배경 + 세로 배터리)
-const BatteryIcon = ({ level, size = 32 }) => {
+const BatteryIcon = ({ level, size = 32, isAdmin = false }) => {
   const colors = {
-    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸
-    gold: { color: '#eab308', bars: 2 },     // 노랑 - 2칸
-    silver: { color: '#f97316', bars: 1 },   // 주황 - 1칸
-    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸
+    vip: { color: '#22c55e', bars: 3 },      // 초록 - 3칸 (10일 연속)
+    gold: { color: '#eab308', bars: 3 },     // 노랑 - 3칸 (5일 연속)
+    silver: { color: '#f97316', bars: 2 },   // 주황 - 2칸 (2일 연속)
+    bronze: { color: '#f97316', bars: 1 },   // 주황 - 1칸 (1일 출석)
+    dormant: { color: '#ef4444', bars: 0 }   // 빨강 - 0칸 (휴면)
   }
   
   const config = colors[level] || colors.dormant
   
+  // 관리자용 무지개 그라데이션
+  if (isAdmin) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+        <defs>
+          <linearGradient id="rainbowGradientAdmin" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="17%" stopColor="#ff8000" />
+            <stop offset="33%" stopColor="#ffff00" />
+            <stop offset="50%" stopColor="#00ff00" />
+            <stop offset="67%" stopColor="#0080ff" />
+            <stop offset="83%" stopColor="#8000ff" />
+            <stop offset="100%" stopColor="#ff0080" />
+          </linearGradient>
+          <linearGradient id="rainbowBorderAdmin" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#ff0000" />
+            <stop offset="50%" stopColor="#00ff00" />
+            <stop offset="100%" stopColor="#0000ff" />
+          </linearGradient>
+        </defs>
+        <circle cx="20" cy="20" r="19" stroke="url(#rainbowBorderAdmin)" strokeWidth="2" fill="none" />
+        <circle cx="20" cy="20" r="17.5" fill="#fefefe" />
+        <rect x="13" y="12" width="14" height="20" rx="2" stroke="url(#rainbowGradientAdmin)" strokeWidth="2" fill="none" />
+        <rect x="16" y="8" width="8" height="4" rx="1" fill="url(#rainbowGradientAdmin)" />
+        <rect x="15" y="25" width="10" height="5" rx="1" fill="#22c55e" />
+        <rect x="15" y="19" width="10" height="5" rx="1" fill="#eab308" />
+        <rect x="15" y="13" width="10" height="5" rx="1" fill="#ef4444" />
+      </svg>
+    )
+  }
+  
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      {/* 외곽 원형 테두리 (연한 빨간색) */}
       <circle cx="20" cy="20" r="19" stroke="#fca5a5" strokeWidth="1.5" fill="none" />
-      {/* 회색 배경 원 - 밝은 회색으로 수정 */}
       <circle cx="20" cy="20" r="17.5" fill="#f3f4f6" />
-      
-      {/* 배터리 본체 외곽 (세로) */}
       <rect x="13" y="12" width="14" height="20" rx="2" stroke={config.color} strokeWidth="2" fill="none" />
-      {/* 배터리 단자 (위쪽) */}
       <rect x="16" y="8" width="8" height="4" rx="1" fill={config.color} />
-      
-      {/* 배터리 바들 (아래서부터 채워짐) */}
       {config.bars >= 1 && (
         <rect x="15" y="25" width="10" height="5" rx="1" fill={config.color} />
       )}
@@ -46,16 +71,23 @@ const BatteryIcon = ({ level, size = 32 }) => {
   )
 }
 
-// 사용자 등급 계산 함수
-const getUserLevel = (postsCount) => {
-  if (postsCount >= 30) return 'vip'
-  if (postsCount >= 11) return 'gold'
-  if (postsCount >= 1) return 'silver'
-  return 'dormant'
+// 사용자 등급 계산 함수 (연속 출석 기준)
+const getUserLevel = (consecutiveDays) => {
+  if (consecutiveDays >= 10) return 'vip'       // 10일 연속 → VIP
+  if (consecutiveDays >= 5) return 'gold'       // 5일 연속 → 골드
+  if (consecutiveDays >= 2) return 'silver'     // 2일 연속 → 실버
+  if (consecutiveDays >= 1) return 'bronze'     // 1일 출석 → 브론즈
+  return 'dormant'                               // 0일 → 휴면
 }
 
 const getLevelLabel = (level) => {
-  const labels = { vip: '🟢 VIP', gold: '🟡 골드', silver: '🟠 실버', dormant: '🔴 휴면' }
+  const labels = { 
+    vip: '🟢 VIP', 
+    gold: '🟡 골드', 
+    silver: '🟠 실버', 
+    bronze: '🟤 브론즈',
+    dormant: '🔴 휴면' 
+  }
   return labels[level] || labels.dormant
 }
 
@@ -99,7 +131,7 @@ export default function Admin() {
   const [weeklySignups, setWeeklySignups] = useState([])
   const [usersWithActivity, setUsersWithActivity] = useState([])
   const [dormantUsers, setDormantUsers] = useState([])
-  const [levelCounts, setLevelCounts] = useState({ vip: 0, gold: 0, silver: 0, dormant: 0 })
+  const [levelCounts, setLevelCounts] = useState({ vip: 0, gold: 0, silver: 0, bronze: 0, dormant: 0 })
 
   // 사용자 관리용
   const [allUsersWithPoints, setAllUsersWithPoints] = useState([])
@@ -244,7 +276,6 @@ const [userPostsLoading, setUserPostsLoading] = useState(false)
     return colors[status] || 'bg-gray-100 text-gray-700 border-gray-300'
   }
 
-  // 전체 사용자 + 포인트 가져오기
   const fetchAllUsersWithPoints = async (search = '') => {
     try {
       setLoading(true)
@@ -257,7 +288,7 @@ const [userPostsLoading, setUserPostsLoading] = useState(false)
       const usersWithData = await Promise.all((users || []).map(async (u) => {
         const { count: postsCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
         const { count: commentsCount } = await supabase.from('comments').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
-        const level = getUserLevel(postsCount || 0)
+        const level = getUserLevel(u.consecutive_days || 0)
         return { ...u, postsCount: postsCount || 0, commentsCount: commentsCount || 0, level, levelLabel: getLevelLabel(level) }
       }))
       
@@ -431,11 +462,11 @@ const handleDeleteUserPost = async (postId) => {
     try {
       const { data: users, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(20)
       if (error) throw error
-      const counts = { vip: 0, gold: 0, silver: 0, dormant: 0 }
+      const counts = { vip: 0, gold: 0, silver: 0, bronze: 0, dormant: 0 }
       const usersWithStats = await Promise.all((users || []).map(async (user) => {
         const { count: postsCount } = await supabase.from('posts').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
         const { count: commentsCount } = await supabase.from('comments').select('*', { count: 'exact', head: true }).eq('user_id', user.id)
-        const level = getUserLevel(postsCount || 0)
+        const level = getUserLevel(user.consecutive_days || 0)
         counts[level]++
         return { ...user, postsCount: postsCount || 0, commentsCount: commentsCount || 0, level, levelLabel: getLevelLabel(level) }
       }))
@@ -760,12 +791,13 @@ const handleDeleteUserPost = async (postId) => {
 
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-4"><Activity className="w-5 h-5 text-teal-600" /><h2 className="text-lg font-bold text-gray-900">🔋 등급별 현황</h2></div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-300"><div className="flex items-center justify-between"><div><p className="text-xs text-green-600 font-medium">🟢 VIP (30+)</p><p className="text-2xl font-bold text-green-700">{levelCounts.vip}명</p></div><BatteryIcon level="vip" size={40} /></div></div>
-                    <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-300"><div className="flex items-center justify-between"><div><p className="text-xs text-yellow-600 font-medium">🟡 골드 (11~29)</p><p className="text-2xl font-bold text-yellow-700">{levelCounts.gold}명</p></div><BatteryIcon level="gold" size={40} /></div></div>
-                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border-2 border-orange-300"><div className="flex items-center justify-between"><div><p className="text-xs text-orange-600 font-medium">🟠 실버 (1~10)</p><p className="text-2xl font-bold text-orange-700">{levelCounts.silver}명</p></div><BatteryIcon level="silver" size={40} /></div></div>
-                    <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border-2 border-red-300"><div className="flex items-center justify-between"><div><p className="text-xs text-red-600 font-medium">🔴 휴면 (0)</p><p className="text-2xl font-bold text-red-700">{levelCounts.dormant}명</p></div><BatteryIcon level="dormant" size={40} /></div></div>
-                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border-2 border-green-300"><div className="flex items-center justify-between"><div><p className="text-xs text-green-600 font-medium">🟢 VIP (10일+)</p><p className="text-2xl font-bold text-green-700">{levelCounts.vip}명</p></div><BatteryIcon level="vip" size={40} /></div></div>
+  <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border-2 border-yellow-300"><div className="flex items-center justify-between"><div><p className="text-xs text-yellow-600 font-medium">🟡 골드 (5~9일)</p><p className="text-2xl font-bold text-yellow-700">{levelCounts.gold}명</p></div><BatteryIcon level="gold" size={40} /></div></div>
+  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border-2 border-orange-300"><div className="flex items-center justify-between"><div><p className="text-xs text-orange-600 font-medium">🟠 실버 (2~4일)</p><p className="text-2xl font-bold text-orange-700">{levelCounts.silver}명</p></div><BatteryIcon level="silver" size={40} /></div></div>
+  <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border-2 border-amber-300"><div className="flex items-center justify-between"><div><p className="text-xs text-amber-600 font-medium">🟤 브론즈 (1일)</p><p className="text-2xl font-bold text-amber-700">{levelCounts.bronze}명</p></div><BatteryIcon level="bronze" size={40} /></div></div>
+  <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border-2 border-red-300"><div className="flex items-center justify-between"><div><p className="text-xs text-red-600 font-medium">🔴 휴면 (0일)</p><p className="text-2xl font-bold text-red-700">{levelCounts.dormant}명</p></div><BatteryIcon level="dormant" size={40} /></div></div>
+</div>
                 </div>
 
                 <div className="mb-8">
@@ -774,16 +806,17 @@ const handleDeleteUserPost = async (postId) => {
                     {dormantUsers.length > 0 && <div className="flex items-center space-x-2 px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-medium"><UserX className="w-3.5 h-3.5" /><span>휴면 사용자 {dormantUsers.length}명</span></div>}
                   </div>
                   <div className="flex flex-wrap gap-3 mb-4">
-                    <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="vip" size={18} /><span className="text-gray-600">VIP (글 30개+)</span></div>
-                    <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="gold" size={18} /><span className="text-gray-600">골드 (글 11~29개)</span></div>
-                    <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="silver" size={18} /><span className="text-gray-600">실버 (글 1~10개)</span></div>
-                    <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="dormant" size={18} /><span className="text-gray-600">휴면 (활동 없음)</span></div>
-                  </div>
+  <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="vip" size={18} /><span className="text-gray-600">VIP (10일+ 연속)</span></div>
+  <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="gold" size={18} /><span className="text-gray-600">골드 (5~9일 연속)</span></div>
+  <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="silver" size={18} /><span className="text-gray-600">실버 (2~4일 연속)</span></div>
+  <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="bronze" size={18} /><span className="text-gray-600">브론즈 (1일 출석)</span></div>
+  <div className="flex items-center space-x-1.5 text-xs"><BatteryIcon level="dormant" size={18} /><span className="text-gray-600">휴면 (미출석)</span></div>
+</div>
                   <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-6 border-2 border-teal-200">
                     {usersWithActivity.length === 0 ? <p className="text-sm text-gray-600 text-center py-4">가입자가 없습니다</p> : (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         {usersWithActivity.map((u, index) => (
-                          <div key={u.id} className={`bg-white rounded-lg p-3 hover:shadow-md transition-shadow border-l-4 ${u.level === 'vip' ? 'border-l-green-500' : u.level === 'gold' ? 'border-l-yellow-500' : u.level === 'silver' ? 'border-l-orange-500' : 'border-l-red-400'}`}>
+                          <div key={u.id} className={`bg-white rounded-lg p-3 hover:shadow-md transition-shadow border-l-4 ${u.level === 'vip' ? 'border-l-green-500' : u.level === 'gold' ? 'border-l-yellow-500' : u.level === 'silver' ? 'border-l-orange-500' : u.level === 'bronze' ? 'border-l-amber-500' : 'border-l-red-400'}`}>
                             <div className="flex items-center space-x-2">
                               <div className="flex-shrink-0"><BatteryIcon level={u.level} size={36} /></div>
                               <div className="flex-1 min-w-0">
