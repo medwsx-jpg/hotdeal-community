@@ -145,6 +145,16 @@ const [selectedUserForPosts, setSelectedUserForPosts] = useState(null)
 const [userPosts, setUserPosts] = useState([])
 const [userPostsLoading, setUserPostsLoading] = useState(false)
 
+  // 🆕 관리자 알림용
+  const [adminAlerts, setAdminAlerts] = useState([])
+  const [showAlertModal, setShowAlertModal] = useState(false)
+  const [lastCheckedReports, setLastCheckedReports] = useState(
+    parseInt(localStorage.getItem('lastCheckedReports') || '0')
+  )
+  const [lastCheckedExchanges, setLastCheckedExchanges] = useState(
+    parseInt(localStorage.getItem('lastCheckedExchanges') || '0')
+  )
+
   // 🆕 복권 지급용
   const [lotteryUsername, setLotteryUsername] = useState('')
   const [lotteryAmount, setLotteryAmount] = useState(1)
@@ -155,6 +165,28 @@ const [userPostsLoading, setUserPostsLoading] = useState(false)
   const [exchangesFilter, setExchangesFilter] = useState('all') // all, pending, processing, completed, cancelled
   const [exchangesLoading, setExchangesLoading] = useState(false)
   const [exchangeStats, setExchangeStats] = useState({ total: 0, pending: 0, processing: 0, completed: 0, cancelled: 0 })
+
+  // 🆕 브라우저 알림 권한 요청
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }, [])
+
+  // 🆕 주기적으로 새 알림 체크 (30초마다)
+  useEffect(() => {
+    if (profile?.role !== '관리자') return
+    
+    // 초기 체크
+    checkNewAlerts()
+    
+    // 30초마다 체크
+    const interval = setInterval(() => {
+      checkNewAlerts()
+    }, 30000)
+    
+    return () => clearInterval(interval)
+  }, [profile, lastCheckedReports, lastCheckedExchanges])
 
   useEffect(() => {
     if (!user) { navigate('/login'); return }
@@ -370,6 +402,114 @@ const [userPostsLoading, setUserPostsLoading] = useState(false)
     } finally {
       setLotteryLoading(false)
     }
+  }
+
+  // 🆕 관리자 알림 체크
+  const checkNewAlerts = async () => {
+    try {
+      const alerts = []
+      
+      // 새 신고 체크
+      const { count: newReportsCount } = await supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true })
+        .gt('id', lastCheckedReports)
+      
+      if (newReportsCount && newReportsCount > 0) {
+        // 최신 신고 정보 가져오기
+        const { data: latestReport } = await supabase
+          .from('reports')
+          .select('*, posts(title)')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        
+        alerts.push({
+          type: 'report',
+          count: newReportsCount,
+          message: `새로운 신고가 ${newReportsCount}건 접수되었습니다!`,
+          detail: latestReport?.posts?.title ? `최근: "${latestReport.posts.title}"` : '',
+          latestId: latestReport?.id
+        })
+      }
+      
+      // 새 교환 신청 체크 (pending 상태만)
+      const { count: newExchangesCount } = await supabase
+        .from('reward_exchanges')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .gt('id', lastCheckedExchanges)
+      
+      if (newExchangesCount && newExchangesCount > 0) {
+        // 최신 교환 신청 정보 가져오기
+        const { data: latestExchange } = await supabase
+          .from('reward_exchanges')
+          .select('*')
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        
+        // 상품 정보 가져오기
+        let productName = ''
+        if (latestExchange?.product_id) {
+          const { data: product } = await supabase
+            .from('store_products')
+            .select('name')
+            .eq('id', latestExchange.product_id)
+            .single()
+          productName = product?.name || ''
+        }
+        
+        alerts.push({
+          type: 'exchange',
+          count: newExchangesCount,
+          message: `새로운 교환 신청이 ${newExchangesCount}건 있습니다!`,
+          detail: productName ? `최근: "${productName}"` : '',
+          latestId: latestExchange?.id
+        })
+      }
+      
+      if (alerts.length > 0) {
+        setAdminAlerts(alerts)
+        setShowAlertModal(true)
+        
+        // 브라우저 알림 (권한 있으면)
+        if (Notification.permission === 'granted') {
+          new Notification('🔔 관리자 알림', {
+            body: alerts.map(a => a.message).join('\n'),
+            icon: '/favicon.ico',
+            requireInteraction: true
+          })
+        }
+      }
+    } catch (error) {
+      console.error('알림 체크 실패:', error)
+    }
+  }
+
+  // 🆕 알림 확인 처리
+  const handleDismissAlerts = () => {
+    // 마지막 확인 ID 업데이트
+    adminAlerts.forEach(alert => {
+      if (alert.type === 'report' && alert.latestId) {
+        localStorage.setItem('lastCheckedReports', alert.latestId.toString())
+        setLastCheckedReports(alert.latestId)
+      }
+      if (alert.type === 'exchange' && alert.latestId) {
+        localStorage.setItem('lastCheckedExchanges', alert.latestId.toString())
+        setLastCheckedExchanges(alert.latestId)
+      }
+    })
+    
+    setShowAlertModal(false)
+    setAdminAlerts([])
+  }
+
+  // 🆕 알림 확인 후 해당 탭으로 이동
+  const handleGoToAlert = (type) => {
+    handleDismissAlerts()
+    setActiveTab(type === 'report' ? 'reports' : 'exchanges')
   }
 
   // 🆕 특정 사용자의 모든 글 가져오기
@@ -1530,10 +1670,79 @@ const handleDeleteUserPost = async (postId) => {
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+       )}
+       </div>
+     </div>
+   </div>
+
+   {/* 🆕 관리자 알림 모달 */}
+   {showAlertModal && adminAlerts.length > 0 && (
+     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
+       <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl animate-bounce-once">
+         {/* 헤더 */}
+         <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-t-2xl p-4 text-white">
+           <div className="flex items-center justify-center space-x-2">
+             <span className="text-3xl">🔔</span>
+             <h2 className="text-xl font-bold">관리자 알림</h2>
+           </div>
+         </div>
+         
+         {/* 알림 내용 */}
+         <div className="p-6 space-y-4">
+           {adminAlerts.map((alert, index) => (
+             <div 
+               key={index}
+               className={`p-4 rounded-xl border-2 ${
+                 alert.type === 'report' 
+                   ? 'bg-red-50 border-red-200' 
+                   : 'bg-yellow-50 border-yellow-200'
+               }`}
+             >
+               <div className="flex items-start space-x-3">
+                 <span className="text-2xl">
+                   {alert.type === 'report' ? '🚨' : '🛒'}
+                 </span>
+                 <div className="flex-1">
+                   <p className={`font-bold ${
+                     alert.type === 'report' ? 'text-red-700' : 'text-yellow-700'
+                   }`}>
+                     {alert.message}
+                   </p>
+                   {alert.detail && (
+                     <p className="text-sm text-gray-600 mt-1">{alert.detail}</p>
+                   )}
+                 </div>
+               </div>
+               
+               <button
+                 onClick={() => handleGoToAlert(alert.type)}
+                 className={`mt-3 w-full py-2 rounded-lg font-semibold text-white ${
+                   alert.type === 'report'
+                     ? 'bg-red-500 hover:bg-red-600'
+                     : 'bg-yellow-500 hover:bg-yellow-600'
+                 }`}
+               >
+                 {alert.type === 'report' ? '신고 관리로 이동' : '교환 내역으로 이동'}
+               </button>
+             </div>
+           ))}
+         </div>
+         
+         {/* 닫기 버튼 */}
+         <div className="p-4 border-t border-gray-200">
+           <button
+             onClick={handleDismissAlerts}
+             className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200"
+           >
+             확인했습니다
+           </button>
+           <p className="text-xs text-gray-400 text-center mt-2">
+             * 30초마다 새 알림을 확인합니다
+           </p>
+         </div>
+       </div>
+     </div>
+   )}
+ </div>
+)
 }
