@@ -868,7 +868,7 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
     try {
       const tempComment = {
         id: 'temp-' + Date.now(),
-        content: newComment.trim(),
+        content: content.trim(),
         user_id: user.id,
         post_id: postId,
         created_at: new Date().toISOString(),
