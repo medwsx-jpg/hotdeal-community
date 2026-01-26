@@ -407,17 +407,10 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
       const start = pageNum * POSTS_PER_PAGE
       const end = start + POSTS_PER_PAGE - 1
       
-      // 🚀 단일 쿼리로 게시물 + 작성자 정보 가져오기
+      // 1️⃣ 게시물 먼저 가져오기
       let query = supabase
         .from('posts')
-        .select(`
-          *,
-          profiles:user_id (
-            username,
-            role,
-            consecutive_days
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .range(start, end)
       
@@ -442,16 +435,43 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
       
       if (error) throw error
       
-      // 🚀 추가 쿼리 없이 바로 데이터 가공
-      const postsWithData = (data || []).map((post) => ({
-        ...post,
-        author: post.profiles?.username || '사용자',
-        authorRole: post.profiles?.role || '회원',
-        authorConsecutiveDays: post.profiles?.consecutive_days || 0,
-        timeAgo: getTimeAgo(post.created_at),
-        comments_count: post.comments_count || 0,
-        likes_count: post.likes_count || 0
-      }))
+      if (!data || data.length === 0) {
+        if (pageNum === 0 || reset) {
+          setPosts([])
+        }
+        setHasMore(false)
+        setLoading(false)
+        return
+      }
+      
+      // 2️⃣ 작성자 ID 목록 추출
+      const userIds = [...new Set(data.map(p => p.user_id))]
+      
+      // 3️⃣ 작성자 정보 한 번에 가져오기
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, username, role, consecutive_days')
+        .in('id', userIds)
+      
+      // 4️⃣ 작성자 정보 매핑용 객체 생성
+      const profilesMap = {}
+      profilesData?.forEach(p => {
+        profilesMap[p.id] = p
+      })
+      
+      // 5️⃣ 게시물에 작성자 정보 합치기
+      const postsWithData = data.map((post) => {
+        const authorProfile = profilesMap[post.user_id] || {}
+        return {
+          ...post,
+          author: authorProfile.username || '사용자',
+          authorRole: authorProfile.role || '회원',
+          authorConsecutiveDays: authorProfile.consecutive_days || 0,
+          timeAgo: getTimeAgo(post.created_at),
+          comments_count: post.comments_count || 0,
+          likes_count: post.likes_count || 0
+        }
+      })
       
       if (pageNum === 0 || reset) {
         setPosts(postsWithData)
