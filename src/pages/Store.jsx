@@ -298,13 +298,10 @@ if (exchangeError) throw exchangeError
               <Check className="w-10 h-10 text-green-500" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">교환 완료!</h3>
-            <p className="text-gray-600 mb-2">
-  {selectedProduct?.name}
-</p>
-<p className="text-sm text-gray-500 mb-8">
-  {phoneNumber}로<br />
-  1-3일 내 기프티콘이 발송됩니다
-</p>
+            <p className="text-sm text-gray-500 mb-8">
+              {phoneNumber}로<br />
+              1-3일 내 기프티콘이 발송됩니다
+            </p>
             <button
              onClick={async () => {
               setShowSuccessModal(false)
