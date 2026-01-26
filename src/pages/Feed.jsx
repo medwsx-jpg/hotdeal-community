@@ -159,30 +159,43 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
     period: ''
   })
 
-  // 🆕 이미지 갤러리 키보드 이벤트
-  useEffect(() => {
-    if (!showGallery) return
+ // 🆕 이미지 갤러리 키보드 + 안드로이드 뒤로가기 이벤트
+useEffect(() => {
+  if (!showGallery) return
 
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        setShowGallery(false)
-        setGalleryImages([])
-        setCurrentImageIndex(0)
-        setImageZoom(100)
-      } else if (e.key === 'ArrowLeft') {
-        setCurrentImageIndex(prev => 
-          prev > 0 ? prev - 1 : galleryImages.length - 1
-        )
-      } else if (e.key === 'ArrowRight') {
-        setCurrentImageIndex(prev => 
-          prev < galleryImages.length - 1 ? prev + 1 : 0
-        )
-      }
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      closeGallery()
+    } else if (e.key === 'ArrowLeft') {
+      setCurrentImageIndex(prev => 
+        prev > 0 ? prev - 1 : galleryImages.length - 1
+      )
+    } else if (e.key === 'ArrowRight') {
+      setCurrentImageIndex(prev => 
+        prev < galleryImages.length - 1 ? prev + 1 : 0
+      )
     }
+  }
 
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showGallery, galleryImages.length])
+  // 🆕 안드로이드 뒤로가기 버튼 처리
+  const handlePopState = (e) => {
+    if (showGallery) {
+      e.preventDefault()
+      closeGallery()
+    }
+  }
+
+  // 🆕 갤러리 열릴 때 히스토리에 상태 추가
+  window.history.pushState({ gallery: true }, '')
+
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('popstate', handlePopState)
+  
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown)
+    window.removeEventListener('popstate', handlePopState)
+  }
+}, [showGallery, galleryImages.length])
 
   // 인앱 브라우저 감지 & PWA 설치 프롬프트 감지
   useEffect(() => {
@@ -1144,12 +1157,20 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
   }
 
   // 🆕 이미지 갤러리 열기
-  const openGallery = (images, startIndex) => {
-    setGalleryImages(images)
-    setCurrentImageIndex(startIndex)
-    setShowGallery(true)
-    setImageZoom(100)
-  }
+const openGallery = (images, startIndex) => {
+  setGalleryImages(images)
+  setCurrentImageIndex(startIndex)
+  setShowGallery(true)
+  setImageZoom(100)
+}
+
+// 🆕 이미지 갤러리 닫기
+const closeGallery = () => {
+  setShowGallery(false)
+  setGalleryImages([])
+  setCurrentImageIndex(0)
+  setImageZoom(100)
+}
 
   // 🆕 이전/다음 이미지
   const goToPrevImage = () => {
@@ -1197,19 +1218,19 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
                 />
                 <Search className="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                 {searchQuery && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('')
-                      setPosts([])
-                      setPage(0)
-                      setHasMore(true)
-                      fetchPosts(0, '', true)
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+  <button
+    onClick={() => {
+      setSearchQuery('')
+      setPosts([])
+      setPage(0)
+      setHasMore(true)
+      fetchPosts(0, '', true)
+    }}
+    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+  >
+    <X className="w-3.5 h-3.5" />
+  </button>
+)}
               </div>
               
               <button 
@@ -2889,29 +2910,24 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
 
       {/* 🆕 Image Gallery Lightbox Modal */}
       {showGallery && (
-        <div 
-          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center overflow-hidden"
-          onClick={() => {
-            setShowGallery(false)
-            setGalleryImages([])
-            setCurrentImageIndex(0)
-            setImageZoom(100)
-          }}
+       <div 
+       className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center overflow-hidden"
+       onClick={() => {
+         window.history.back()  // 🆕 히스토리 뒤로가기로 닫기
+       }}
           onWheel={(e) => {
             e.preventDefault()
             const delta = e.deltaY > 0 ? -25 : 25
             setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
           }}
         >
+          
           {/* 닫기 버튼 */}
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowGallery(false)
-              setGalleryImages([])
-              setCurrentImageIndex(0)
-              setImageZoom(100)
-            }}
+  onClick={(e) => {
+    e.stopPropagation()
+    window.history.back()
+  }}
             className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
           >
             <X className="w-6 h-6 text-white" />
