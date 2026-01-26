@@ -639,7 +639,7 @@ export default function Challenge() {
                 </button>
                 <h1 className="text-lg font-bold">🎰 특공대 행운복권</h1>
               </div>
-              <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">테스트중</span>
+             
             </div>
           </div>
 
@@ -1181,9 +1181,8 @@ export default function Challenge() {
               <div className="relative flex items-center space-x-4">
                 <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center text-4xl">🎰</div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                     <h3 className="font-bold text-white text-lg">특공대 행운복권</h3>
-                    <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">테스트중</span>
                   </div>
                   <p className="text-sm text-white/80">복권을 긁어 포인트를 획득하세요!</p>
                 </div>
@@ -1205,6 +1204,7 @@ export default function Challenge() {
     <div className="flex-1">
       <h3 className="font-bold text-gray-900">글작성미션</h3>
       <p className="text-sm text-gray-500">(핫딜)</p>
+      <p className="text-xs text-red-500 mt-1">⚠️ 글 삭제시 P 차감 주의</p>
     </div>
     <span className="text-red-500 font-bold text-sm">최대300P</span>
   </div>

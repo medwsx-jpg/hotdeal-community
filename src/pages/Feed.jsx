@@ -112,6 +112,9 @@ export default function Feed() {
   const [newComment, setNewComment] = useState('')
   const [editingComment, setEditingComment] = useState(null)
   const [editCommentText, setEditCommentText] = useState('')
+  // 🆕 대댓글용 state
+  const [replyingTo, setReplyingTo] = useState(null)
+  const [replyContent, setReplyContent] = useState('')
   const [showComments, setShowComments] = useState(null)
   const [expandedPosts, setExpandedPosts] = useState(new Set())
   const [searchQuery, setSearchQuery] = useState('')
@@ -818,37 +821,49 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
       const commentsWithAuthors = await Promise.all(
         (data || []).map(async (comment) => {
           const { data: authorData } = await supabase
-  .from('profiles')
-  .select('username, role, consecutive_days')
-  .eq('id', comment.user_id)
-  .single()
+            .from('profiles')
+            .select('username, role, consecutive_days')
+            .eq('id', comment.user_id)
+            .single()
 
-return {
-  ...comment,
-  author: authorData?.username || '사용자',
-  authorRole: authorData?.role || '회원',
-  authorConsecutiveDays: authorData?.consecutive_days || 0,
-  timeAgo: getTimeAgo(comment.created_at)
-}
+          return {
+            ...comment,
+            author: authorData?.username || '사용자',
+            authorRole: authorData?.role || '회원',
+            authorConsecutiveDays: authorData?.consecutive_days || 0,
+            timeAgo: getTimeAgo(comment.created_at)
+          }
         })
       )
       
+      // 🆕 댓글을 계층 구조로 정리 (부모 댓글 + 대댓글)
+      const parentComments = commentsWithAuthors.filter(c => !c.parent_id)
+      const childComments = commentsWithAuthors.filter(c => c.parent_id)
+      
+      // 부모 댓글에 대댓글 연결
+      const structuredComments = parentComments.map(parent => ({
+        ...parent,
+        replies: childComments.filter(child => child.parent_id === parent.id)
+      }))
+      
       setComments(prev => ({
         ...prev,
-        [postId]: commentsWithAuthors
+        [postId]: structuredComments
       }))
     } catch (error) {
       console.error('댓글 로드 실패:', error)
     }
   }
 
-  const handleAddComment = async (postId) => {
+  const handleAddComment = async (postId, parentId = null) => {
     if (!user) {
       alert('로그인이 필요합니다.')
       return
     }
-  
-    if (!newComment.trim()) return
+    
+    // 🆕 대댓글인 경우 replyContent 사용, 아니면 newComment 사용
+    const content = parentId ? replyContent : newComment
+    if (!content.trim()) return
   
     try {
       const tempComment = {
@@ -880,14 +895,21 @@ return {
         })
       )
   
-      setNewComment('')
+      // 🆕 대댓글이면 replyContent 초기화, 아니면 newComment 초기화
+      if (parentId) {
+        setReplyContent('')
+        setReplyingTo(null)
+      } else {
+        setNewComment('')
+      }
   
       const { data, error } = await supabase
         .from('comments')
         .insert([{
           user_id: user.id,
           post_id: postId,
-          content: tempComment.content
+          content: content.trim(),
+          parent_id: parentId || null  // 🆕 대댓글이면 parent_id 포함
         }])
         .select()
         .single()
@@ -1998,80 +2020,203 @@ return {
                         <div className="mt-4 pt-4 border-t border-gray-200">
                           <div className="space-y-3 mb-3">
                             {comments[post.id]?.map((comment) => (
-                              <div key={comment.id} className="flex space-x-2">
-                                {/* 🆕 댓글에도 배터리 아이콘 적용 */}
-                                <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-  <BatteryIcon 
-    level={getUserLevel(comment.authorConsecutiveDays || 0)} 
-    size={24} 
-    isAdmin={comment.authorRole === '관리자'}
-  />
-</div>
-                                <div className="flex-1">
-                                  {editingComment === comment.id ? (
-                                    <div className="space-y-2">
-                                      <textarea
-                                        value={editCommentText}
-                                        onChange={(e) => setEditCommentText(e.target.value)}
-                                        className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
-                                        rows="2"
-                                        autoFocus
-                                      />
-                                      <div className="flex gap-2">
-                                      <button
-  onClick={() => handleEditComment(comment.id, post.id)}
-  className="px-3 py-1 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors"
->
-  수정 완료
-</button>
+                              <div key={comment.id}>
+                                {/* 부모 댓글 */}
+                                <div className="flex space-x-2">
+                                  <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                    <BatteryIcon 
+                                      level={getUserLevel(comment.authorConsecutiveDays || 0)} 
+                                      size={24} 
+                                      isAdmin={comment.authorRole === '관리자'}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    {editingComment === comment.id ? (
+                                      <div className="space-y-2">
+                                        <textarea
+                                          value={editCommentText}
+                                          onChange={(e) => setEditCommentText(e.target.value)}
+                                          className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+                                          rows="2"
+                                          autoFocus
+                                        />
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => handleEditComment(comment.id, post.id)}
+                                            className="px-3 py-1 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors"
+                                          >
+                                            수정 완료
+                                          </button>
+                                          <button
+                                            onClick={() => {
+                                              setEditingComment(null)
+                                              setEditCommentText('')
+                                            }}
+                                            className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200 transition-colors"
+                                          >
+                                            취소
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        <div className="bg-gray-100 rounded-lg px-3 py-2">
+                                          <div className="flex items-center justify-between mb-0.5">
+                                            <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
+                                            <div className="flex items-center space-x-2">
+                                              <p className="text-[10px] text-gray-400">{comment.timeAgo}</p>
+                                              {user && comment.user_id === user.id && (
+                                                <div className="flex items-center space-x-1">
+                                                  <button
+                                                    onClick={() => {
+                                                      setEditingComment(comment.id)
+                                                      setEditCommentText(comment.content)
+                                                    }}
+                                                    className="text-gray-500 hover:text-teal-600 transition-colors"
+                                                  >
+                                                    <Edit2 className="w-3 h-3" />
+                                                  </button>
+                                                  <button
+                                                    onClick={() => handleDeleteComment(comment.id, post.id)}
+                                                    className="text-gray-500 hover:text-red-600 transition-colors"
+                                                  >
+                                                    <Trash2 className="w-3 h-3" />
+                                                  </button>
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                          <p className="text-sm text-gray-700">{comment.content}</p>
+                                        </div>
+                                        {/* 🆕 답글 버튼 */}
                                         <button
-                                          onClick={() => {
-                                            setEditingComment(null)
-                                            setEditCommentText('')
-                                          }}
-                                          className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200 transition-colors"
+                                          onClick={() => handleActionClick(() => {
+                                            setReplyingTo(replyingTo === comment.id ? null : comment.id)
+                                            setReplyContent('')
+                                          })}
+                                          className="mt-1 text-xs text-gray-500 hover:text-teal-600 transition-colors"
                                         >
-                                          취소
+                                          답글 달기
                                         </button>
                                       </div>
-                                    </div>
-                                  ) : (
-                                    <div>
-                                      <div className="bg-gray-100 rounded-lg px-3 py-2">
-                                        <div className="flex items-center justify-between mb-0.5">
-                                          <p className="text-xs font-semibold text-gray-900">{comment.author}</p>
-                                          <div className="flex items-center space-x-2">
-                                            <p className="text-[10px] text-gray-400">{comment.timeAgo}</p>
-                                            {user && comment.user_id === user.id && (
-                                              <div className="flex items-center space-x-1">
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* 🆕 대댓글 목록 */}
+                                {comment.replies && comment.replies.length > 0 && (
+                                  <div className="ml-8 mt-2 space-y-2 border-l-2 border-gray-200 pl-3">
+                                    {comment.replies.map((reply) => (
+                                      <div key={reply.id} className="flex space-x-2">
+                                        <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                                          <BatteryIcon 
+                                            level={getUserLevel(reply.authorConsecutiveDays || 0)} 
+                                            size={20} 
+                                            isAdmin={reply.authorRole === '관리자'}
+                                          />
+                                        </div>
+                                        <div className="flex-1">
+                                          {editingComment === reply.id ? (
+                                            <div className="space-y-2">
+                                              <textarea
+                                                value={editCommentText}
+                                                onChange={(e) => setEditCommentText(e.target.value)}
+                                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
+                                                rows="2"
+                                                autoFocus
+                                              />
+                                              <div className="flex gap-2">
+                                                <button
+                                                  onClick={() => handleEditComment(reply.id, post.id)}
+                                                  className="px-3 py-1 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors"
+                                                >
+                                                  수정 완료
+                                                </button>
                                                 <button
                                                   onClick={() => {
-                                                    setEditingComment(comment.id)
-                                                    setEditCommentText(comment.content)
+                                                    setEditingComment(null)
+                                                    setEditCommentText('')
                                                   }}
-                                                  className="text-gray-500 hover:text-teal-600 transition-colors"
+                                                  className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg hover:bg-gray-200 transition-colors"
                                                 >
-                                                  <Edit2 className="w-3 h-3" />
-                                                </button>
-                                                <button
-                                                  onClick={() => handleDeleteComment(comment.id, post.id)}
-                                                  className="text-gray-500 hover:text-red-600 transition-colors"
-                                                >
-                                                  <Trash2 className="w-3 h-3" />
+                                                  취소
                                                 </button>
                                               </div>
-                                            )}
-                                          </div>
+                                            </div>
+                                          ) : (
+                                            <div className="bg-gray-50 rounded-lg px-3 py-2">
+                                              <div className="flex items-center justify-between mb-0.5">
+                                                <p className="text-xs font-semibold text-gray-900">{reply.author}</p>
+                                                <div className="flex items-center space-x-2">
+                                                  <p className="text-[10px] text-gray-400">{reply.timeAgo}</p>
+                                                  {user && reply.user_id === user.id && (
+                                                    <div className="flex items-center space-x-1">
+                                                      <button
+                                                        onClick={() => {
+                                                          setEditingComment(reply.id)
+                                                          setEditCommentText(reply.content)
+                                                        }}
+                                                        className="text-gray-500 hover:text-teal-600 transition-colors"
+                                                      >
+                                                        <Edit2 className="w-3 h-3" />
+                                                      </button>
+                                                      <button
+                                                        onClick={() => handleDeleteComment(reply.id, post.id)}
+                                                        className="text-gray-500 hover:text-red-600 transition-colors"
+                                                      >
+                                                        <Trash2 className="w-3 h-3" />
+                                                      </button>
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              </div>
+                                              <p className="text-sm text-gray-700">{reply.content}</p>
+                                            </div>
+                                          )}
                                         </div>
-                                        <p className="text-sm text-gray-700">{comment.content}</p>
                                       </div>
-                                    </div>
-                                  )}
-                                </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* 🆕 대댓글 입력창 */}
+                                {replyingTo === comment.id && (
+                                  <div className="ml-8 mt-2 flex space-x-2">
+                                    <input
+                                      type="text"
+                                      value={replyContent}
+                                      onChange={(e) => setReplyContent(e.target.value)}
+                                      placeholder="답글을 입력하세요..."
+                                      className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
+                                      onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                          handleAddComment(post.id, comment.id)
+                                        }
+                                      }}
+                                      autoFocus
+                                    />
+                                    <button
+                                      onClick={() => handleActionClick(() => handleAddComment(post.id, comment.id))}
+                                      className="px-3 py-2 bg-teal-500 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-colors"
+                                    >
+                                      답글
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setReplyingTo(null)
+                                        setReplyContent('')
+                                      }}
+                                      className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors"
+                                    >
+                                      취소
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
 
+                          {/* 새 댓글 입력 */}
                           <div className="flex space-x-2">
                             <input
                               type="text"
