@@ -1064,7 +1064,7 @@ export default function Challenge() {
               <div className="bg-cyan-50 rounded-xl p-4 mb-3">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-700">매일 포인트 랜덤 뽑기</span>
-                  <span className="text-cyan-600 font-bold text-lg">1~30P</span>
+                  <span className="text-cyan-600 font-bold text-lg">1~50P</span>
                 </div>
               </div>
               
@@ -1204,7 +1204,7 @@ export default function Challenge() {
     <div className="flex-1">
       <h3 className="font-bold text-gray-900">글작성미션</h3>
       <p className="text-sm text-gray-500">(핫딜)</p>
-      <p className="text-xs text-red-500 mt-1">⚠️ 글 삭제시 P 차감 주의</p>
+      <p className="text-xs text-red-500 mt-1">⚠️ 글삭제, 글중복시 P차감 주의</p>
     </div>
     <span className="text-red-500 font-bold text-sm">최대300P</span>
   </div>
