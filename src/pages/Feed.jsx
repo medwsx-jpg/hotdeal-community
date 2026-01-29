@@ -1973,7 +1973,7 @@ const closeGallery = () => {
 
                       {/* 🆕 Images - 갤러리로 열기 */}
                       {post.images && post.images.length > 0 && (
-                        <div className={`mb-3 grid gap-2 ${
+                        <div className={`mb-3 grid gap-2 overflow-hidden ${
                           post.images.length === 1 ? 'grid-cols-1' : 
                           post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
                         }`}>
