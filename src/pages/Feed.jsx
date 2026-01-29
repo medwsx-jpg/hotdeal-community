@@ -2915,11 +2915,13 @@ const closeGallery = () => {
        onClick={() => {
          window.history.back()  // 🆕 히스토리 뒤로가기로 닫기
        }}
-          onWheel={(e) => {
-            e.preventDefault()
-            const delta = e.deltaY > 0 ? -25 : 25
-            setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
-          }}
+       onWheel={(e) => {
+        // 모바일에서는 wheel 이벤트 무시
+        if ('ontouchstart' in window) return
+        e.preventDefault()
+        const delta = e.deltaY > 0 ? -25 : 25
+        setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
+      }}
         >
           
           {/* 닫기 버튼 */}
