@@ -24,6 +24,17 @@
     max-width: 100vw;
     overflow-x: hidden;
   }
+
+  /* 🆕 이미지 오버플로우 방지 */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* 🆕 모든 요소 박스 사이징 */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 }
 
 @layer components {
