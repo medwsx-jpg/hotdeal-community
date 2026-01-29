@@ -1851,10 +1851,10 @@ const closeGallery = () => {
               ) : (
                 <>
                   {sortedPosts.map((post, index) => (
-                   <article 
-                   key={post.id}
-                   id={`post-${post.id}`}
-                   className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow animate-slide-up overflow-hidden"
+                    <article 
+                      key={post.id}
+                      id={`post-${post.id}`}
+                      className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow animate-slide-up"
                       style={{animationDelay: `${index * 0.1}s`}}
                     >
                       {/* Header */}
@@ -1973,10 +1973,10 @@ const closeGallery = () => {
 
                       {/* 🆕 Images - 갤러리로 열기 */}
                       {post.images && post.images.length > 0 && (
-  <div className={`mb-3 grid gap-2 overflow-hidden ${
-    post.images.length === 1 ? 'grid-cols-1' : 
-    post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
-  }`}>
+                        <div className={`mb-3 grid gap-2 ${
+                          post.images.length === 1 ? 'grid-cols-1' : 
+                          post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
+                        }`}>
                           {post.images.slice(0, 4).map((img, i) => (
                             <div key={i} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
                               <img 
@@ -2915,13 +2915,11 @@ const closeGallery = () => {
        onClick={() => {
          window.history.back()  // 🆕 히스토리 뒤로가기로 닫기
        }}
-       onWheel={(e) => {
-        // 모바일에서는 wheel 이벤트 무시
-        if ('ontouchstart' in window) return
-        e.preventDefault()
-        const delta = e.deltaY > 0 ? -25 : 25
-        setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
-      }}
+          onWheel={(e) => {
+            e.preventDefault()
+            const delta = e.deltaY > 0 ? -25 : 25
+            setImageZoom(prev => Math.max(25, Math.min(400, prev + delta)))
+          }}
         >
           
           {/* 닫기 버튼 */}
