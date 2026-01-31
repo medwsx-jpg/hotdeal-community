@@ -1948,7 +1948,8 @@ const closeGallery = () => {
                         <h2 className="text-base font-bold mb-1 text-gray-900 hover:text-teal-600 cursor-pointer transition-colors">
                           {post.title}
                         </h2>
-                        <p className={`text-sm text-gray-600 ${expandedPosts.has(post.id) ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
+                        <p className={`text-sm text-gray-600 break-words overflow-hidden ${expandedPosts.has(post.id) ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
+
                           {post.content}
                         </p>
                         {post.content.length > 100 && (
