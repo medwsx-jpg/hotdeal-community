@@ -7,6 +7,23 @@ import {
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
+// 한국 시간 헬퍼 함수
+const getKoreanDate = () => {
+  const now = new Date()
+  const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)) // UTC+9
+  return koreaTime
+}
+
+const getKoreanDateString = () => {
+  const koreaTime = getKoreanDate()
+  return koreaTime.toISOString().split('T')[0] // YYYY-MM-DD
+}
+
+const getKoreanToday = () => {
+  const koreaTime = getKoreanDate()
+  return new Date(koreaTime.toISOString().split('T')[0]) // 한국 날짜 자정
+}
+
 // 🆕 배터리 애니메이션 컴포넌트
 const AnimatedBattery = ({ level, onClick, isCharging }) => {
   const getBatteryColor = () => {
@@ -189,9 +206,13 @@ export default function Challenge() {
       setAttendanceData(data || [])
       
       // 오늘 출석했는지 확인
-      const today = new Date().toDateString()
+      const today = getKoreanDateString()
       const checkedToday = (data || []).some(
-        d => new Date(d.checked_at).toDateString() === today
+        d => {
+          const checkedDate = new Date(d.checked_at)
+          const checkedKorea = new Date(checkedDate.getTime() + (9 * 60 * 60 * 1000))
+          return checkedKorea.toISOString().split('T')[0] === today
+        }
       )
       setTodayChecked(checkedToday)
     } catch (error) {
@@ -507,7 +528,7 @@ export default function Challenge() {
       if (fetchError) throw fetchError
       
       // 연속 출석일 계산
-      const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+      const today = getKoreanDateString()
       const lastDate = currentProfile?.last_attendance_date
       let newConsecutiveDays = 1
       
@@ -592,7 +613,11 @@ export default function Challenge() {
       
       // 출석 여부 확인
       const attended = attendanceData.some(
-        d => new Date(d.checked_at).getDate() === day
+        d => {
+          const checkedDate = new Date(d.checked_at)
+          const checkedKorea = new Date(checkedDate.getTime() + (9 * 60 * 60 * 1000))
+          return checkedKorea.getDate() === day
+        }
       )
       
       let status = 'pending' // 미출석 (점선)
