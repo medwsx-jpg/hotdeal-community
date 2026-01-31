@@ -1548,7 +1548,7 @@ const closeGallery = () => {
 
         <div className="flex gap-5">
           {/* Feed */}
-          <main className="flex-1">
+          <main className="flex-1 overflow-hidden">
             {/* 모바일 탭 메뉴 */}
             <div className="md:hidden mb-4 bg-white border border-gray-200 rounded-xl p-3">
               {activeMainTab === 'home' && (
