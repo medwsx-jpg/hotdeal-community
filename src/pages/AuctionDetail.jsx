@@ -566,18 +566,21 @@ export default function AuctionDetail() {
             <div className="flex gap-2">
               {/* 빠른 입찰 버튼들 */}
               <div className="flex gap-1.5">
-                {[1, 2, 5].map(mult => {
-                  const quickAmount = auction.current_price + (auction.bid_increment * mult)
-                  return (
-                    <button
-                      key={mult}
-                      onClick={() => setBidAmount(quickAmount.toLocaleString())}
-                      className="px-2.5 py-2 bg-orange-50 border border-orange-200 rounded-lg text-[11px] font-semibold text-orange-700 hover:bg-orange-100 transition-colors whitespace-nowrap"
-                    >
-                      +{formatPrice(auction.bid_increment * mult)}
-                    </button>
-                  )
-                })}
+              {[
+                { label: '+100', amount: 100 },
+                { label: '+500', amount: 500 }
+              ].map(({ label, amount }) => {
+                const quickAmount = auction.current_price + amount
+                return (
+                  <button
+                    key={label}
+                    onClick={() => setBidAmount(quickAmount.toLocaleString())}
+                    className="px-2.5 py-2 bg-orange-50 border border-orange-200 rounded-lg text-[11px] font-semibold text-orange-700 hover:bg-orange-100 transition-colors whitespace-nowrap"
+                  >
+                    {label}
+                  </button>
+                )
+              })}
               </div>
 
               {/* 입찰 금액 입력 */}
