@@ -9,6 +9,8 @@ import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Challenge from './pages/Challenge'
 import Store from './pages/Store'  // 🆕 스토어 추가
+import { lazy, Suspense } from 'react'
+const Market = lazy(() => import('./pages/Market'))
 
 function App() {
   return (
@@ -23,6 +25,11 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/challenge" element={<Challenge />} />
           <Route path="/store" element={<Store />} />  {/* 🆕 스토어 추가 */}
+          <Route path="/market" element={
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+              <Market />
+            </Suspense>
+          } />
           <Route path="/open" element={<Navigate to="/feed" replace />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
