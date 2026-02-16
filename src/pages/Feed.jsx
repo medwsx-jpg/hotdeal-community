@@ -367,39 +367,22 @@ useEffect(() => {
 
   const fetchTopPosts = async () => {
     try {
-      const { data: commentData } = await supabase
+      // 쿼리 1번: posts 테이블에서 comments_count, likes_count 직접 사용
+      const { data, error } = await supabase
         .from('posts')
-        .select('id, title, type, comments_count:comments(count)')
+        .select('id, title, type, comments_count, likes_count')
         .order('created_at', { ascending: false })
+        .limit(100)
       
-      const postsWithCommentCount = await Promise.all(
-        (commentData || []).map(async (post) => {
-          const { count } = await supabase
-            .from('comments')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-          
-          return { ...post, comments_count: count || 0 }
-        })
-      )
-      
-      const topByComments = postsWithCommentCount
-        .sort((a, b) => b.comments_count - a.comments_count)
+      if (error) throw error
+      if (!data) return
+
+      const topByComments = [...data]
+        .sort((a, b) => (b.comments_count || 0) - (a.comments_count || 0))
         .slice(0, 3)
       
-      const postsWithLikeCount = await Promise.all(
-        (commentData || []).map(async (post) => {
-          const { count } = await supabase
-            .from('likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('post_id', post.id)
-          
-          return { ...post, likes_count: count || 0 }
-        })
-      )
-      
-      const topByLikes = postsWithLikeCount
-        .sort((a, b) => b.likes_count - a.likes_count)
+      const topByLikes = [...data]
+        .sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0))
         .slice(0, 3)
       
       setTopPosts({
