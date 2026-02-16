@@ -402,7 +402,7 @@ export default function Market() {
                   key={product.id}
                   className="flex gap-4 p-4 bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() => {
-                    if (product.sale_type === 'auction' && product.auction) {
+                    if (product.sale_type === 'auction') {
                       navigate(`/market/auction/${product.id}`)
                     } else {
                       // 추후 상세 페이지
