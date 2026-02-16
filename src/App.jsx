@@ -26,6 +26,11 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/challenge" element={<Challenge />} />
           <Route path="/store" element={<Store />} />  {/* 🆕 스토어 추가 */}
+          <Route path="/market" element={
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+              <Market />
+            </Suspense>
+          } />
           <Route path="/market/auction/:id" element={
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>}>
               <AuctionDetail />
