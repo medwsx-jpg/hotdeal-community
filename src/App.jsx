@@ -11,6 +11,7 @@ import Challenge from './pages/Challenge'
 import Store from './pages/Store'  // 🆕 스토어 추가
 import { lazy, Suspense } from 'react'
 const Market = lazy(() => import('./pages/Market'))
+const AuctionDetail = lazy(() => import('./pages/AuctionDetail'))
 
 function App() {
   return (
@@ -25,9 +26,9 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/challenge" element={<Challenge />} />
           <Route path="/store" element={<Store />} />  {/* 🆕 스토어 추가 */}
-          <Route path="/market" element={
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div></div>}>
-              <Market />
+          <Route path="/market/auction/:id" element={
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div></div>}>
+              <AuctionDetail />
             </Suspense>
           } />
           <Route path="/open" element={<Navigate to="/feed" replace />} />
