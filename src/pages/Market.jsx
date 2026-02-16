@@ -405,7 +405,7 @@ export default function Market() {
                     if (product.sale_type === 'auction') {
                       navigate(`/market/auction/${product.id}`)
                     } else {
-                      // 추후 상세 페이지
+                      alert('상세 페이지 준비 중입니다.')
                     }
                   }}
                 >

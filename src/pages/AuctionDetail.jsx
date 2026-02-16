@@ -22,7 +22,7 @@ export default function AuctionDetail() {
   const [bidding, setBidding] = useState(false)
   const [timeLeft, setTimeLeft] = useState('')
   const [timeUrgent, setTimeUrgent] = useState(false)
-  const [showBidHistory, setShowBidHistory] = useState(false)
+  const [showBidHistory, setShowBidHistory] = useState(true)
   const [liked, setLiked] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showGallery, setShowGallery] = useState(false)
