@@ -334,7 +334,12 @@ export default function Market() {
       <nav className="fixed top-0 w-full bg-white z-50 border-b border-gray-200 shadow-sm">
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
+              <button onClick={() => navigate(-1)} className="p-1 hover:bg-gray-100 rounded-lg">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
               <button onClick={() => navigate('/feed')} className="flex items-center space-x-2">
                 <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
                 <span className="text-lg font-bold gradient-text">마켓</span>
