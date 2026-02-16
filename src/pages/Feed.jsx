@@ -1520,10 +1520,10 @@ const closeGallery = () => {
               </button>
 
               <button
-                onClick={() => handleActionClick(() => navigate('/store'))}
-                className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-gray-100"
+                onClick={() => handleActionClick(() => navigate('/market'))}
+                className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-orange-100 hover:text-orange-600"
               >
-                스토어
+                🏷️ 마켓
               </button>
             </div>
           </div>
@@ -2545,11 +2545,11 @@ const closeGallery = () => {
           </button>
 
           <button 
-            onClick={() => handleActionClick(() => navigate('/store'))}
+            onClick={() => handleActionClick(() => navigate('/market'))}
             className="flex flex-col items-center justify-center flex-1 h-full space-y-1 text-gray-600"
           >
-            <Gift className="w-5 h-5" />
-            <span className="text-[10px] font-medium">스토어</span>
+            <Tag className="w-5 h-5" />
+            <span className="text-[10px] font-medium">마켓</span>
           </button>
 
           <button 
