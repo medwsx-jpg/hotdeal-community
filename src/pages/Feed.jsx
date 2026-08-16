@@ -1498,14 +1498,14 @@ const closeGallery = () => {
         {activeMainTab !== 'check' && (
           <button
             onClick={() => setActiveMainTab('check')}
-            className="w-full mb-4 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl px-4 py-4 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left"
+            className="w-full mb-4 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl px-4 py-5 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
           >
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-base md:text-lg font-bold leading-tight">⚡ 오늘 내가 먼저 확인할 정책은 어디일까요?</p>
-                <p className="text-xs md:text-sm text-teal-100 mt-1">로그인 없이 30초만에 공식 확인 창구를 알려드립니다 — 정책자금·바우처·출산급여 등</p>
+            <div className="flex flex-col items-center text-center gap-3">
+              <div>
+                <p className="text-xl md:text-2xl font-bold leading-tight">⚡ 오늘 내가 먼저 확인할 정책은 어디일까요?</p>
+                <p className="text-sm md:text-base text-teal-100 mt-2">로그인 없이 30초만에 공식 확인 창구를 알려드립니다 — 정책자금·바우처·출산급여 등</p>
               </div>
-              <span className="flex-shrink-0 bg-white/20 rounded-lg px-3 py-2 text-sm font-bold whitespace-nowrap">30초 체크 →</span>
+              <span className="bg-yellow-300 text-teal-900 rounded-xl px-6 py-3 text-base md:text-lg font-bold whitespace-nowrap shadow-sm">30초 체크 →</span>
             </div>
           </button>
         )}
