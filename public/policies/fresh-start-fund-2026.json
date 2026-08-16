@@ -1,0 +1,194 @@
+{
+  "policy": {
+    "id": "fresh-start-fund-2026",
+    "slug": "fresh-start-fund-2026",
+    "title": "2026년 새출발기금 (채무조정)",
+    "owner": "금융위원회 · 한국자산관리공사(캠코)",
+    "source_url": "https://www.kamco.or.kr/portal/contents.do?mId=0203010000",
+    "source_published_at": "2026-01-01",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://새출발기금.kr",
+    "disclaimer": "본 체크는 새출발기금 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 감면율은 반드시 새출발기금 홈페이지 또는 콜센터(1660-1378)에서 확인하시기 바랍니다. 새출발기금 신청은 평생 1회만 가능하므로 신청 전 충분히 상담받으시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 기준"
+  },
+
+  "questions": [
+    {
+      "key": "biz_history",
+      "label": "2020년 4월 ~ 2025년 6월 사이에 사업을 운영한 이력이 있으신가요?",
+      "help_text": "개인사업자 또는 법인 소상공인으로 운영한 이력이 있어야 합니다. 현재 폐업한 경우도 신청 가능합니다(폐업한 법인은 제외).",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 해당 기간에 사업을 운영했습니다" },
+        { "value": "yes_closed", "label": "네, 운영했고 현재는 폐업했습니다 (개인사업자)" },
+        { "value": "closed_corp", "label": "운영했지만 폐업한 법인입니다" },
+        { "value": "no", "label": "아니요, 해당 기간 사업 이력이 없습니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "debt_status",
+      "label": "현재 대출 상환 상태가 어떤가요?",
+      "help_text": "부실차주(3개월 이상 연체)와 부실우려차주(연체 전이지만 상환 곤란)로 나뉩니다.",
+      "type": "radio",
+      "options": [
+        { "value": "overdue_3m", "label": "3개월 이상 연체 중입니다", "description": "부실차주 — 원금 조정 대상" },
+        { "value": "at_risk", "label": "연체 전이지만 상환이 어렵습니다", "description": "만기연장·상환유예 중, 세금 체납 등 — 부실우려차주" },
+        { "value": "normal", "label": "정상 상환 중이며 어려움이 없습니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "biz_history", "op": "in", "value": ["yes", "yes_closed"] }
+    },
+    {
+      "key": "already_applied",
+      "label": "이전에 새출발기금을 신청한 적이 있으신가요?",
+      "help_text": "새출발기금은 평생 1회만 신청할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "아니요, 처음입니다" },
+        { "value": "yes", "label": "네, 신청한 적이 있습니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "biz_history", "op": "in", "value": ["yes", "yes_closed"] },
+          { "field": "debt_status", "op": "in", "value": ["overdue_3m", "at_risk"] }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "biz_history", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "사업 운영 이력 요건에 해당하지 않습니다",
+      "result_body": "새출발기금은 2020년 4월~2025년 6월 사이 사업을 운영한 소상공인·자영업자를 대상으로 합니다.\n\n개인 채무조정이 필요하시다면 신용회복위원회(1600-5500)의 채무조정 제도를 확인해 보세요.",
+      "evidence_text": "biz_history = no"
+    },
+    {
+      "priority": 11,
+      "expression": { "field": "biz_history", "op": "eq", "value": "closed_corp" },
+      "result_status": "likely_mismatch",
+      "result_title": "폐업한 법인은 신청 대상이 아닙니다",
+      "result_body": "폐업한 법인은 새출발기금 신청 대상에서 제외됩니다. 자세한 내용은 캠코(1660-1378)에 문의하세요.",
+      "evidence_text": "biz_history = closed_corp"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "debt_status", "op": "eq", "value": "normal" },
+      "result_status": "likely_mismatch",
+      "result_title": "현재 상태로는 채무조정 대상이 아닐 수 있습니다",
+      "result_body": "새출발기금은 상환이 곤란한 부실·부실우려차주를 대상으로 합니다. 정상 상환 중이며 어려움이 없는 경우 대상에 해당하지 않습니다.\n\n고금리 대출 부담이 크시다면 '고금리 대환대출' 30초 체크를 확인해 보세요.",
+      "evidence_text": "debt_status = normal"
+    },
+    {
+      "priority": 21,
+      "expression": { "field": "debt_status", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "연체·상환 상태를 확인해 주세요",
+      "result_body": "대출 연체 여부와 기간은 거래 금융기관 또는 신용정보 조회(NICE·올크레딧)로 확인할 수 있습니다. 상환이 어려운 상황이라면 새출발기금 콜센터(1660-1378)에서 상담받아 보세요.",
+      "evidence_text": "debt_status = unsure"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "already_applied", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "새출발기금은 평생 1회만 신청할 수 있습니다",
+      "result_body": "이미 신청한 이력이 있는 경우 재신청이 어렵습니다. 진행 중인 조정 건에 대한 문의는 캠코(1660-1378)로 연락하세요.",
+      "evidence_text": "already_applied = yes"
+    },
+    {
+      "priority": 100,
+      "expression": {
+        "all": [
+          { "field": "debt_status", "op": "eq", "value": "overdue_3m" },
+          { "field": "already_applied", "op": "eq", "value": "no" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "새출발기금(부실차주) 확인 대상입니다",
+      "result_body": "3개월 이상 연체 중인 부실차주로, 원금 조정 대상에 해당할 수 있습니다. 순 부채의 최대 80%(기초수급자·차상위는 최대 90%)까지 감면될 수 있습니다.\n\n⚠️ 신청은 평생 1회만 가능하므로, 신청 전 반드시 콜센터(1660-1378) 상담을 먼저 받아보세요.",
+      "limit_note": "감면율: 최대 80%(취약계층 90%) | 재기 교육 이수 시 +10%p | 신청: 새출발기금.kr 또는 캠코 사무소(예약 1660-1378)",
+      "evidence_text": "debt_status = overdue_3m, 첫 신청"
+    },
+    {
+      "priority": 110,
+      "expression": {
+        "all": [
+          { "field": "debt_status", "op": "eq", "value": "at_risk" },
+          { "field": "already_applied", "op": "eq", "value": "no" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "새출발기금(부실우려차주) 확인 대상입니다",
+      "result_body": "연체 전이지만 상환이 곤란한 부실우려차주로, 금리 조정·상환기간 연장 등의 채무조정 대상에 해당할 수 있습니다.\n\n부실우려차주는 원금 감면이 아닌 금리·기간 조정 중심으로 지원됩니다. 정확한 조정 내용은 콜센터(1660-1378) 상담으로 확인하세요.",
+      "limit_note": "지원: 금리 조정·상환기간 연장 등 | 신청: 새출발기금.kr 또는 캠코 사무소(예약 1660-1378) | 평생 1회",
+      "evidence_text": "debt_status = at_risk, 첫 신청"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 새출발기금 콜센터(1660-1378)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 조정 여부와 감면율은 캠코 심사로 결정됩니다.",
+    "채무조정 시 신용정보에 일정 기간 기록이 남을 수 있으니, 장단점을 상담으로 확인하세요.",
+    "고의 연체, 재산 은닉 등이 확인되면 조정이 취소될 수 있습니다.",
+    "온라인: 새출발기금.kr | 방문: 캠코 26개 사무소·서민금융통합지원센터(사전예약 1660-1378)"
+  ],
+
+  "cross_sell_note": "폐업 후 재창업을 준비하신다면 '재기사업화 지원'과 '점포철거비 지원' 30초 체크도 확인해 보세요.",
+
+  "unknown_if": [
+    "감면율은 재산·소득 심사 결과에 따라 달라집니다",
+    "대상 사업 운영 기간 기준은 제도 연장에 따라 변경될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "사업 이력 없음",
+      "answers": { "biz_history": "no" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "부실차주 첫 신청",
+      "answers": {
+        "biz_history": "yes",
+        "debt_status": "overdue_3m",
+        "already_applied": "no"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "정상 상환 중",
+      "answers": {
+        "biz_history": "yes",
+        "debt_status": "normal"
+      },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "재신청",
+      "answers": {
+        "biz_history": "yes_closed",
+        "debt_status": "overdue_3m",
+        "already_applied": "yes"
+      },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}

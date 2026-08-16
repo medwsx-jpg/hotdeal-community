@@ -1,0 +1,148 @@
+{
+  "policy": {
+    "id": "restart-biz-2026",
+    "slug": "restart-biz-2026",
+    "title": "2026년 희망리턴패키지 재기사업화 (재창업)",
+    "owner": "중소벤처기업부 · 소상공인시장진흥공단",
+    "source_url": "https://www.sbiz.or.kr",
+    "source_published_at": "2026-01-01",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.sbiz.or.kr",
+    "disclaimer": "본 체크는 희망리턴패키지 재기사업화 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 모집 일정은 반드시 소상공인24 또는 중소기업통합콜센터(1357)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 모집 공고 기준"
+  },
+
+  "questions": [
+    {
+      "key": "closed_status",
+      "label": "폐업 상태가 어떻게 되시나요?",
+      "help_text": "재기사업화는 폐업(예정) 소상공인의 재창업을 지원합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "closed", "label": "이미 폐업했습니다" },
+        { "value": "closing", "label": "폐업 예정입니다" },
+        { "value": "operating", "label": "폐업 계획 없이 정상 운영 중입니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "restart_plan",
+      "label": "재창업 계획이 있으신가요?",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 재창업을 준비 중입니다" },
+        { "value": "considering", "label": "고민 중입니다" },
+        { "value": "no", "label": "재창업 계획이 없습니다 (취업 희망)" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "closed_status", "op": "in", "value": ["closed", "closing"] }
+    },
+    {
+      "key": "education_status",
+      "label": "희망리턴패키지 재창업 교육을 받으셨거나 받을 의향이 있으신가요?",
+      "help_text": "재기사업화 지원은 교육·컨설팅과 연계하여 진행됩니다.",
+      "type": "radio",
+      "options": [
+        { "value": "done", "label": "이미 수료했습니다" },
+        { "value": "willing", "label": "받을 의향이 있습니다" },
+        { "value": "no", "label": "교육은 받고 싶지 않습니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "closed_status", "op": "in", "value": ["closed", "closing"] },
+          { "field": "restart_plan", "op": "in", "value": ["yes", "considering"] }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "closed_status", "op": "eq", "value": "operating" },
+      "result_status": "likely_mismatch",
+      "result_title": "폐업(예정) 소상공인 대상 프로그램입니다",
+      "result_body": "재기사업화 지원은 폐업했거나 폐업 예정인 소상공인을 대상으로 합니다.\n\n운영 중 자금이 필요하시다면 '소상공인 정책자금', 경영 부담 완화가 필요하시다면 '경영안정바우처' 30초 체크를 확인해 보세요.",
+      "evidence_text": "closed_status = operating"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "restart_plan", "op": "eq", "value": "no" },
+      "result_status": "needs_official_check",
+      "result_title": "재취업 지원 프로그램을 확인해 보세요",
+      "result_body": "재창업 대신 취업을 희망하시는 경우, 희망리턴패키지의 '특화 취업지원'이 더 적합할 수 있습니다.\n\n• 전직장려수당: 최대 100만원 (교육 수료 60만원 + 취업 근속 40만원)\n• 국민취업지원제도 연계수당: 월 20만원×6개월\n\n소상공인24 또는 1357에서 확인해 보세요. '국민취업지원제도' 30초 체크도 함께 확인해 보시길 권합니다.",
+      "evidence_text": "restart_plan = no"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "education_status", "op": "in", "value": ["done", "willing"] },
+      "result_status": "check_first",
+      "result_title": "재기사업화 지원 확인 대상입니다",
+      "result_body": "현재 공개 기준상 희망리턴패키지 재기사업화 지원 대상에 해당할 수 있습니다. 소상공인24에서 모집 공고와 신청 일정을 먼저 확인해 보세요.\n\n지원 내용: 1:1 경영진단, 재창업 교육, 사업화 보조금(최대 2,000만원, 유형별 상이), PM 밀착관리\n\n모집은 차수별로 진행되므로 공고 일정 확인이 중요합니다.",
+      "limit_note": "사업화 지원: 최대 2,000만원(유형별 상이) | 신청: 소상공인24(www.sbiz.or.kr) | 문의: 1357",
+      "evidence_text": "폐업(예정) + 재창업 의향 + 교육 의향"
+    },
+    {
+      "priority": 110,
+      "expression": { "field": "education_status", "op": "eq", "value": "no" },
+      "result_status": "needs_official_check",
+      "result_title": "교육·컨설팅 연계 여부를 확인해 주세요",
+      "result_body": "재기사업화 지원은 교육·컨설팅과 연계하여 진행되는 경우가 많습니다. 교육 없이 참여 가능한 유형이 있는지 소상공인24 공고문 또는 1357에서 확인해 보세요.",
+      "evidence_text": "education_status = no"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 소상공인24 또는 중소기업통합콜센터(1357)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 선정 여부는 소진공 심사로 결정됩니다.",
+    "모집은 차수별로 진행되며 예산 소진 시 조기 마감될 수 있습니다.",
+    "폐업 과정의 점포철거비(최대 600만원)는 별도 프로그램으로 신청합니다.",
+    "신청: 소상공인24(www.sbiz.or.kr) | 문의: 1357"
+  ],
+
+  "cross_sell_note": "폐업 비용이 부담되시면 '점포철거비 지원', 채무 부담이 크시면 '새출발기금' 30초 체크도 확인해 보세요. 재창업 후 자금이 필요하시면 소상공인 정책자금의 '재도전특별자금'도 있습니다.",
+
+  "unknown_if": [
+    "지원 유형별 보조금 한도와 자부담 비율은 공고문에서 확인이 필요합니다",
+    "모집 차수·일정은 수시로 변경될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "정상 운영 중",
+      "answers": { "closed_status": "operating" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "폐업 + 재창업 준비 + 교육 의향",
+      "answers": {
+        "closed_status": "closed",
+        "restart_plan": "yes",
+        "education_status": "willing"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "취업 희망",
+      "answers": {
+        "closed_status": "closed",
+        "restart_plan": "no"
+      },
+      "expected_status": "needs_official_check"
+    }
+  ]
+}

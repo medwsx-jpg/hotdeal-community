@@ -1882,6 +1882,20 @@ const closeGallery = () => {
                         <p className="text-xs text-pink-100 mt-0.5">30초 체크 →</p>
                       </div>
                     </Link>
+                    <Link to="/check/learning-card-2026" className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <span className="text-lg flex-shrink-0">🎓</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold leading-tight">내일배움카드 500만원</p>
+                        <p className="text-xs text-orange-100 mt-0.5">30초 체크 →</p>
+                      </div>
+                    </Link>
+                    <Link to="/check/job-support-2026" className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <span className="text-lg flex-shrink-0">🧭</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold leading-tight">구직촉진수당 월 60만원</p>
+                        <p className="text-xs text-green-100 mt-0.5">30초 체크 →</p>
+                      </div>
+                    </Link>
                     <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">
                       <span className="text-lg flex-shrink-0">🔜</span>
                       <div className="min-w-0">
@@ -1960,6 +1974,20 @@ const closeGallery = () => {
                       <div className="min-w-0">
                         <p className="text-sm font-bold leading-tight">점포철거비 지원</p>
                         <p className="text-xs text-amber-100 mt-0.5">30초 체크 →</p>
+                      </div>
+                    </Link>
+                    <Link to="/check/fresh-start-fund-2026" className="flex items-center gap-2 bg-gradient-to-r from-slate-600 to-gray-700 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <span className="text-lg flex-shrink-0">🌅</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold leading-tight">새출발기금 채무조정</p>
+                        <p className="text-xs text-slate-200 mt-0.5">30초 체크 →</p>
+                      </div>
+                    </Link>
+                    <Link to="/check/restart-biz-2026" className="flex items-center gap-2 bg-gradient-to-r from-fuchsia-500 to-pink-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <span className="text-lg flex-shrink-0">🌱</span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold leading-tight">재창업 지원 2천만원</p>
+                        <p className="text-xs text-fuchsia-100 mt-0.5">30초 체크 →</p>
                       </div>
                     </Link>
                     <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">

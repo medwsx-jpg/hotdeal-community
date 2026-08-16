@@ -1,0 +1,212 @@
+{
+  "policy": {
+    "id": "learning-card-2026",
+    "slug": "learning-card-2026",
+    "title": "2026년 국민내일배움카드",
+    "owner": "고용노동부",
+    "source_url": "https://www.work24.go.kr",
+    "source_published_at": "2026-01-01",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.work24.go.kr",
+    "disclaimer": "본 체크는 국민내일배움카드 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부는 반드시 고용24 또는 고용노동부 고객상담센터(1350)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 기준"
+  },
+
+  "questions": [
+    {
+      "key": "current_status",
+      "label": "현재 어떤 상태이신가요?",
+      "type": "radio",
+      "options": [
+        { "value": "unemployed", "label": "실업자·구직자입니다" },
+        { "value": "employed", "label": "재직자입니다" },
+        { "value": "self_employed", "label": "자영업자입니다" },
+        { "value": "student", "label": "대학생입니다" },
+        { "value": "public", "label": "공무원 또는 사립학교 교직원입니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "age_check",
+      "label": "만 75세 이상이신가요?",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "아니요, 만 75세 미만입니다" },
+        { "value": "yes", "label": "네, 만 75세 이상입니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "current_status", "op": "neq", "value": "public" }
+    },
+    {
+      "key": "income_check",
+      "label": "다음 중 해당되는 사항이 있나요?",
+      "help_text": "소득 수준에 따른 제외 기준입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "none", "label": "해당 없음" },
+        { "value": "big_corp", "label": "만 45세 미만이면서 대기업 재직, 월 소득 300만원 이상입니다" },
+        { "value": "special_worker", "label": "특수형태근로종사자이며 월 소득 500만원 이상입니다" },
+        { "value": "high_sales", "label": "자영업자이며 연 매출 4억원 이상입니다" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "current_status", "op": "neq", "value": "public" },
+          { "field": "age_check", "op": "eq", "value": "no" }
+        ]
+      }
+    },
+    {
+      "key": "student_grade",
+      "label": "현재 학년이 어떻게 되시나요?",
+      "help_text": "2026년부터 4년제는 2학년 2학기 종료 시점부터, 3년제는 1학년 2학기 종료 시점부터 신청 가능합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "eligible", "label": "4년제 2학년 2학기 종료 이후 (3년제는 1학년 2학기 종료 이후)" },
+        { "value": "not_yet", "label": "아직 해당 학기 전입니다" },
+        { "value": "graduate_soon", "label": "졸업예정자입니다" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": {
+        "all": [
+          { "field": "current_status", "op": "eq", "value": "student" },
+          { "field": "age_check", "op": "eq", "value": "no" },
+          { "field": "income_check", "op": "eq", "value": "none" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "current_status", "op": "eq", "value": "public" },
+      "result_status": "likely_mismatch",
+      "result_title": "공무원·사립학교 교직원은 발급 대상이 아닙니다",
+      "result_body": "현직 공무원과 사립학교 교직원은 국민내일배움카드 발급 대상에서 제외됩니다.",
+      "evidence_text": "current_status = public"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "age_check", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "만 75세 이상은 발급 대상이 아닙니다",
+      "result_body": "국민내일배움카드는 만 75세 미만을 대상으로 합니다.\n\n어르신 대상 일자리 사업은 노인일자리 여기(www.seniorro.or.kr) 또는 가까운 시니어클럽에서 확인해 보세요.",
+      "evidence_text": "age_check = yes"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "income_check", "op": "in", "value": ["big_corp", "special_worker", "high_sales"] },
+      "result_status": "likely_mismatch",
+      "result_title": "소득·매출 기준으로 제외될 수 있습니다",
+      "result_body": "대기업 재직(만 45세 미만, 월 300만원 이상), 특수형태근로종사자(월 500만원 이상), 자영업자(연 매출 4억원 이상)는 발급 대상에서 제외됩니다.\n\n경계선에 있는 경우 고용24 또는 1350에서 정확히 확인해 보세요.",
+      "evidence_text": "income_check = 제외 사유 해당"
+    },
+    {
+      "priority": 31,
+      "expression": { "field": "income_check", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "소득 기준 해당 여부를 확인해 주세요",
+      "result_body": "제외 기준(대기업 월 300만원, 특고 월 500만원, 자영업 연 매출 4억원) 해당 여부가 불확실한 경우, 고용24 또는 고용노동부 고객상담센터(1350)에서 확인하시기 바랍니다.",
+      "evidence_text": "income_check = unsure"
+    },
+    {
+      "priority": 40,
+      "expression": { "field": "student_grade", "op": "eq", "value": "not_yet" },
+      "result_status": "likely_mismatch",
+      "result_title": "아직 신청 가능 학기가 아닙니다",
+      "result_body": "2026년부터 4년제 대학생은 2학년 2학기 종료 시점부터, 3년제는 1학년 2학기 종료 시점부터 신청할 수 있습니다. 해당 시점 이후에 다시 확인해 보세요.",
+      "evidence_text": "student_grade = not_yet"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "student_grade", "op": "in", "value": ["eligible", "graduate_soon"] },
+      "result_status": "check_first",
+      "result_title": "국민내일배움카드 확인 대상입니다",
+      "result_body": "현재 공개 기준상 국민내일배움카드 발급 대상에 해당할 수 있습니다. 고용24에서 발급 신청을 진행해 보세요.\n\n발급 절차: 고용24 가입 → 구직등록(실업자) → 발급 신청 → 카드사 선택 → 심사(3~7일)",
+      "limit_note": "훈련비 지원: 기본 300만원~최대 500만원(5년) | 자부담: 과정별 15~55% | 신청: 고용24(work24.go.kr) 또는 고용복지플러스센터",
+      "evidence_text": "student + 학기 요건 충족"
+    },
+    {
+      "priority": 110,
+      "expression": {
+        "all": [
+          { "field": "current_status", "op": "in", "value": ["unemployed", "employed", "self_employed"] },
+          { "field": "age_check", "op": "eq", "value": "no" },
+          { "field": "income_check", "op": "eq", "value": "none" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "국민내일배움카드 확인 대상입니다",
+      "result_body": "현재 공개 기준상 국민내일배움카드 발급 대상에 해당할 수 있습니다. 고용24에서 발급 신청을 진행해 보세요.\n\n발급 절차: 고용24 가입 → 구직등록(실업자·구직자만) → 발급 신청 → 카드사 선택(신한·농협) → 심사(3~7일)\n\n비정규직·고용취약계층은 +100만원, 저소득·취약계층은 +200만원 추가 지원될 수 있습니다.",
+      "limit_note": "훈련비 지원: 기본 300만원~최대 500만원(5년 유효) | 자부담: 과정별 15~55%(취약계층 면제 가능) | 신청: 고용24(work24.go.kr)",
+      "evidence_text": "제외 사유 없음"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 고용24 또는 고용노동부 고객상담센터(1350)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 발급 여부는 고용노동부 심사로 결정됩니다.",
+    "카드는 발급 후 5년간 유효하며, 고용24에 등록된 훈련과정에서만 사용할 수 있습니다.",
+    "훈련장려금(월 최대 11만 6천원)이 별도 지급될 수 있습니다(요건 충족 시).",
+    "신청: 고용24(work24.go.kr) | 방문: 고용복지플러스센터 | 문의: 1350"
+  ],
+
+  "cross_sell_note": "구직 중이시라면 '국민취업지원제도' 30초 체크도 확인해 보세요. 구직촉진수당(월 60만원)과 함께 받을 수 있는 경우가 있습니다.",
+
+  "unknown_if": [
+    "훈련과정별 자부담 비율은 직종·과정에 따라 다릅니다",
+    "추가 지원 한도(+100만원/+200만원)의 세부 요건은 고용24에서 확인이 필요합니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "공무원",
+      "answers": { "current_status": "public" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "일반 실업자",
+      "answers": {
+        "current_status": "unemployed",
+        "age_check": "no",
+        "income_check": "none"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "고매출 자영업자",
+      "answers": {
+        "current_status": "self_employed",
+        "age_check": "no",
+        "income_check": "high_sales"
+      },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "대학생 저학년",
+      "answers": {
+        "current_status": "student",
+        "age_check": "no",
+        "income_check": "none",
+        "student_grade": "not_yet"
+      },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}
