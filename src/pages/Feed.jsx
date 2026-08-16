@@ -1492,51 +1492,33 @@ const closeGallery = () => {
           </div>
         </div>
 
-        {/* 정책 진단기 배너 */}
-        <Link
-          to="/check/small-biz-fund-2026"
-          className="block mb-4 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg shadow-teal-500/20 hover:shadow-xl transition-all"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-teal-100 mb-1">소상공인 정책자금 진단기</p>
-              <p className="text-base font-bold leading-snug">내가 받을 수 있는 정책자금,<br/>1분 만에 확인해보세요</p>
-            </div>
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
-              <span className="text-2xl">🩺</span>
-            </div>
-          </div>
-        </Link>
+        {/* 정책 진단기 카드 */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <Link
+            to="/check/small-biz-fund-2026"
+            className="block bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl p-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+          >
+            <span className="text-lg">🩺</span>
+            <p className="text-xs font-bold mt-1.5 leading-snug">소상공인<br/>정책자금</p>
+            <p className="text-[10px] text-teal-100 mt-2 font-medium">진단하기 →</p>
+          </Link>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
           <Link
             to="/check/hope-return-demolition-2026"
-            className="block bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all"
+            className="block bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-amber-100 mb-1">희망리턴패키지</p>
-                <p className="text-sm font-bold leading-snug">점포철거비 지원<br/>대상 확인하기</p>
-              </div>
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
-                <span className="text-xl">🏠</span>
-              </div>
-            </div>
+            <span className="text-lg">🏠</span>
+            <p className="text-xs font-bold mt-1.5 leading-snug">점포철거비<br/>지원</p>
+            <p className="text-[10px] text-amber-100 mt-2 font-medium">진단하기 →</p>
           </Link>
 
           <Link
             to="/check/maternity-benefit-uninsured-2026"
-            className="block bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-4 text-white shadow-lg shadow-pink-500/20 hover:shadow-xl transition-all"
+            className="block bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl p-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-pink-100 mb-1">고용보험 미적용자</p>
-                <p className="text-sm font-bold leading-snug">출산급여 150만원<br/>대상 확인하기</p>
-              </div>
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
-                <span className="text-xl">🤰</span>
-              </div>
-            </div>
+            <span className="text-lg">🤰</span>
+            <p className="text-xs font-bold mt-1.5 leading-snug">출산급여<br/>150만원</p>
+            <p className="text-[10px] text-pink-100 mt-2 font-medium">진단하기 →</p>
           </Link>
         </div>
 
