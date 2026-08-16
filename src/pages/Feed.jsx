@@ -1841,162 +1841,186 @@ const closeGallery = () => {
                 </div>
 
                 {/* 생활·복지 확인 */}
-                <div className="bg-white border border-blue-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
+                <div className="bg-white border border-gray-200 border-t-[3px] border-t-blue-500 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
                     <span className="text-xl">🏠</span>
-                    <h3 className="text-base font-bold text-blue-800">생활·복지 확인</h3>
-                    <span className="text-xs text-blue-400 ml-auto">정부24·복지로</span>
+                    <h3 className="text-base font-bold text-blue-700">생활·복지 확인</h3>
+                    <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full ml-auto">정부24·복지로</span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">정부24·복지로에서 먼저 확인할 혜택을 정리합니다.</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to="/check/energy-voucher-2026" className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-sky-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">⚡</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">에너지바우처 최대 70만원</p>
-                        <p className="text-xs text-blue-100 mt-0.5">30초 체크 →</p>
+                  <p className="text-xs text-gray-400 mb-3 ml-7">정부24·복지로에서 먼저 확인할 혜택을 정리합니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <Link to="/check/energy-voucher-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-blue-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-blue-300 text-blue-600">저소득</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-blue-300 text-blue-600">에너지</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">에너지바우처</p>
+                      <p className="text-base font-extrabold text-blue-600 text-center mt-1">최대 70만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">기초생활수급 가구의 전기·가스·연탄 등 에너지 비용을 지원합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-blue-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/eitc-2026" className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">💰</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">근로장려금 최대 330만원</p>
-                        <p className="text-xs text-emerald-100 mt-0.5">30초 체크 →</p>
+                    <Link to="/check/eitc-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-blue-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-blue-300 text-blue-600">저소득</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-blue-300 text-blue-600">근로자</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">근로장려금</p>
+                      <p className="text-base font-extrabold text-blue-600 text-center mt-1">최대 330만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">일하는 저소득 가구에 장려금을 지급합니다. 5월 정기·3월 반기 신청.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-blue-500">30초 체크 →</div>
                     </Link>
-                  </div>
-                </div>
-
-                {/* 취업·직업훈련 확인 */}
-                <div className="bg-white border border-green-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl">💼</span>
-                    <h3 className="text-base font-bold text-green-800">취업·직업훈련 확인</h3>
-                    <span className="text-xs text-green-400 ml-auto">고용24</span>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">고용24에서 먼저 볼 지원을 안내합니다.</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to="/check/maternity-benefit-uninsured-2026" className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🤰</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">출산급여 150만원</p>
-                        <p className="text-xs text-pink-100 mt-0.5">30초 체크 →</p>
-                      </div>
-                    </Link>
-                    <Link to="/check/learning-card-2026" className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🎓</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">내일배움카드 500만원</p>
-                        <p className="text-xs text-orange-100 mt-0.5">30초 체크 →</p>
-                      </div>
-                    </Link>
-                    <Link to="/check/job-support-2026" className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🧭</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">구직촉진수당 월 60만원</p>
-                        <p className="text-xs text-green-100 mt-0.5">30초 체크 →</p>
-                      </div>
-                    </Link>
-                    <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">
-                      <span className="text-lg flex-shrink-0">🔜</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-400 leading-tight">준비 중</p>
-                        <p className="text-xs text-gray-300 mt-0.5">곧 추가됩니다</p>
-                      </div>
+                    <div className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 text-gray-300 text-[13px] font-semibold min-h-[150px]">
+                      <span>🔜</span><span>준비 중</span>
                     </div>
                   </div>
                 </div>
 
-                {/* 사업 운영·소상공인 확인 */}
-                <div className="bg-white border border-teal-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl">🏪</span>
-                    <h3 className="text-base font-bold text-teal-800">사업 운영·소상공인 확인</h3>
-                    <span className="text-xs text-teal-400 ml-auto">소상공인24·기업마당</span>
+                {/* 취업·직업훈련 확인 */}
+                <div className="bg-white border border-gray-200 border-t-[3px] border-t-emerald-500 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl">💼</span>
+                    <h3 className="text-base font-bold text-emerald-700">취업·직업훈련 확인</h3>
+                    <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full ml-auto">고용24</span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">소상공인24·기업마당의 공식 공고를 찾습니다.</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to="/check/small-biz-fund-2026" className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🩺</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">소상공인 정책자금</p>
-                        <p className="text-xs text-teal-100 mt-0.5">30초 체크 →</p>
+                  <p className="text-xs text-gray-400 mb-3 ml-7">고용24에서 먼저 볼 지원을 안내합니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <Link to="/check/maternity-benefit-uninsured-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-emerald-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-300 text-emerald-600">출산</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-300 text-emerald-600">고용보험 미적용</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">출산급여</p>
+                      <p className="text-base font-extrabold text-emerald-600 text-center mt-1">150만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">고용보험 미적용 프리랜서·1인 사업자 출산 여성을 지원합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-emerald-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/biz-voucher-2026" className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-sky-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🎫</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">경영안정바우처 25만원</p>
-                        <p className="text-xs text-cyan-100 mt-0.5">30초 체크 →</p>
+                    <Link to="/check/learning-card-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-emerald-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-300 text-emerald-600">직업훈련</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-300 text-emerald-600">전국민</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">내일배움카드</p>
+                      <p className="text-base font-extrabold text-emerald-600 text-center mt-1">최대 500만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">실업자·재직자·자영업자 훈련비를 지원합니다. 5년간 사용.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-emerald-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/youth-employ-fund-2026" className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🧑‍💼</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">청년고용연계자금</p>
-                        <p className="text-xs text-violet-100 mt-0.5">30초 체크 →</p>
+                    <Link to="/check/job-support-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-emerald-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-300 text-emerald-600">구직</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-300 text-emerald-600">수당</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">구직촉진수당</p>
+                      <p className="text-base font-extrabold text-emerald-600 text-center mt-1">월 60만원 × 6개월</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">국민취업지원제도 1유형 참여자에게 구직촉진수당을 지급합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-emerald-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/startup-innovation-fund-2026" className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🚀</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">혁신창업자금(중진공)</p>
-                        <p className="text-xs text-indigo-100 mt-0.5">30초 체크 →</p>
+                  </div>
+                </div>
+
+                {/* 사업 운영·소상공인 확인 */}
+                <div className="bg-white border border-gray-200 border-t-[3px] border-t-teal-500 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl">🏪</span>
+                    <h3 className="text-base font-bold text-teal-700">사업 운영·소상공인 확인</h3>
+                    <span className="text-[11px] font-semibold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full ml-auto">소상공인24·기업마당</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3 ml-7">소상공인24·기업마당의 공식 공고를 찾습니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <Link to="/check/small-biz-fund-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-teal-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">융자</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">운전자금</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">소상공인 정책자금</p>
+                      <p className="text-base font-extrabold text-teal-600 text-center mt-1">최대 7천만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">일반·긴급·재도전 등 상황별 정책자금을 안내합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-teal-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/refinance-loan-2026" className="flex items-center gap-2 bg-gradient-to-r from-rose-500 to-red-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">💳</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">고금리 대환대출</p>
-                        <p className="text-xs text-rose-100 mt-0.5">30초 체크 →</p>
+                    <Link to="/check/biz-voucher-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-teal-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">바우처</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">고정비</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">경영안정바우처</p>
+                      <p className="text-base font-extrabold text-teal-600 text-center mt-1">최대 25만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">공공요금·4대 보험료 등 고정비 부담을 줄여줍니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-teal-500">30초 체크 →</div>
                     </Link>
-                    <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">
-                      <span className="text-lg flex-shrink-0">🔜</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-400 leading-tight">준비 중</p>
-                        <p className="text-xs text-gray-300 mt-0.5">곧 추가됩니다</p>
+                    <Link to="/check/youth-employ-fund-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-teal-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">청년</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">융자</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">청년고용연계자금</p>
+                      <p className="text-base font-extrabold text-teal-600 text-center mt-1">최대 7천만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">만 39세 이하 대표 또는 청년 고용 사업장을 지원합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-teal-500">30초 체크 →</div>
+                    </Link>
+                    <Link to="/check/startup-innovation-fund-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-teal-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">창업</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">중진공</span>
+                      </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">혁신창업자금</p>
+                      <p className="text-base font-extrabold text-teal-600 text-center mt-1">업력 7년 미만</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">창업기업 대상 중진공 정책자금. 청년은 우대 조건.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-teal-500">30초 체크 →</div>
+                    </Link>
+                    <Link to="/check/refinance-loan-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-teal-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">대환</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-teal-300 text-teal-600">중·저신용</span>
+                      </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">고금리 대환대출</p>
+                      <p className="text-base font-extrabold text-teal-600 text-center mt-1">연 4.5% 고정</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">7% 이상 고금리 대출을 저금리로 전환합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-teal-500">30초 체크 →</div>
+                    </Link>
+                    <div className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 text-gray-300 text-[13px] font-semibold min-h-[150px]">
+                      <span>🔜</span><span>준비 중</span>
                     </div>
                   </div>
                 </div>
 
                 {/* 폐업·재기 지원 확인 */}
-                <div className="bg-white border border-amber-200 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-3">
+                <div className="bg-white border border-gray-200 border-t-[3px] border-t-amber-500 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
                     <span className="text-xl">🔄</span>
-                    <h3 className="text-base font-bold text-amber-800">폐업·재기 지원 확인</h3>
-                    <span className="text-xs text-amber-400 ml-auto">소상공인24</span>
+                    <h3 className="text-base font-bold text-amber-700">폐업·재기 지원 확인</h3>
+                    <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full ml-auto">소상공인24</span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">폐업일·임대차 조건을 바탕으로 공식 확인 순서를 안내합니다.</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Link to="/check/hope-return-demolition-2026" className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🏗️</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">점포철거비 지원</p>
-                        <p className="text-xs text-amber-100 mt-0.5">30초 체크 →</p>
+                  <p className="text-xs text-gray-400 mb-3 ml-7">폐업일·임대차 조건을 바탕으로 공식 확인 순서를 안내합니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <Link to="/check/hope-return-demolition-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-amber-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 text-amber-600">폐업</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 text-amber-600">철거비</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">점포철거비 지원</p>
+                      <p className="text-base font-extrabold text-amber-600 text-center mt-1">최대 600만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">폐업 점포의 철거·원상복구 비용을 지원합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-amber-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/fresh-start-fund-2026" className="flex items-center gap-2 bg-gradient-to-r from-slate-600 to-gray-700 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🌅</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">새출발기금 채무조정</p>
-                        <p className="text-xs text-slate-200 mt-0.5">30초 체크 →</p>
+                    <Link to="/check/fresh-start-fund-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-amber-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 text-amber-600">채무조정</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 text-amber-600">평생 1회</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">새출발기금</p>
+                      <p className="text-base font-extrabold text-amber-600 text-center mt-1">최대 90% 감면</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">연체·상환곤란 소상공인의 채무를 조정합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-amber-500">30초 체크 →</div>
                     </Link>
-                    <Link to="/check/restart-biz-2026" className="flex items-center gap-2 bg-gradient-to-r from-fuchsia-500 to-pink-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
-                      <span className="text-lg flex-shrink-0">🌱</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold leading-tight">재창업 지원 2천만원</p>
-                        <p className="text-xs text-fuchsia-100 mt-0.5">30초 체크 →</p>
+                    <Link to="/check/restart-biz-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-amber-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 text-amber-600">재창업</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-amber-300 text-amber-600">교육 연계</span>
                       </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">재창업 지원</p>
+                      <p className="text-base font-extrabold text-amber-600 text-center mt-1">최대 2천만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">폐업 소상공인의 재창업 사업화를 지원합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-amber-500">30초 체크 →</div>
                     </Link>
-                    <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">
-                      <span className="text-lg flex-shrink-0">🔜</span>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-400 leading-tight">준비 중</p>
-                        <p className="text-xs text-gray-300 mt-0.5">곧 추가됩니다</p>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
