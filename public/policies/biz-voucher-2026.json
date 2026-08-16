@@ -1,0 +1,256 @@
+{
+  "policy": {
+    "id": "biz-voucher-2026",
+    "slug": "biz-voucher-2026",
+    "title": "2026년 소상공인 경영안정바우처",
+    "owner": "중소벤처기업부 · 소상공인시장진흥공단",
+    "source_url": "https://www.sbiz24.kr",
+    "source_published_at": "2026-02-09",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.sbiz24.kr",
+    "disclaimer": "본 체크는 2026년 소상공인 경영안정바우처 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 세부 조건은 반드시 소상공인24 또는 중소기업통합콜센터(1357)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 공고 기준 (신청기간 2026.2.9~12.18)"
+  },
+
+  "questions": [
+    {
+      "key": "biz_status",
+      "label": "현재 사업장이 정상 운영 중인가요?",
+      "help_text": "신청일 기준 휴업·폐업 상태가 아니어야 하며, 사업자등록증의 대표자와 신청자가 일치해야 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "active", "label": "네, 정상 영업 중입니다" },
+        { "value": "closed", "label": "휴업 또는 폐업 상태입니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "revenue_range",
+      "label": "2025년 연 매출액이 어느 범위인가요?",
+      "help_text": "과세사업자는 부가가치세 신고내역, 면세사업자는 수입금액증명원 기준입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "in_range", "label": "0원 초과 ~ 1억 400만원 미만" },
+        { "value": "over", "label": "1억 400만원 이상" },
+        { "value": "zero", "label": "매출이 없습니다 (0원)" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "biz_status", "op": "eq", "value": "active" }
+    },
+    {
+      "key": "industry_excluded",
+      "label": "운영 중인 업종이 지원제외 대상에 해당하나요?",
+      "help_text": "사행산업, 유흥·향락 업종, 금융·보험업, 부동산임대업, 일부 고소득 전문직 등은 지원 대상에서 제외됩니다.",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "해당 없음 (일반 업종)" },
+        { "value": "yes", "label": "해당됨 (제외 업종)" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "biz_status", "op": "eq", "value": "active" },
+          { "field": "revenue_range", "op": "eq", "value": "in_range" }
+        ]
+      }
+    },
+    {
+      "key": "tax_delinquent",
+      "label": "현재 국세를 체납 중인가요?",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "아니요, 체납이 없습니다" },
+        { "value": "yes", "label": "네, 체납 중입니다" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": {
+        "all": [
+          { "field": "biz_status", "op": "eq", "value": "active" },
+          { "field": "revenue_range", "op": "eq", "value": "in_range" },
+          { "field": "industry_excluded", "op": "eq", "value": "no" }
+        ]
+      }
+    },
+    {
+      "key": "duplicate_benefit",
+      "label": "유사한 목적의 공공요금 지원금을 이미 받은 적이 있나요?",
+      "help_text": "동일·유사 목적의 지원금 중복 수혜 시 제외될 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "받은 적 없습니다" },
+        { "value": "yes", "label": "받은 적 있습니다" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": {
+        "all": [
+          { "field": "biz_status", "op": "eq", "value": "active" },
+          { "field": "revenue_range", "op": "eq", "value": "in_range" },
+          { "field": "industry_excluded", "op": "eq", "value": "no" },
+          { "field": "tax_delinquent", "op": "eq", "value": "no" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "biz_status", "op": "eq", "value": "closed" },
+      "result_status": "likely_mismatch",
+      "result_title": "휴·폐업 상태에서는 신청이 어렵습니다",
+      "result_body": "경영안정바우처는 신청일 기준 정상 영업 중인 소상공인을 대상으로 합니다. 휴업·폐업 상태인 경우 지원 대상에서 제외됩니다.\n\n폐업 후 재기를 준비 중이시라면 '희망리턴패키지'를 확인해 보세요.",
+      "evidence_text": "biz_status = closed"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "revenue_range", "op": "eq", "value": "over" },
+      "result_status": "likely_mismatch",
+      "result_title": "매출 기준을 초과할 가능성이 있습니다",
+      "result_body": "경영안정바우처는 2025년 연 매출액 1억 400만원 미만 소상공인을 대상으로 합니다. 매출이 기준을 초과하는 경우 지원 대상에 해당하지 않을 수 있습니다.\n\n정확한 기준은 소상공인24 공고문에서 확인하세요.",
+      "evidence_text": "revenue_range = over"
+    },
+    {
+      "priority": 21,
+      "expression": { "field": "revenue_range", "op": "eq", "value": "zero" },
+      "result_status": "needs_official_check",
+      "result_title": "매출 0원인 경우 공식 확인이 필요합니다",
+      "result_body": "매출 기준은 '0원 초과'로 공고되어 있어, 매출이 전혀 없는 경우 대상 여부 확인이 필요합니다. 소상공인24 또는 1357에 문의하세요.",
+      "evidence_text": "revenue_range = zero"
+    },
+    {
+      "priority": 22,
+      "expression": { "field": "revenue_range", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "매출액을 먼저 확인해 주세요",
+      "result_body": "지원 대상 여부는 2025년 연 매출액으로 판단합니다. 홈택스에서 부가가치세 신고내역 또는 수입금액증명원을 확인하신 후 다시 체크해 보세요.",
+      "evidence_text": "revenue_range = unsure"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "industry_excluded", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "지원제외 업종에 해당합니다",
+      "result_body": "사행산업, 유흥·향락 업종, 금융·보험업, 부동산임대업 등은 경영안정바우처 지원 대상에서 제외됩니다.\n\n업종별 세부 기준은 공고문에서 확인하세요.",
+      "evidence_text": "industry_excluded = yes"
+    },
+    {
+      "priority": 31,
+      "expression": { "field": "industry_excluded", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "업종 제외 여부를 확인해 주세요",
+      "result_body": "운영 중인 업종이 지원제외 대상인지 확인이 필요합니다. 공고문의 제외 업종 목록을 확인하시거나 1357에 문의하세요.",
+      "evidence_text": "industry_excluded = unsure"
+    },
+    {
+      "priority": 40,
+      "expression": { "field": "tax_delinquent", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "국세 체납 시 지원이 제한됩니다",
+      "result_body": "국세 체납 상태인 경우 경영안정바우처 지원 대상에서 제외됩니다. 체납 해소 후 신청을 검토해 보세요.",
+      "evidence_text": "tax_delinquent = yes"
+    },
+    {
+      "priority": 41,
+      "expression": { "field": "tax_delinquent", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "체납 여부를 확인해 주세요",
+      "result_body": "홈택스 또는 관할 세무서에서 체납 여부를 확인하신 후 신청하시기 바랍니다.",
+      "evidence_text": "tax_delinquent = unsure"
+    },
+    {
+      "priority": 50,
+      "expression": { "field": "duplicate_benefit", "op": "eq", "value": "yes" },
+      "result_status": "needs_official_check",
+      "result_title": "중복 수혜 여부 확인이 필요합니다",
+      "result_body": "유사한 목적의 공공요금 지원금을 이미 받은 경우 중복 지원이 제한될 수 있습니다. 받은 지원금의 종류를 확인 후 소상공인24 또는 1357에 문의하세요.",
+      "evidence_text": "duplicate_benefit = yes"
+    },
+    {
+      "priority": 100,
+      "expression": {
+        "all": [
+          { "field": "biz_status", "op": "eq", "value": "active" },
+          { "field": "revenue_range", "op": "eq", "value": "in_range" },
+          { "field": "industry_excluded", "op": "eq", "value": "no" },
+          { "field": "tax_delinquent", "op": "eq", "value": "no" },
+          { "field": "duplicate_benefit", "op": "in", "value": ["no", "unsure"] }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "경영안정바우처 확인 대상입니다",
+      "result_body": "현재 공개 기준상 경영안정바우처 지원 대상에 해당할 수 있습니다. 소상공인24에서 공고문과 신청 절차를 먼저 확인해 보세요.\n\n최대 25만원의 바우처로 사업장 공공요금(전기·가스·수도), 4대 보험료 등에 사용할 수 있습니다.",
+      "limit_note": "지원금액: 최대 25만원 | 신청기간: 2026.2.9 ~ 12.18 | 사용기한: 2026.12.31 | 사용처: 사업장 공공요금·4대 보험료 등",
+      "evidence_text": "모든 기본 요건 충족"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 소상공인24 또는 중소기업통합콜센터(1357)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공고문 기준 사전 확인이며, 최종 지원 여부는 소진공 심사를 통해 결정됩니다.",
+    "신청 시 사업자등록증명원, 매출 증빙서류, 대표자 신분증, 지급계좌 사본이 필요합니다.",
+    "바우처는 개인 소비·가정용 비용에는 사용할 수 없습니다.",
+    "예산 소진 시 조기 마감될 수 있습니다.",
+    "온라인 신청: 소상공인24(www.sbiz24.kr) | 문의: 1357"
+  ],
+
+  "cross_sell_note": "운전자금이 필요하시다면 '소상공인 정책자금' 30초 체크도 확인해 보세요.",
+
+  "unknown_if": [
+    "매출 구간별 지원금액 차등 여부는 공고문에서 확인이 필요합니다",
+    "지역별·차수별 신청 일정이 다를 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "휴폐업 상태",
+      "answers": { "biz_status": "closed" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "매출 초과",
+      "answers": { "biz_status": "active", "revenue_range": "over" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "전체 요건 충족",
+      "answers": {
+        "biz_status": "active",
+        "revenue_range": "in_range",
+        "industry_excluded": "no",
+        "tax_delinquent": "no",
+        "duplicate_benefit": "no"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "중복 수혜 이력",
+      "answers": {
+        "biz_status": "active",
+        "revenue_range": "in_range",
+        "industry_excluded": "no",
+        "tax_delinquent": "no",
+        "duplicate_benefit": "yes"
+      },
+      "expected_status": "needs_official_check"
+    }
+  ]
+}

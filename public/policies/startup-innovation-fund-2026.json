@@ -1,0 +1,208 @@
+{
+  "policy": {
+    "id": "startup-innovation-fund-2026",
+    "slug": "startup-innovation-fund-2026",
+    "title": "2026년 혁신창업사업화자금 (중진공)",
+    "owner": "중소벤처기업부 · 중소벤처기업진흥공단",
+    "source_url": "https://www.kosmes.or.kr",
+    "source_published_at": "2026-01-02",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.kosmes.or.kr",
+    "disclaimer": "본 체크는 '2026년 중소기업 정책자금 융자계획 공고'를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 세부 조건은 반드시 중소벤처기업진흥공단(중진공) 또는 중소기업통합콜센터(1357)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 융자계획 공고 기준"
+  },
+
+  "questions": [
+    {
+      "key": "is_sme",
+      "label": "중소기업기본법상 중소기업에 해당하시나요?",
+      "help_text": "업종별 평균매출액 기준을 충족하는 기업입니다. 개인사업자도 포함됩니다. 소상공인이라면 소진공 정책자금을 먼저 확인해 보세요.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 중소기업입니다" },
+        { "value": "no", "label": "아니요 (대기업·중견기업 등)" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "biz_age",
+      "label": "사업 업력이 얼마나 되셨나요?",
+      "help_text": "혁신창업사업화자금은 업력 7년 미만 창업기업(예비창업자 포함)을 주요 대상으로 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "pre", "label": "예비창업자입니다 (아직 창업 전)" },
+        { "value": "under_3", "label": "3년 미만" },
+        { "value": "3_to_7", "label": "3년 이상 ~ 7년 미만" },
+        { "value": "over_7", "label": "7년 이상" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "is_sme", "op": "eq", "value": "yes" }
+    },
+    {
+      "key": "financial_status",
+      "label": "세금 체납이나 금융기관 연체가 있으신가요?",
+      "help_text": "국세·지방세 체납, 금융기관 대출 연체가 있는 경우 융자가 제한됩니다. (징수유예 승인 시 예외 가능)",
+      "type": "radio",
+      "options": [
+        { "value": "none", "label": "체납·연체 없음" },
+        { "value": "has_issue", "label": "체납 또는 연체가 있습니다" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "is_sme", "op": "eq", "value": "yes" },
+          { "field": "biz_age", "op": "neq", "value": "over_7" }
+        ]
+      }
+    },
+    {
+      "key": "ceo_age",
+      "label": "대표자가 만 39세 이하인가요?",
+      "help_text": "만 39세 이하 + 업력 3년 미만이면 청년전용창업자금(더 우대된 조건)을 검토할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 만 39세 이하입니다" },
+        { "value": "no", "label": "아니요, 만 40세 이상입니다" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": {
+        "all": [
+          { "field": "is_sme", "op": "eq", "value": "yes" },
+          { "field": "biz_age", "op": "neq", "value": "over_7" },
+          { "field": "financial_status", "op": "eq", "value": "none" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "is_sme", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "중소기업 정책자금 대상이 아닙니다",
+      "result_body": "혁신창업사업화자금은 중소기업기본법상 중소기업을 대상으로 합니다. 대기업·중견기업은 융자 대상에서 제외됩니다.",
+      "evidence_text": "is_sme = no"
+    },
+    {
+      "priority": 11,
+      "expression": { "field": "is_sme", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "중소기업 해당 여부를 먼저 확인해 주세요",
+      "result_body": "중소기업 여부는 업종별 평균매출액과 자산총액 기준으로 판단합니다. 중소기업현황정보시스템(sminfo.mss.go.kr)에서 확인하실 수 있습니다.",
+      "evidence_text": "is_sme = unsure"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "biz_age", "op": "eq", "value": "over_7" },
+      "result_status": "likely_mismatch",
+      "result_title": "혁신창업사업화자금은 업력 7년 미만이 대상입니다",
+      "result_body": "혁신창업사업화자금은 업력 7년 미만 창업기업을 대상으로 합니다. 업력 7년 이상이시라면 '신성장기반자금'(업력 7년 이상 성장기업 대상)을 확인해 보세요.\n\n중진공 홈페이지 또는 1357에서 안내받을 수 있습니다.",
+      "evidence_text": "biz_age = over_7"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "financial_status", "op": "eq", "value": "has_issue" },
+      "result_status": "needs_official_check",
+      "result_title": "체납·연체 시 융자가 제한될 수 있습니다",
+      "result_body": "국세·지방세 체납, 금융기관 연체가 있는 경우 원칙적으로 융자가 제한됩니다. 다만 징수유예 승인 등 예외가 있을 수 있으니, 정확한 확인은 중진공 또는 1357에 문의하세요.",
+      "evidence_text": "financial_status = has_issue"
+    },
+    {
+      "priority": 31,
+      "expression": { "field": "financial_status", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "체납·연체 여부를 확인해 주세요",
+      "result_body": "홈택스(국세), 위택스(지방세), 거래 금융기관에서 체납·연체 여부를 확인하신 후 신청하시기 바랍니다.",
+      "evidence_text": "financial_status = unsure"
+    },
+    {
+      "priority": 100,
+      "expression": {
+        "all": [
+          { "field": "ceo_age", "op": "eq", "value": "yes" },
+          { "field": "biz_age", "op": "in", "value": ["pre", "under_3"] }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "청년전용창업자금 확인 대상입니다",
+      "result_body": "만 39세 이하 대표이면서 업력 3년 미만(예비창업 포함)이신 경우, 혁신창업사업화자금 중 '청년전용창업자금'을 우선 확인해 보세요. 일반 자금보다 우대된 조건이 적용될 수 있습니다.\n\n중진공 홈페이지에서 공고를 확인하고 온라인으로 신청할 수 있습니다.",
+      "limit_note": "2026년 혁신창업사업화 예산: 1조 6,058억원 | 신청: 중진공 온라인(kosmes.or.kr) | 세부 한도·금리는 공고문 확인",
+      "evidence_text": "ceo_age = yes, biz_age < 3년"
+    },
+    {
+      "priority": 110,
+      "expression": { "field": "ceo_age", "op": "exists" },
+      "result_status": "check_first",
+      "result_title": "혁신창업사업화자금 확인 대상입니다",
+      "result_body": "업력 7년 미만 중소기업으로, 혁신창업사업화자금 지원 대상에 해당할 수 있습니다. 중진공 홈페이지에서 공고문과 신청 절차를 먼저 확인해 보세요.\n\n2026년부터는 '정책자금 내비게이션'으로 업력·자금 용도를 입력하면 맞춤형 자금을 추천받을 수 있습니다.",
+      "limit_note": "2026년 혁신창업사업화 예산: 1조 6,058억원 | 금리: 정책 기준금리+가산금리(시중 대비 낮음) | 한도: 매출액·용도별 상이 | 신청: 중진공 온라인(kosmes.or.kr)",
+      "evidence_text": "업력 7년 미만, 체납·연체 없음"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 중소벤처기업진흥공단 또는 중소기업통합콜센터(1357)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공고문 기준 사전 확인이며, 최종 융자 여부는 기업 평가·현장 실사를 통해 결정됩니다.",
+    "부채비율 제한(통상 200~500%)이 적용될 수 있습니다.",
+    "신청 시 사업계획서, 재무제표, 사업자등록증 등이 필요합니다.",
+    "정책자금을 목적 외로 사용하면 향후 신청이 제한됩니다(원스트라이크 아웃제).",
+    "신청: 중진공 홈페이지(www.kosmes.or.kr) | 문의: 1357"
+  ],
+
+  "cross_sell_note": "소상공인이시라면 소진공의 '소상공인 정책자금' 30초 체크도 확인해 보세요. 조건이 더 잘 맞을 수 있습니다.",
+
+  "unknown_if": [
+    "세부 대출한도와 금리는 기업 평가에 따라 달라집니다",
+    "자금별 예산 소진 시 조기 마감될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "청년 창업 3년 미만",
+      "answers": {
+        "is_sme": "yes",
+        "biz_age": "under_3",
+        "financial_status": "none",
+        "ceo_age": "yes"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "업력 7년 이상",
+      "answers": { "is_sme": "yes", "biz_age": "over_7" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "일반 창업기업 (40세 이상)",
+      "answers": {
+        "is_sme": "yes",
+        "biz_age": "3_to_7",
+        "financial_status": "none",
+        "ceo_age": "no"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "중소기업 아님",
+      "answers": { "is_sme": "no" },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}

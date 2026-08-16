@@ -1,0 +1,198 @@
+{
+  "policy": {
+    "id": "youth-employ-fund-2026",
+    "slug": "youth-employ-fund-2026",
+    "title": "2026년 청년고용연계자금",
+    "owner": "중소벤처기업부 · 소상공인시장진흥공단",
+    "source_url": "https://www.sbiz24.kr",
+    "source_published_at": "2026-04-16",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://ols.semas.or.kr",
+    "disclaimer": "본 체크는 '2026년 중소벤처기업부 소관 소상공인 정책자금 융자계획'을 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 세부 조건은 반드시 소상공인시장진흥공단 또는 중소기업통합콜센터(1357)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 공고 기준"
+  },
+
+  "questions": [
+    {
+      "key": "is_small_biz",
+      "label": "소상공인기본법 제2조에 해당하는 소상공인이신가요?",
+      "help_text": "소상공인은 소기업 중 상시근로자가 업종별 기준 이하인 사업자를 말합니다. (광업·제조업·건설업·운수업 10인 미만, 그 외 5인 미만)",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 소상공인입니다" },
+        { "value": "no", "label": "아니요, 소상공인이 아닙니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "industry_excluded",
+      "label": "운영 중인 업종이 융자제외 대상에 해당하나요?",
+      "help_text": "도박·사행업, 유흥주점, 금융·보험, 법무·세무·회계, 부동산업(일부 예외 있음) 등이 제외 대상입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "해당 없음 (일반 업종)" },
+        { "value": "yes", "label": "해당됨 (제외 업종)" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "is_small_biz", "op": "eq", "value": "yes" }
+    },
+    {
+      "key": "restriction_status",
+      "label": "세금 체납, 신용정보 등록, 휴·폐업 중 해당되는 사항이 있나요?",
+      "help_text": "융자가 제한되는 주요 사유입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "none", "label": "해당 없음" },
+        { "value": "has_issue", "label": "하나 이상 해당됩니다" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "is_small_biz", "op": "eq", "value": "yes" },
+          { "field": "industry_excluded", "op": "eq", "value": "no" }
+        ]
+      }
+    },
+    {
+      "key": "youth_condition",
+      "label": "다음 중 어떤 조건에 해당하시나요?",
+      "help_text": "청년고용연계자금은 3가지 유형 중 1개 이상 해당 시 신청할 수 있습니다. 청년은 만 39세 이하 기준입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "young_ceo", "label": "만 39세 이하 대표이며, 업력 3년 미만입니다" },
+        { "value": "young_majority", "label": "상시근로자의 과반수가 청년(만 39세 이하)입니다" },
+        { "value": "recent_hire", "label": "최근 1년 이내 청년 근로자 1인 이상을 고용해 유지 중입니다" },
+        { "value": "none", "label": "모두 해당하지 않습니다" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": { "field": "restriction_status", "op": "eq", "value": "none" }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "is_small_biz", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "소상공인 정책자금 대상이 아닙니다",
+      "result_body": "청년고용연계자금은 소상공인기본법 제2조에 해당하는 소상공인을 대상으로 합니다.\n\n중소기업이시라면 중진공의 '혁신창업사업화자금'을 확인해 보세요.",
+      "evidence_text": "is_small_biz = no"
+    },
+    {
+      "priority": 11,
+      "expression": { "field": "is_small_biz", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "소상공인 해당 여부를 먼저 확인해 주세요",
+      "result_body": "소상공인 여부는 업종과 상시근로자 수로 판단합니다. 소상공인시장진흥공단(1357)이나 소상공인24에서 확인하실 수 있습니다.",
+      "evidence_text": "is_small_biz = unsure"
+    },
+    {
+      "priority": 12,
+      "expression": { "field": "industry_excluded", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "융자제외 업종에 해당합니다",
+      "result_body": "도박·사행업, 유흥주점, 금융·보험, 법무·세무, 부동산업 등 융자제외 업종에 해당하는 경우 정책자금 융자 대상에서 제외됩니다.",
+      "evidence_text": "industry_excluded = yes"
+    },
+    {
+      "priority": 13,
+      "expression": { "field": "industry_excluded", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "업종 제외 여부를 확인해 주세요",
+      "result_body": "운영 중인 업종이 융자제외 대상인지 확인이 필요합니다. 공고문의 제외 업종 목록을 확인하시거나 소진공(1357)에 문의하세요.",
+      "evidence_text": "industry_excluded = unsure"
+    },
+    {
+      "priority": 14,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "has_issue" },
+      "result_status": "needs_official_check",
+      "result_title": "융자제한 사유 해당 여부 확인이 필요합니다",
+      "result_body": "세금 체납, 신용도판단정보 등록, 휴·폐업 등은 융자제한 사유입니다. 다만 세금 체납은 압류·매각 유예 시 예외가 있을 수 있으니, 정확한 확인은 소진공(1357)에 문의하세요.",
+      "evidence_text": "restriction_status = has_issue"
+    },
+    {
+      "priority": 15,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "융자제한 사유 해당 여부를 확인해 주세요",
+      "result_body": "융자제한 사유 해당 여부를 정확히 알 수 없는 경우, 소진공(1357)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "restriction_status = unsure"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "youth_condition", "op": "in", "value": ["young_ceo", "young_majority", "recent_hire"] },
+      "result_status": "check_first",
+      "result_title": "청년고용연계자금 확인 대상입니다",
+      "result_body": "현재 공개 기준상 청년고용연계자금 지원 대상에 해당할 수 있습니다. 소상공인정책자금 사이트에서 공고문과 신청 절차를 먼저 확인해 보세요.\n\n금융기관을 통한 대리대출로 운영됩니다.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 정책자금 기준금리(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 대리대출",
+      "evidence_text": "youth_condition 충족"
+    },
+    {
+      "priority": 110,
+      "expression": { "field": "youth_condition", "op": "eq", "value": "none" },
+      "result_status": "likely_mismatch",
+      "result_title": "청년고용연계자금 조건에 해당하지 않습니다",
+      "result_body": "청년고용연계자금은 청년 대표(만 39세 이하, 업력 3년 미만), 상시근로자 과반수 청년, 최근 1년 내 청년 고용·유지 중 1개 이상 해당해야 합니다.\n\n일반 운전자금이 필요하시다면 '일반경영안정자금'(소상공인 정책자금 체크)을 확인해 보세요.",
+      "evidence_text": "youth_condition = none"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 소상공인시장진흥공단 또는 중소기업통합콜센터(1357)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공고문 기준 사전 확인이며, 최종 융자 여부는 심사를 통해 결정됩니다.",
+    "대출금리는 분기별 변동되며, 소진공 홈페이지에서 최신 기준금리를 확인하세요.",
+    "온라인 신청: ols.semas.or.kr | 오프라인: 소진공 지역센터 | 문의: 1357"
+  ],
+
+  "cross_sell_note": "만 39세 이하 창업 준비 중이시라면 중진공의 '혁신창업사업화자금(청년전용창업자금)'도 확인해 보세요.",
+
+  "unknown_if": [
+    "세부 대출한도와 금리는 심사 과정에서 달라질 수 있습니다",
+    "예산 소진 시 조기 마감될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "청년 대표",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "youth_condition": "young_ceo"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "조건 미해당",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "youth_condition": "none"
+      },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "소상공인 아님",
+      "answers": { "is_small_biz": "no" },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}
