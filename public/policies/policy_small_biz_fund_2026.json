@@ -1,0 +1,669 @@
+{
+  "policy": {
+    "id": "small-biz-fund-2026",
+    "slug": "small-biz-fund-2026",
+    "title": "2026년 소상공인 정책자금 융자사업",
+    "owner": "중소벤처기업부 · 소상공인시장진흥공단",
+    "source_url": "https://www.sbiz24.kr",
+    "source_published_at": "2026-04-16",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://ols.semas.or.kr",
+    "disclaimer": "본 진단 결과는 '2026년 중소벤처기업부 소관 소상공인 정책자금 융자계획(공고 제2026-271호, 2026.4.16)'을 바탕으로 작성되었습니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 세부 조건은 반드시 소상공인시장진흥공단(소진공) 또는 중소기업통합콜센터(1357)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 변경(2차) 공고 기준"
+  },
+
+  "questions": [
+    {
+      "key": "is_small_biz",
+      "label": "소상공인기본법 제2조에 해당하는 소상공인이신가요?",
+      "help_text": "소상공인은 소기업 중 상시근로자가 업종별 기준 이하인 사업자를 말합니다. (광업·제조업·건설업·운수업 10인 미만, 그 외 5인 미만)",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 소상공인입니다" },
+        { "value": "no", "label": "아니요, 소상공인이 아닙니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "industry_excluded",
+      "label": "운영 중인 업종이 융자제외 대상에 해당하나요?",
+      "help_text": "도박·사행업, 유흥주점, 금융·보험, 법무·세무·회계, 부동산업(일부 예외 있음), 담배, 성인용품 등이 제외 대상입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "해당 없음 (일반 업종)" },
+        { "value": "yes", "label": "해당됨 (제외 업종)" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "is_small_biz", "op": "eq", "value": "yes" }
+    },
+    {
+      "key": "restriction_status",
+      "label": "다음 중 해당되는 사항이 있나요?",
+      "help_text": "융자가 제한되는 주요 사유입니다. 정확하지 않으면 '잘 모르겠음'을 선택하세요.",
+      "type": "radio",
+      "options": [
+        { "value": "none", "label": "해당 없음" },
+        { "value": "tax_delinquent", "label": "세금을 체납 중입니다", "description": "단, 압류·매각 유예 시 직접대출 가능 여부 별도 확인" },
+        { "value": "credit_issue", "label": "한국신용정보원 신용도판단정보에 등록되어 있습니다" },
+        { "value": "closed_biz", "label": "현재 휴업 또는 폐업 중입니다", "description": "재해로 인한 휴업은 가동 중으로 간주" },
+        { "value": "other_issue", "label": "기타 제한 사유에 해당합니다", "description": "부정 융자, 자금횡령, 용도 외 사용 등" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "is_small_biz", "op": "eq", "value": "yes" },
+          { "field": "industry_excluded", "op": "eq", "value": "no" }
+        ]
+      }
+    },
+    {
+      "key": "support_need",
+      "label": "현재 상황에 가장 가까운 것을 선택해 주세요.",
+      "help_text": "가장 필요한 지원 유형 하나를 선택하시면, 해당하는 정책자금을 안내해 드립니다.",
+      "type": "radio",
+      "options": [
+        { "value": "general", "label": "일반 운전자금이 필요합니다", "description": "업력 무관, 소상공인이면 신청 가능" },
+        { "value": "disaster", "label": "자연재해·사회재난으로 피해를 입었습니다", "description": "집중호우, 태풍, 폭설, 화재 등" },
+        { "value": "revenue_decline", "label": "매출 감소 등 경영 애로를 겪고 있습니다", "description": "일시적 경영 어려움" },
+        { "value": "low_credit", "label": "신용이 낮아 자금 조달이 어렵습니다", "description": "NCB 신용점수 839점 이하" },
+        { "value": "refinance", "label": "고금리 대출을 저금리로 전환하고 싶습니다", "description": "7% 이상 고금리 또는 만기연장 애로" },
+        { "value": "restart", "label": "재창업을 준비 중이거나 채무조정 중입니다", "description": "폐업 후 재창업, 채무조정 등" },
+        { "value": "disability", "label": "장애인기업입니다", "description": "장애인복지카드 또는 장애인기업확인서 보유" },
+        { "value": "youth", "label": "청년(만39세 이하) 대표이거나 청년을 고용하고 있습니다" },
+        { "value": "growth", "label": "제조업·수출·혁신·온라인 성장 분야입니다", "description": "소공인, 수출, 스마트, 민간투자, 온라인 플랫폼 등" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": { "field": "restriction_status", "op": "eq", "value": "none" }
+    },
+    {
+      "key": "disaster_cert",
+      "label": "재해 중소기업(소상공인) 확인증을 발급받으셨나요?",
+      "help_text": "지자체에서 '재해 중소기업(소상공인) 확인증'을 발급받아야 신청할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 확인증을 발급받았습니다" },
+        { "value": "no", "label": "아직 발급받지 않았습니다" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "support_need", "op": "eq", "value": "disaster" }
+    },
+    {
+      "key": "revenue_decline_pct",
+      "label": "직전 매출이 직전전 매출 대비 15% 이상 감소했나요?",
+      "help_text": "연도별, 반기별, 분기별, 월별 기준으로 비교하여 매출이 15% 이상 감소한 경우 해당됩니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes_15", "label": "네, 15% 이상 감소했습니다" },
+        { "value": "special_area", "label": "고용위기지역·상권활성화구역 등 특별지역에 소재합니다", "description": "매출감소 확인 예외 해당" },
+        { "value": "no", "label": "15% 미만이거나 감소하지 않았습니다" },
+        { "value": "unsure", "label": "정확히 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "support_need", "op": "eq", "value": "revenue_decline" }
+    },
+    {
+      "key": "credit_education",
+      "label": "소상공인 지식배움터의 신용관리 교육을 이수하셨나요?",
+      "help_text": "신용취약소상공인자금 신청을 위해서는 소상공인 지식배움터(edu.sbiz.or.kr)에서 신용관리 교육을 사전 이수해야 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 이수했습니다" },
+        { "value": "no", "label": "아직 이수하지 않았습니다" },
+        { "value": "plan", "label": "이수할 예정입니다" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "support_need", "op": "eq", "value": "low_credit" }
+    },
+    {
+      "key": "loan_situation",
+      "label": "현재 대출 상황은 어떤가요?",
+      "help_text": "은행·비은행권(저축은행, 카드사, 보험사 등)의 대출 상황을 선택해 주세요.",
+      "type": "radio",
+      "options": [
+        { "value": "high_interest", "label": "7% 이상 고금리 대출을 보유하고 있습니다" },
+        { "value": "maturity_issue", "label": "은행권 대출 만기연장이 어려운 상황입니다" },
+        { "value": "both", "label": "고금리 대출 보유 + 만기연장 어려움 모두 해당" },
+        { "value": "none", "label": "해당하는 대출이 없습니다" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "support_need", "op": "eq", "value": "refinance" }
+    },
+    {
+      "key": "credit_score_range",
+      "label": "신용점수(NCB 기준)는 어느 범위인가요?",
+      "help_text": "NICE평가정보 개인신용점수 기준입니다. 정확한 점수를 모르시면 '잘 모르겠음'을 선택하세요.",
+      "type": "radio",
+      "options": [
+        { "value": "below_919", "label": "919점 이하" },
+        { "value": "above_920", "label": "920점 이상" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 6,
+      "show_if": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "refinance" },
+          { "field": "loan_situation", "op": "neq", "value": "none" }
+        ]
+      }
+    },
+    {
+      "key": "restart_stage",
+      "label": "재도전 단계는 어디에 해당하나요?",
+      "help_text": "현재 상황에 가장 가까운 단계를 선택하세요.",
+      "type": "radio",
+      "options": [
+        { "value": "preparation", "label": "재창업 준비단계", "description": "희망리턴패키지 재창업교육 수료(최근 1년 이내)" },
+        { "value": "early", "label": "재창업 초기단계", "description": "폐업 후 재창업했거나, 3개월 이상 휴업 후 영업 재개" },
+        { "value": "debt_adjustment", "label": "채무조정 중", "description": "재기지원종합패키지 참여, 성실상환 인정 등" },
+        { "value": "growth", "label": "재창업 후 성장 중 (도약형)", "description": "업력 2년 이상, 매출·고용 성장, 성실상환" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "support_need", "op": "eq", "value": "restart" }
+    },
+    {
+      "key": "youth_condition",
+      "label": "어떤 조건에 해당하시나요?",
+      "type": "radio",
+      "options": [
+        { "value": "young_ceo", "label": "만 39세 이하 대표, 업력 3년 미만" },
+        { "value": "young_majority", "label": "상시근로자 과반수가 청년(만 39세 이하)" },
+        { "value": "recent_hire", "label": "최근 1년 이내 청년 근로자 1인 이상 고용·유지 중" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "support_need", "op": "eq", "value": "youth" }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "is_small_biz", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "소상공인 정책자금 대상이 아닙니다",
+      "result_body": "소상공인 정책자금은 소상공인기본법 제2조에 해당하는 소상공인을 대상으로 합니다. 소상공인이 아닌 경우 융자 대상에서 제외됩니다.",
+      "evidence_text": "is_small_biz = no"
+    },
+    {
+      "priority": 11,
+      "expression": { "field": "is_small_biz", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "소상공인 해당 여부를 먼저 확인해 주세요",
+      "result_body": "소상공인 여부는 업종과 상시근로자 수로 판단합니다. 소상공인시장진흥공단(1357)이나 소상공인24에서 확인하실 수 있습니다.",
+      "evidence_text": "is_small_biz = unsure"
+    },
+    {
+      "priority": 12,
+      "expression": { "field": "industry_excluded", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "융자제외 업종에 해당합니다",
+      "result_body": "도박·사행업, 유흥주점, 금융·보험, 법무·세무, 부동산업 등 융자제외 업종에 해당하는 경우 정책자금 융자 대상에서 제외됩니다.\n\n일부 업종은 예외가 있을 수 있으니, 정확한 확인은 소진공(1357)에 문의하세요.",
+      "evidence_text": "industry_excluded = yes"
+    },
+    {
+      "priority": 13,
+      "expression": { "field": "industry_excluded", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "업종 제외 여부를 확인해 주세요",
+      "result_body": "운영 중인 업종이 융자제외 대상인지 확인이 필요합니다. 공고문 별표1(24쪽)의 제외 업종 목록을 확인하시거나, 소진공(1357)에 문의하세요.",
+      "evidence_text": "industry_excluded = unsure"
+    },
+    {
+      "priority": 14,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "credit_issue" },
+      "result_status": "likely_mismatch",
+      "result_title": "신용도판단정보 등록자는 융자가 제한됩니다",
+      "result_body": "한국신용정보원의 신용도판단정보 또는 공공정보에 등록되어 있는 경우 융자가 제한됩니다.\n\n신용 회복 후 재신청하시거나, 신용회복위원회 등을 통한 채무조정을 검토해 보세요.",
+      "evidence_text": "restriction_status = credit_issue"
+    },
+    {
+      "priority": 15,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "other_issue" },
+      "result_status": "likely_mismatch",
+      "result_title": "융자제한 사유에 해당합니다",
+      "result_body": "부정한 방법으로 융자를 신청했거나, 자금을 목적 외로 사용했거나, 임직원의 자금횡령 등 사회적 물의를 일으킨 소상공인은 융자가 제한됩니다.",
+      "evidence_text": "restriction_status = other_issue"
+    },
+    {
+      "priority": 16,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "tax_delinquent" },
+      "result_status": "needs_official_check",
+      "result_title": "세금 체납 시 공식 확인이 필요합니다",
+      "result_body": "세금을 체납 중인 경우 원칙적으로 융자가 제한됩니다. 다만, 국세징수법·조세특례제한법·지방세징수법에 따른 압류·매각의 유예 또는 체납처분 유예에 해당하는 경우 직접대출이 가능할 수 있습니다.\n\n정확한 확인은 소진공(1357)에 문의하세요.",
+      "evidence_text": "restriction_status = tax_delinquent"
+    },
+    {
+      "priority": 17,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "closed_biz" },
+      "result_status": "likely_mismatch",
+      "result_title": "휴·폐업 중인 소상공인은 융자가 제한됩니다",
+      "result_body": "현재 휴업 또는 폐업 중인 경우 정책자금 융자 대상에서 제외됩니다.\n\n단, 재해를 직접 원인으로 휴업 중인 경우는 가동 중인 소상공인으로 간주하여 융자 대상에 포함됩니다. 또한 재창업을 준비 중이시라면 '재도전특별자금'을 확인해 보세요.",
+      "evidence_text": "restriction_status = closed_biz"
+    },
+    {
+      "priority": 18,
+      "expression": { "field": "restriction_status", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "융자제한 사유 해당 여부를 확인해 주세요",
+      "result_body": "융자제한 사유 해당 여부를 정확히 알 수 없는 경우, 소진공(1357) 또는 소상공인통합콜센터(1533-0100)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "restriction_status = unsure"
+    },
+
+    {
+      "priority": 100,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "disaster" },
+          { "field": "disaster_cert", "op": "eq", "value": "yes" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "긴급경영안정자금(재해) 확인 대상입니다",
+      "result_body": "재해 확인증을 보유하신 소상공인으로, 긴급경영안정자금(재해) 지원 대상에 해당할 수 있습니다.\n\n소상공인정책자금 사이트에서 신청하시거나, 가까운 소진공 지역센터(전국 78곳)를 방문하여 접수하실 수 있습니다.",
+      "limit_note": "대출한도: 1억원 | 대출금리: 연 2.0%(고정) | 대출기간: 5년(거치 2년 포함) | 융자방식: 직접대출·대리대출",
+      "evidence_text": "support_need = disaster, disaster_cert = yes"
+    },
+    {
+      "priority": 101,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "disaster" },
+          { "field": "disaster_cert", "op": "eq", "value": "no" }
+        ]
+      },
+      "result_status": "needs_official_check",
+      "result_title": "재해 확인증 발급이 필요합니다",
+      "result_body": "긴급경영안정자금(재해) 신청을 위해서는 지자체에서 '재해 중소기업(소상공인) 확인증'을 먼저 발급받아야 합니다.\n\n확인증 발급 후 소상공인정책자금 사이트에서 신청하실 수 있습니다.",
+      "evidence_text": "support_need = disaster, disaster_cert = no"
+    },
+
+    {
+      "priority": 110,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "revenue_decline" },
+          { "field": "revenue_decline_pct", "op": "eq", "value": "yes_15" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "긴급경영안정자금(일시적 경영애로) 확인 대상입니다",
+      "result_body": "매출이 15% 이상 감소한 소상공인으로, 긴급경영안정자금(일시적 경영애로) 지원 대상에 해당할 수 있습니다.\n\n소상공인정책자금 사이트에서 신청하시거나, 가까운 소진공 지역센터를 방문하여 접수하실 수 있습니다.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 정책자금 기준금리(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 대리대출",
+      "evidence_text": "support_need = revenue_decline, revenue_decline_pct = yes_15"
+    },
+    {
+      "priority": 111,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "revenue_decline" },
+          { "field": "revenue_decline_pct", "op": "eq", "value": "special_area" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "긴급경영안정자금(경영애로) 확인 대상입니다",
+      "result_body": "고용위기지역, 산업위기대응특별지역, 상권활성화구역, 자율상권구역 등 특별지역에 소재한 소상공인은 매출감소 확인 없이 긴급경영안정자금 지원 대상이 될 수 있습니다.\n\n정확한 지역 해당 여부는 소진공(1357)에 문의하세요.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 정책자금 기준금리(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 대리대출",
+      "evidence_text": "support_need = revenue_decline, revenue_decline_pct = special_area"
+    },
+    {
+      "priority": 112,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "revenue_decline" },
+          { "field": "revenue_decline_pct", "op": "in", "value": ["no", "unsure"] }
+        ]
+      },
+      "result_status": "needs_official_check",
+      "result_title": "매출 감소 비율을 확인해 주세요",
+      "result_body": "긴급경영안정자금(일시적 경영애로)은 직전 매출이 직전전 대비 15% 이상 감소해야 신청할 수 있습니다. 매출 자료를 확인하시거나, 소진공(1357)에 문의하여 해당 여부를 확인하세요.\n\n일반 경영 안정이 목적이라면 '일반경영안정자금'도 검토해 보세요.",
+      "evidence_text": "support_need = revenue_decline, revenue_decline_pct = no or unsure"
+    },
+
+    {
+      "priority": 120,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "low_credit" },
+          { "field": "credit_education", "op": "eq", "value": "yes" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "신용취약소상공인자금 확인 대상입니다",
+      "result_body": "신용관리 교육을 이수한 중·저신용(NCB 839점 이하) 소상공인으로, 신용취약소상공인자금 지원 대상에 해당할 수 있습니다.\n\n소진공을 통한 직접대출로 운영되며, 대출 후 1년 경과 시 신용점수가 70점 이상 상승하거나 840점 이상 회복한 경우 금리인하(0.5%p) 혜택도 있습니다.",
+      "limit_note": "대출한도: 3천만원 | 대출금리: 기준금리+1.6%p(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 직접대출(소진공)",
+      "evidence_text": "support_need = low_credit, credit_education = yes"
+    },
+    {
+      "priority": 121,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "low_credit" },
+          { "field": "credit_education", "op": "in", "value": ["no", "plan"] }
+        ]
+      },
+      "result_status": "needs_official_check",
+      "result_title": "신용관리 교육 이수가 필요합니다",
+      "result_body": "신용취약소상공인자금 신청을 위해서는 소상공인 지식배움터(edu.sbiz.or.kr)에서 신용관리 교육을 사전 이수해야 합니다.\n\n교육 이수 후 소진공에서 직접대출을 신청하실 수 있습니다.",
+      "evidence_text": "support_need = low_credit, credit_education = no or plan"
+    },
+
+    {
+      "priority": 130,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "refinance" },
+          { "field": "loan_situation", "op": "in", "value": ["high_interest", "maturity_issue", "both"] },
+          { "field": "credit_score_range", "op": "eq", "value": "below_919" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "대환대출 확인 대상입니다",
+      "result_body": "중·저신용(NCB 919점 이하) 소상공인으로 고금리 대출 또는 만기연장 애로가 있으신 경우, 대환대출 지원 대상에 해당할 수 있습니다.\n\n2025년 6월 30일 이전에 받은 대출 중 고금리(은행·비은행권 7% 이상) 또는 만기연장이 어려운 대출이 대환 대상입니다.",
+      "limit_note": "대출한도: 5천만원 | 대출금리: 연 4.5%(고정) | 대출기간: 10년(거치 2년+분할상환 8년 또는 10년 분할상환 택1) | 융자방식: 대리대출",
+      "evidence_text": "support_need = refinance, loan_situation has qualifying loan, credit_score_range = below_919"
+    },
+    {
+      "priority": 131,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "refinance" },
+          { "field": "loan_situation", "op": "in", "value": ["high_interest", "maturity_issue", "both"] },
+          { "field": "credit_score_range", "op": "eq", "value": "above_920" }
+        ]
+      },
+      "result_status": "likely_mismatch",
+      "result_title": "대환대출 신용점수 기준에 부합하지 않습니다",
+      "result_body": "대환대출은 중·저신용(NCB 919점 이하) 소상공인을 대상으로 합니다. 신용점수가 920점 이상인 경우 대환대출 대상에 해당하지 않습니다.\n\n일반 운전자금이 필요하시다면 '일반경영안정자금'을 확인해 보세요.",
+      "evidence_text": "credit_score_range = above_920"
+    },
+    {
+      "priority": 132,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "refinance" },
+          { "field": "loan_situation", "op": "eq", "value": "none" }
+        ]
+      },
+      "result_status": "likely_mismatch",
+      "result_title": "대환 대상 대출이 없습니다",
+      "result_body": "대환대출은 기존의 7% 이상 고금리 대출 또는 만기연장이 어려운 대출을 저금리로 전환하는 프로그램입니다. 해당하는 대출이 없는 경우 대환대출 대상에 해당하지 않습니다.\n\n일반 운전자금이 필요하시다면 '일반경영안정자금'을 확인해 보세요.",
+      "evidence_text": "loan_situation = none"
+    },
+    {
+      "priority": 133,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "refinance" },
+          { "field": "loan_situation", "op": "in", "value": ["high_interest", "maturity_issue", "both"] },
+          { "field": "credit_score_range", "op": "eq", "value": "unsure" }
+        ]
+      },
+      "result_status": "needs_official_check",
+      "result_title": "신용점수 확인 후 대환대출 신청 가능 여부를 확인하세요",
+      "result_body": "대환대출은 NCB 919점 이하 소상공인을 대상으로 합니다. 신용점수를 확인하신 후 해당 여부를 판단하시기 바랍니다.\n\nNICE평가정보 또는 올크레딧에서 신용점수를 무료로 조회할 수 있습니다.",
+      "evidence_text": "credit_score_range = unsure"
+    },
+
+    {
+      "priority": 140,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "restart" },
+          { "field": "restart_stage", "op": "eq", "value": "preparation" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "재도전특별자금(일반형-재창업 준비) 확인 대상입니다",
+      "result_body": "희망리턴패키지 재창업교육을 수료하신 소상공인으로, 재도전특별자금(일반형 재창업 준비단계) 지원 대상에 해당할 수 있습니다.\n\n소진공을 통한 직접대출로 운영됩니다.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 기준금리+1.6%p(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 직접대출(소진공)",
+      "evidence_text": "support_need = restart, restart_stage = preparation"
+    },
+    {
+      "priority": 141,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "restart" },
+          { "field": "restart_stage", "op": "eq", "value": "early" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "재도전특별자금(일반형-재창업 초기) 확인 대상입니다",
+      "result_body": "폐업 후 재창업하셨거나 3개월 이상 휴업 후 영업을 재개하신 소상공인으로, 재도전특별자금(일반형 재창업 초기단계) 지원 대상에 해당할 수 있습니다.\n\n세부 요건(폐업기업 대표 동일, 업종 해당 등)은 소진공에서 확인하세요.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 기준금리+1.6%p(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 직접대출(소진공)",
+      "evidence_text": "support_need = restart, restart_stage = early"
+    },
+    {
+      "priority": 142,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "restart" },
+          { "field": "restart_stage", "op": "eq", "value": "debt_adjustment" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "재도전특별자금(일반형-채무조정) 확인 대상입니다",
+      "result_body": "채무조정 중이거나 성실상환 중인 소상공인으로, 재도전특별자금(일반형 채무조정) 지원 대상에 해당할 수 있습니다.\n\n재기지원종합패키지 참여기관 인정, 상환연장제도 성실상환 등 세부 요건은 소진공에서 확인하세요.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 기준금리+1.6%p(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 직접대출(소진공)",
+      "evidence_text": "support_need = restart, restart_stage = debt_adjustment"
+    },
+    {
+      "priority": 143,
+      "expression": {
+        "all": [
+          { "field": "support_need", "op": "eq", "value": "restart" },
+          { "field": "restart_stage", "op": "eq", "value": "growth" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "재도전특별자금(도약형) 확인 대상입니다",
+      "result_body": "재창업 후 업력 2년 이상으로 성장 중인 소상공인으로, 재도전특별자금(도약형) 지원 대상에 해당할 수 있습니다.\n\n매출 5% 이상 증가, 상시근로자 증가, 성실상환 등의 세부 요건은 소진공에서 확인하세요.",
+      "limit_note": "대출한도: 2억원 | 대출금리: 기준금리+0.4%p(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 직접대출(소진공)",
+      "evidence_text": "support_need = restart, restart_stage = growth"
+    },
+
+    {
+      "priority": 150,
+      "expression": { "field": "support_need", "op": "eq", "value": "disability" },
+      "result_status": "check_first",
+      "result_title": "장애인기업지원자금 확인 대상입니다",
+      "result_body": "장애인복지카드(국가유공자 카드 또는 증서) 또는 장애인기업확인서를 소지하신 장애 소상공인으로, 장애인기업지원자금 지원 대상에 해당할 수 있습니다.\n\n금융기관을 통한 대리대출로 운영됩니다.",
+      "limit_note": "대출한도: 1억원 | 대출금리: 연 2.0%(고정) | 대출기간: 7년(거치 2년 포함) | 융자방식: 대리대출",
+      "evidence_text": "support_need = disability"
+    },
+
+    {
+      "priority": 160,
+      "expression": { "field": "support_need", "op": "eq", "value": "youth" },
+      "result_status": "check_first",
+      "result_title": "청년고용연계자금 확인 대상입니다",
+      "result_body": "청년(만 39세 이하) 대표이시거나 청년을 고용하고 계신 소상공인으로, 청년고용연계자금 지원 대상에 해당할 수 있습니다.\n\n업력 3년 미만 청년 대표, 상시근로자 과반수 청년, 최근 1년 내 청년 1인 이상 고용·유지 중 1개 이상 해당 시 신청 가능합니다.",
+      "limit_note": "대출한도: 7천만원 | 대출금리: 정책자금 기준금리(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 대리대출",
+      "evidence_text": "support_need = youth"
+    },
+
+    {
+      "priority": 170,
+      "expression": { "field": "support_need", "op": "eq", "value": "growth" },
+      "result_status": "needs_official_check",
+      "result_title": "성장기반자금 — 세부 프로그램을 확인해 주세요",
+      "result_body": "성장기반자금에는 여러 세부 프로그램이 있습니다. 상황에 맞는 프로그램을 소진공에서 확인하세요.\n\n• 소공인특화자금: 제조업 소공인 대상 (업력 무관)\n• 혁신성장촉진자금: 수출·스마트·혁신 소상공인 대상\n• 민간투자연계형 매칭융자: 민간 투자를 유치한 소상공인\n• 상생성장지원자금: 온라인 플랫폼 입점 소상공인(TOPS 프로그램 등)\n\n각 프로그램마다 세부 자격 요건이 다르므로, 소진공(1357)에 문의하시면 맞춤 안내를 받으실 수 있습니다.",
+      "limit_note": "대출한도: 프로그램별 7천만원~10억원 | 대출금리: 기준금리+0.4~0.6%p | 대출기간: 운전 5년, 시설 8년",
+      "evidence_text": "support_need = growth"
+    },
+
+    {
+      "priority": 190,
+      "expression": { "field": "support_need", "op": "eq", "value": "general" },
+      "result_status": "check_first",
+      "result_title": "일반경영안정자금 확인 대상입니다",
+      "result_body": "업력에 관계없이 소상공인이시면 일반경영안정자금 지원 대상에 해당할 수 있습니다.\n\n제품생산 비용 및 기업경영에 필요한 운전자금으로 활용할 수 있으며, 금융기관을 통한 대리대출로 운영됩니다.",
+      "limit_note": "대출한도: 연간 7천만원 | 대출금리: 기준금리+0.6%p(변동) | 대출기간: 5년(거치 2년 포함) | 융자방식: 대리대출",
+      "evidence_text": "support_need = general"
+    },
+
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 소상공인시장진흥공단(소진공) 또는 중소기업통합콜센터(1357)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 진단은 공고문 기준 사전 확인이며, 최종 융자 여부는 소진공 심사를 통해 결정됩니다.",
+    "융자한도는 기존 정책자금 대출잔액과 합산하여 운전자금 5억원, 시설자금 포함 10억원 이내입니다. 긴급경영안정자금은 별도 운용됩니다.",
+    "대출금리는 분기별 변동되며, 소진공 홈페이지(www.semas.or.kr)에서 최신 기준금리를 확인하세요.",
+    "최근 5년 이내 정책자금 3회 이상 지원받은 경우 일부 제한이 있을 수 있습니다. 특별경영안정자금은 별도 기준 적용.",
+    "온라인 신청: ols.semas.or.kr | 오프라인: 소진공 지역센터(전국 78곳) | 문의: 1357 또는 1533-0100"
+  ],
+
+  "cross_sell_note": "여러 자금에 중복 신청이 가능할 수 있습니다. 금리우대제도(정책배려·성실상환·지역격차해소 등 최대 0.8%p 인하)도 확인해 보세요. 자세한 사항은 1357(중소기업통합콜센터)에 문의하세요.",
+
+  "unknown_if": [
+    "세부 대출한도와 금리는 심사 과정에서 달라질 수 있습니다",
+    "예산 소진 시 조기 마감될 수 있습니다",
+    "동일 연도 내 부결·승인(전액 포기) 후 6개월 미경과 시 직접대출 재신청 불가"
+  ],
+
+  "test_cases": [
+    {
+      "name": "소상공인 아닌 경우",
+      "answers": { "is_small_biz": "no" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "일반경영안정자금 해당",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "general"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "재해 + 확인증 있음",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "disaster",
+        "disaster_cert": "yes"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "재해 + 확인증 없음",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "disaster",
+        "disaster_cert": "no"
+      },
+      "expected_status": "needs_official_check"
+    },
+    {
+      "name": "매출 15% 이상 감소",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "revenue_decline",
+        "revenue_decline_pct": "yes_15"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "신용취약 + 교육 이수",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "low_credit",
+        "credit_education": "yes"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "대환대출 해당",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "refinance",
+        "loan_situation": "high_interest",
+        "credit_score_range": "below_919"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "대환대출 - 신용점수 초과",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "refinance",
+        "loan_situation": "high_interest",
+        "credit_score_range": "above_920"
+      },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "장애인기업",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "disability"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "청년고용",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "none",
+        "support_need": "youth",
+        "youth_condition": "young_ceo"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "제외업종",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "yes"
+      },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "세금 체납",
+      "answers": {
+        "is_small_biz": "yes",
+        "industry_excluded": "no",
+        "restriction_status": "tax_delinquent"
+      },
+      "expected_status": "needs_official_check"
+    }
+  ]
+}

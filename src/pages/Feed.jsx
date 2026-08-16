@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { 
-  TrendingUp, Search, Bell, User, Plus, 
+import { Helmet } from 'react-helmet-async'
+import {
+  TrendingUp, Search, Bell, User, Plus,
   Flame, ThumbsUp, MessageCircle, Bookmark,
   Clock, MapPin, DollarSign, Tag, X, Image as ImageIcon, Link as LinkIcon,
   Home, Briefcase, Menu, MoreVertical, Edit2, Trash2, Shield, Smartphone,
@@ -101,7 +102,7 @@ export default function Feed() {
   
   const [activeTab, setActiveTab] = useState('all')
   const [activeMainTab, setActiveMainTab] = useState('home')
-  const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, hotdeal: false, job: false })
+  const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, loan: false, experience: false })
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
   const [selectedImages, setSelectedImages] = useState([])
@@ -149,14 +150,10 @@ const [postEarnedPoints, setPostEarnedPoints] = useState(0)
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
-    type: 'hotdeal',
+    type: 'talk',
     category: '',
     tags: '',
-    discount: '',
-    price: '',
-    hourlyPay: '',
-    location: '',
-    period: ''
+    location: ''
   })
 
  // 🆕 이미지 갤러리 키보드 + 안드로이드 뒤로가기 이벤트
@@ -229,11 +226,11 @@ useEffect(() => {
       if (inApp) {
         fetchPosts(0, '', true)
         fetchTopPosts()
-        setHasMore(false)
+        setHasMore(true)
       } else {
         fetchPosts(0, '', true)
         fetchTopPosts()
-        setHasMore(false)
+        setHasMore(true)
       }
     }
 
@@ -535,17 +532,16 @@ useEffect(() => {
   const filteredPosts = posts.filter(post => {
     if (activeTab === 'all') return true
     
-    if (activeTab === 'hotdeal-jeonje') return post.type === 'hotdeal' && post.category === '전단지'
-    if (activeTab === 'hotdeal-sale') return post.type === 'hotdeal' && post.category === '행사'
-    if (activeTab === 'hotdeal-event') return post.type === 'hotdeal' && post.category === '기타'
-    
-    if (activeTab === 'share-living') return post.type === 'share' && post.category === '생활용품'
-    if (activeTab === 'share-realestate') return post.type === 'share' && post.category === '부동산'
-    if (activeTab === 'share-etc') return post.type === 'share' && post.category === '기타'
-    
-    if (activeTab === 'job-hire') return post.type === 'job' && post.category === '구인'
-    if (activeTab === 'job-tip') return post.type === 'job' && post.category === '일자리제보'
-    if (activeTab === 'job-seek') return post.type === 'job' && post.category === '구직'
+    if (activeTab === 'loan-all') return post.type === 'loan'
+    if (activeTab === 'loan-gov') return post.type === 'loan' && post.category === '정부대출'
+    if (activeTab === 'loan-miso') return post.type === 'loan' && post.category === '미소금융'
+    if (activeTab === 'loan-small') return post.type === 'loan' && post.category === '소상공인지원'
+    if (activeTab === 'loan-rate') return post.type === 'loan' && post.category === '금리변동'
+
+    if (activeTab === 'experience-all') return post.type === 'experience'
+    if (activeTab === 'experience-success') return post.type === 'experience' && post.category === '성공기'
+    if (activeTab === 'experience-fail') return post.type === 'experience' && post.category === '실패기'
+    if (activeTab === 'experience-qna') return post.type === 'experience' && post.category === 'Q&A'
     
     if (activeTab === 'talk-all') return post.type === 'talk'
     if (activeTab === 'talk-chat') return post.type === 'talk' && post.category === '수다'
@@ -624,15 +620,11 @@ useEffect(() => {
             title: newPost.title,
             content: newPost.content,
             tags: newPost.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-            discount: newPost.discount || null,
-            price: newPost.price || null,
-            hourly_pay: newPost.hourlyPay || null,
             location: newPost.location || null,
-            period: newPost.period || null,
             images: selectedImages.length > 0 ? selectedImages : null
           })
           .eq('id', editingPost.id)
-        
+
         if (error) throw error
         alert('수정되었습니다!')
       } else {
@@ -646,34 +638,13 @@ useEffect(() => {
               title: newPost.title,
               content: newPost.content,
               tags: newPost.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-              discount: newPost.discount || null,
-              price: newPost.price || null,
-              hourly_pay: newPost.hourlyPay || null,
               location: newPost.location || null,
-              period: newPost.period || null,
               images: selectedImages.length > 0 ? selectedImages : null
             }
           ])
-        
+
         if (error) throw error
-        
-        // 🆕 핫딜 글 작성 시 랜덤 포인트 지급 (7~47P)
-        if (newPost.type === 'hotdeal') {
-          const randomPoints = Math.floor(Math.random() * 41) + 7  // 7~47
-          
-          // 포인트 지급
-          const { error: pointError } = await supabase
-            .from('profiles')
-            .update({ points: (profile?.points || 0) + randomPoints })
-            .eq('id', user.id)
-          
-          if (!pointError) {
-            setPostEarnedPoints(randomPoints)
-            setShowPostPointModal(true)
-          }
-        } else {
-          alert('게시물이 작성되었습니다!')
-        }
+        alert('게시물이 작성되었습니다!')
       }
       
       setIsWriteModalOpen(false)
@@ -682,14 +653,10 @@ useEffect(() => {
       setNewPost({
         title: '',
         content: '',
-        type: 'hotdeal',
+        type: 'talk',
         category: '',
         tags: '',
-        discount: '',
-        price: '',
-        hourlyPay: '',
-        location: '',
-        period: ''
+        location: ''
       })
       
       setPosts([])
@@ -736,17 +703,22 @@ useEffect(() => {
       type: post.type,
       category: post.category,
       tags: post.tags?.join(', ') || '',
-      discount: post.discount || '',
-      price: post.price || '',
-      hourlyPay: post.hourly_pay || '',
-      location: post.location || '',
-      period: post.period || ''
+      location: post.location || ''
     })
     setSelectedImages(post.images || [])
     setIsWriteModalOpen(true)
   }
 
   const handleActionClick = (action) => {
+    if (isInApp) {
+      setShowInstallModal(true)
+      return
+    }
+
+    action()
+  }
+
+  const handleAuthRequired = (action) => {
     if (isInApp) {
       setShowInstallModal(true)
       return
@@ -1172,6 +1144,19 @@ const closeGallery = () => {
 
   return (
     <div className="min-h-screen pb-24 md:pb-20">
+      <Helmet>
+        <title>우리동네플러스 - 서민을 위한 정책자금 정보</title>
+        <meta name="description" content="정부대출, 미소금융, 소상공인지원, 금리변동 정보를 한눈에. 서민을 위한 정책자금 정보 플랫폼" />
+        <meta property="og:title" content="우리동네플러스 - 서민을 위한 정책자금 정보" />
+        <meta property="og:description" content="정부대출, 미소금융, 소상공인지원, 금리변동 정보를 한눈에" />
+        <meta property="og:url" content="https://udt79.com/feed" />
+        <meta property="og:site_name" content="우리동네플러스" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="우리동네플러스 - 서민을 위한 정책자금 정보" />
+        <meta name="twitter:description" content="정부대출, 미소금융, 소상공인지원, 금리변동 정보를 한눈에" />
+        <link rel="canonical" href="https://udt79.com/feed" />
+      </Helmet>
       {/* Navigation */}
       <nav className="fixed top-0 w-full bg-white z-50 border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4">
@@ -1184,10 +1169,10 @@ const closeGallery = () => {
   }}
   className="flex items-center space-x-2"
 >
-  <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
-  <span className="text-lg font-bold gradient-text">UDT79</span>
+  <img src="/logo.png" alt="우리동네플러스" className="w-8 h-8 object-contain" />
+  <span className="text-lg font-bold gradient-text">우리동네플러스</span>
 </button>
-              <span className="hidden md:block text-sm text-gray-600">우리동네 특공대 친구</span>
+              <span className="hidden md:block text-sm text-gray-600">서민을 위한 정책자금 정보</span>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -1252,8 +1237,8 @@ const closeGallery = () => {
                 </button>
               )}
 
-              <button 
-                onClick={() => handleActionClick(() => setIsWriteModalOpen(true))}
+              <button
+                onClick={() => handleAuthRequired(() => setIsWriteModalOpen(true))}
                 className="hidden md:flex px-3 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-sm font-semibold hover-lift shadow-md shadow-teal-500/30 items-center space-x-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -1303,129 +1288,100 @@ const closeGallery = () => {
 
               <div className="relative">
                 <button
-                  onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false, talk: false})}
+                  onClick={() => setExpandedMenus({...expandedMenus, loan: !expandedMenus.loan, experience: false, talk: false})}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
-                    activeTab.startsWith('hotdeal')
+                    activeTab.startsWith('loan')
                       ? 'bg-teal-500 text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span>핫딜</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.hotdeal ? 'rotate-180' : ''}`} />
+                  <span>정책자금정보</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.loan ? 'rotate-180' : ''}`} />
                 </button>
-                
-                {expandedMenus.hotdeal && (
+
+                {expandedMenus.loan && (
                   <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
                     <button
-                      onClick={() => handleActionClick(() => { 
+                      onClick={() => handleActionClick(() => {
                         setActiveMainTab('home')
-                        setActiveTab('hotdeal-jeonje')
+                        setActiveTab('loan-gov')
                         setPosts([])
                         setPage(0)
                         setHasMore(true)
-                        fetchPosts(0, '', true, 'hotdeal', '전단지')
-                        setExpandedMenus({...expandedMenus, hotdeal: false})
+                        fetchPosts(0, '', true, 'loan', '정부대출')
+                        setExpandedMenus({...expandedMenus, loan: false})
                       })}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      전단지
+                      정부대출
                     </button>
                     <button
-                      onClick={() => handleActionClick(() => { 
+                      onClick={() => handleActionClick(() => {
                         setActiveMainTab('home')
-                        setActiveTab('hotdeal-sale')
+                        setActiveTab('loan-miso')
                         setPosts([])
                         setPage(0)
                         setHasMore(true)
-                        fetchPosts(0, '', true, 'hotdeal', '행사')
-                        setExpandedMenus({...expandedMenus, hotdeal: false})
+                        fetchPosts(0, '', true, 'loan', '미소금융')
+                        setExpandedMenus({...expandedMenus, loan: false})
                       })}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      행사
+                      미소금융
                     </button>
                     <button
-                      onClick={() => handleActionClick(() => { 
+                      onClick={() => handleActionClick(() => {
                         setActiveMainTab('home')
-                        setActiveTab('hotdeal-event')
+                        setActiveTab('loan-small')
                         setPosts([])
                         setPage(0)
                         setHasMore(true)
-                        fetchPosts(0, '', true, 'hotdeal', '기타')
-                        setExpandedMenus({...expandedMenus, hotdeal: false})
+                        fetchPosts(0, '', true, 'loan', '소상공인지원')
+                        setExpandedMenus({...expandedMenus, loan: false})
                       })}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      기타
+                      소상공인지원
+                    </button>
+                    <button
+                      onClick={() => handleActionClick(() => {
+                        setActiveMainTab('home')
+                        setActiveTab('loan-rate')
+                        setPosts([])
+                        setPage(0)
+                        setHasMore(true)
+                        fetchPosts(0, '', true, 'loan', '금리변동')
+                        setExpandedMenus({...expandedMenus, loan: false})
+                      })}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      금리변동
                     </button>
                   </div>
                 )}
               </div>
 
-              <div className="relative">
-                <button
-                  onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, talk: false})}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
-                    activeTab.startsWith('job')
-                      ? 'bg-cyan-500 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span>JOB</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${expandedMenus.job ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {expandedMenus.job && (
-                  <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[120px]">
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('job-hire')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'job', '구인')
-                        setExpandedMenus({...expandedMenus, job: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      구인
-                    </button>
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('job-tip')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'job', '일자리제보')
-                        setExpandedMenus({...expandedMenus, job: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      일자리제보
-                    </button>
-                    <button
-                      onClick={() => handleActionClick(() => { 
-                        setActiveMainTab('home')
-                        setActiveTab('job-seek')
-                        setPosts([])
-                        setPage(0)
-                        setHasMore(true)
-                        fetchPosts(0, '', true, 'job', '구직')
-                        setExpandedMenus({...expandedMenus, job: false})
-                      })}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      구직
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={() => handleActionClick(() => {
+                  setActiveMainTab('home')
+                  setActiveTab('experience-all')
+                  setPosts([])
+                  setPage(0)
+                  setHasMore(true)
+                  fetchPosts(0, '', true, 'experience', '')
+                })}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+                  activeTab.startsWith('experience')
+                    ? 'bg-blue-500 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                경험담
+              </button>
 
               <div className="relative">
                 <button
-                  onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, hotdeal: false, job: false})}
+                  onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, loan: false, experience: false})}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center space-x-1 whitespace-nowrap ${
                     activeTab.startsWith('talk')
                       ? 'bg-orange-500 text-white'
@@ -1540,7 +1496,7 @@ const closeGallery = () => {
                     <button
                       onClick={() => { 
                         setActiveTab('all')
-                        setExpandedMenus({...expandedMenus, hotdeal: false, job: false})
+                        setExpandedMenus({...expandedMenus, loan: false, experience: false})
                         setPosts([])
                         setPage(0)
                         setHasMore(true)
@@ -1552,113 +1508,91 @@ const closeGallery = () => {
                     >
                       전체
                     </button>
-                    
+
                     <button
-                      onClick={() => setExpandedMenus({...expandedMenus, hotdeal: !expandedMenus.hotdeal, job: false, talk: false})}
+                      onClick={() => setExpandedMenus({...expandedMenus, loan: !expandedMenus.loan, experience: false, talk: false})}
                       className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        expandedMenus.hotdeal || activeTab.startsWith('hotdeal') ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
+                        expandedMenus.loan || activeTab.startsWith('loan') ? 'bg-teal-100 text-teal-700' : 'bg-gray-50 text-gray-700'
                       }`}
                     >
-                      핫딜
+                      정책자금
                     </button>
-                    
+
                     <button
-                      onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, hotdeal: false, job: false})}
+                      onClick={() => handleActionClick(() => {
+                        setActiveMainTab('home')
+                        setActiveTab('experience-all')
+                        setPosts([])
+                        setPage(0)
+                        setHasMore(true)
+                        fetchPosts(0, '', true, 'experience', '')
+                      })}
+                      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        activeTab.startsWith('experience') ? 'bg-blue-100 text-blue-700' : 'bg-gray-50 text-gray-700'
+                      }`}
+                    >
+                      경험담
+                    </button>
+
+                    <button
+                      onClick={() => setExpandedMenus({...expandedMenus, talk: !expandedMenus.talk, loan: false, experience: false})}
                       className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         expandedMenus.talk || activeTab.startsWith('talk') ? 'bg-orange-100 text-orange-700' : 'bg-gray-50 text-gray-700'
                       }`}
                     >
                       톡
                     </button>
-                    
-                    <button
-                      onClick={() => setExpandedMenus({...expandedMenus, job: !expandedMenus.job, hotdeal: false, talk: false})}
-                      className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        expandedMenus.job || activeTab.startsWith('job') ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-50 text-gray-700'
-                      }`}
-                    >
-                      JOB
-                    </button>
                   </div>
-                  
-                  {expandedMenus.hotdeal && (
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => { 
-                          setActiveTab('hotdeal-jeonje')
-                          setPosts([])
-                          setPage(0)
-                          setHasMore(true)
-                          fetchPosts(0, '', true, 'hotdeal', '전단지')
-                        }} 
-                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-jeonje' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
-                      >
-                        전단지
-                      </button>
-                      <button 
-                        onClick={() => { 
-                          setActiveTab('hotdeal-sale')
-                          setPosts([])
-                          setPage(0)
-                          setHasMore(true)
-                          fetchPosts(0, '', true, 'hotdeal', '행사')
-                        }} 
-                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-sale' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
-                      >
-                        행사
-                      </button>
-                      <button 
-                        onClick={() => { 
-                          setActiveTab('hotdeal-event')
-                          setPosts([])
-                          setPage(0)
-                          setHasMore(true)
-                          fetchPosts(0, '', true, 'hotdeal', '기타')
-                        }} 
-                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'hotdeal-event' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
-                      >
-                        기타
-                      </button>
-                    </div>
-                  )}
 
-                  {expandedMenus.job && (
+                  {expandedMenus.loan && (
                     <div className="flex gap-2">
-                      <button 
-                        onClick={() => { 
-                          setActiveTab('job-hire')
+                      <button
+                        onClick={() => {
+                          setActiveTab('loan-gov')
                           setPosts([])
                           setPage(0)
                           setHasMore(true)
-                          fetchPosts(0, '', true, 'job', '구인')
-                        }} 
-                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-hire' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+                          fetchPosts(0, '', true, 'loan', '정부대출')
+                        }}
+                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'loan-gov' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
                       >
-                        구인
+                        정부대출
                       </button>
-                      <button 
-                        onClick={() => { 
-                          setActiveTab('job-tip')
+                      <button
+                        onClick={() => {
+                          setActiveTab('loan-miso')
                           setPosts([])
                           setPage(0)
                           setHasMore(true)
-                          fetchPosts(0, '', true, 'job', '일자리제보')
-                        }} 
-                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-tip' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+                          fetchPosts(0, '', true, 'loan', '미소금융')
+                        }}
+                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'loan-miso' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
                       >
-                        일자리제보
+                        미소금융
                       </button>
-                      <button 
-                        onClick={() => { 
-                          setActiveTab('job-seek')
+                      <button
+                        onClick={() => {
+                          setActiveTab('loan-small')
                           setPosts([])
                           setPage(0)
                           setHasMore(true)
-                          fetchPosts(0, '', true, 'job', '구직')
-                        }} 
-                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'job-seek' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}
+                          fetchPosts(0, '', true, 'loan', '소상공인지원')
+                        }}
+                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'loan-small' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
                       >
-                        구직
+                        소상공인
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveTab('loan-rate')
+                          setPosts([])
+                          setPage(0)
+                          setHasMore(true)
+                          fetchPosts(0, '', true, 'loan', '금리변동')
+                        }}
+                        className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium ${activeTab === 'loan-rate' ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600'}`}
+                      >
+                        금리변동
                       </button>
                     </div>
                   )}
@@ -1873,12 +1807,10 @@ const closeGallery = () => {
                         
                         <div className="flex items-center space-x-1.5">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                            post.type === 'hotdeal' 
-                              ? 'bg-teal-100 text-teal-700' 
-                              : post.type === 'share'
-                              ? 'bg-purple-100 text-purple-700'
-                              : post.type === 'job'
-                              ? 'bg-cyan-100 text-cyan-700'
+                            post.type === 'loan'
+                              ? 'bg-teal-100 text-teal-700'
+                              : post.type === 'experience'
+                              ? 'bg-blue-100 text-blue-700'
                               : post.type === 'talk'
                               ? 'bg-orange-100 text-orange-700'
                               : post.type === 'notice'
@@ -1926,96 +1858,56 @@ const closeGallery = () => {
                         </div>
                       </div>
 
-                      {/* Content */}
-                      <div className="mb-3">
-                        <h2 className="text-base font-bold mb-1 text-gray-900 hover:text-teal-600 cursor-pointer transition-colors">
-                          {post.title}
-                        </h2>
-                        <p className={`text-sm text-gray-600 break-words overflow-hidden ${expandedPosts.has(post.id) ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}>
-
-                          {post.content}
-                        </p>
-                        {post.content.length > 100 && (
-                          <button
-                            onClick={() => handleActionClick(() => {
-                              setExpandedPosts(prev => {
-                                const newSet = new Set(prev)
-                                if (newSet.has(post.id)) {
-                                  newSet.delete(post.id)
-                                } else {
-                                  newSet.add(post.id)
-                                }
-                                return newSet
-                              })
-                            })}
-                            className="text-xs text-teal-600 hover:underline mt-1"
+                      {/* Content + Thumbnail */}
+                      <div className="flex mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h2
+                            className="text-base font-bold mb-1 text-gray-900 hover:text-teal-600 cursor-pointer transition-colors"
+                            onClick={() => navigate(`/post/${post.id}`)}
                           >
-                            {expandedPosts.has(post.id) ? '접기' : '더보기'}
-                          </button>
+                            {post.title}
+                          </h2>
+                          <p
+                            className={`text-sm text-gray-600 break-words overflow-hidden cursor-pointer ${expandedPosts.has(post.id) ? 'whitespace-pre-wrap' : 'line-clamp-3'}`}
+                            onClick={() => navigate(`/post/${post.id}`)}
+                          >
+                            {(() => { const tmp = document.createElement('div'); tmp.innerHTML = post.content; return tmp.textContent || tmp.innerText || ''; })()}
+                          </p>
+                          {post.content && post.content.length > 100 && (
+                            <button
+                              onClick={() => handleActionClick(() => {
+                                setExpandedPosts(prev => {
+                                  const newSet = new Set(prev)
+                                  if (newSet.has(post.id)) {
+                                    newSet.delete(post.id)
+                                  } else {
+                                    newSet.add(post.id)
+                                  }
+                                  return newSet
+                                })
+                              })}
+                              className="text-xs text-teal-600 hover:underline mt-1"
+                            >
+                              {expandedPosts.has(post.id) ? '접기' : '더보기'}
+                            </button>
+                          )}
+                        </div>
+                        {post.images && post.images.length > 0 && (
+                          <div
+                            className="flex-shrink-0 ml-3 w-24 h-24 rounded-lg overflow-hidden bg-gray-100 cursor-pointer"
+                            onClick={() => handleActionClick(() => openGallery(post.images, 0))}
+                          >
+                            <img
+                              src={post.images[0]}
+                              alt=""
+                              className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                            />
+                          </div>
                         )}
                       </div>
 
-                      {/* 🆕 Images - 갤러리로 열기 */}
-                      {post.images && post.images.length > 0 && (
-                        <div className={`mb-3 grid gap-2 overflow-hidden ${
-                          post.images.length === 1 ? 'grid-cols-1' : 
-                          post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2'
-                        }`}>
-                          {post.images.slice(0, 4).map((img, i) => (
-                            <div key={i} className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                              <img 
-                                src={img} 
-                                alt="" 
-                                className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity" 
-                                onClick={() => handleActionClick(() => openGallery(post.images, i))}
-                              />
-                              {i === 3 && post.images.length > 4 && (
-                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                  <span className="text-white font-bold text-lg">+{post.images.length - 4}</span>
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
                       {/* Meta Info */}
                       <div className="flex flex-wrap gap-1.5 mb-3">
-                        {post.type === 'job' && post.category === '구인' && (
-                          <button
-                            onClick={() => handleActionClick(() => {
-                              setApplyingPostId(post.id)
-                              setShowApplicationModal(true)
-                            })}
-                            className="flex items-center space-x-1 px-3 py-2 bg-blue-50 rounded-md text-blue-700 text-xs font-semibold border border-blue-200 hover:bg-blue-100 transition-colors"
-                          >
-                            <Briefcase className="w-3 h-3" />
-                            <span>지원하기</span>
-                          </button>
-                        )}
-                        {post.discount && (
-                          <div className="flex items-center space-x-1 px-2 py-1 bg-teal-50 rounded-md text-teal-700 text-xs font-semibold border border-teal-200">
-                            <Tag className="w-3 h-3" />
-                            <span>{post.discount} 행사</span>
-                          </div>
-                        )}
-                        {post.price && (
-                          <div className="flex items-center space-x-1 px-2 py-1 bg-emerald-50 rounded-md text-emerald-700 text-xs font-semibold border border-emerald-200">
-                            <DollarSign className="w-3 h-3" />
-                            <span>{post.price}</span>
-                          </div>
-                        )}
-                        {post.hourly_pay && (
-                          <div className="px-2 py-1 bg-cyan-50 rounded-md text-cyan-700 text-xs font-semibold border border-cyan-200">
-                            <span>시급 {formatNumber(post.hourly_pay)}원</span>
-                          </div>
-                        )}
-                        {post.period && (
-                          <div className="flex items-center space-x-1 px-2 py-1 bg-sky-50 rounded-md text-sky-700 text-xs font-semibold border border-sky-200">
-                            <Clock className="w-3 h-3" />
-                            <span>{post.period}</span>
-                          </div>
-                        )}
                         {post.location && (
                           <div className="flex items-center space-x-1 px-2 py-1 bg-gray-50 rounded-md text-gray-700 text-xs border border-gray-200">
                             <MapPin className="w-3 h-3" />
@@ -2044,8 +1936,8 @@ const closeGallery = () => {
 
                       {/* Actions */}
                       <div className="flex items-center space-x-5 text-gray-500">
-                        <button 
-                          onClick={() => handleActionClick(() => handleLike(post.id))}
+                        <button
+                          onClick={() => handleAuthRequired(() => handleLike(post.id))}
                           className={`flex items-center space-x-1.5 transition-colors ${
                             likedPosts.has(post.id) ? 'text-teal-600' : 'text-gray-500 hover:text-teal-600'
                           }`}
@@ -2069,8 +1961,8 @@ const closeGallery = () => {
                           <span className="text-xs font-medium">{post.comments_count || 0}</span>
                         </button>
 
-                        <button 
-                          onClick={() => handleActionClick(() => {
+                        <button
+                          onClick={() => handleAuthRequired(() => {
                             setReportingPostId(post.id)
                             setShowReportModal(true)
                           })}
@@ -2158,7 +2050,7 @@ const closeGallery = () => {
                                         </div>
                                         {/* 🆕 답글 버튼 */}
                                         <button
-                                          onClick={() => handleActionClick(() => {
+                                          onClick={() => handleAuthRequired(() => {
                                             setReplyingTo(replyingTo === comment.id ? null : comment.id)
                                             setReplyContent('')
                                           })}
@@ -2264,7 +2156,7 @@ const closeGallery = () => {
                                       autoFocus
                                     />
                                     <button
-                                      onClick={() => handleActionClick(() => handleAddComment(post.id, comment.id))}
+                                      onClick={() => handleAuthRequired(() => handleAddComment(post.id, comment.id))}
                                       className="px-3 py-2 bg-teal-500 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-colors"
                                     >
                                       답글
@@ -2299,7 +2191,7 @@ const closeGallery = () => {
                               }}
                             />
                             <button
-                              onClick={() => handleActionClick(() => handleAddComment(post.id))}
+                              onClick={() => handleAuthRequired(() => handleAddComment(post.id))}
                               className="px-4 py-2 bg-teal-500 text-white text-sm font-semibold rounded-lg hover:bg-teal-600 transition-colors"
                             >
                               작성
@@ -2319,39 +2211,32 @@ const closeGallery = () => {
                   
                   {!hasMore && sortedPosts.length > 0 && (
                     <div className="text-center py-8">
-                      {(!user || isInApp) ? (
+                      {isInApp ? (
                         <div className="max-w-md mx-auto bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-200 rounded-2xl p-8">
                           <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span className="text-3xl">🎯</span>
                           </div>
-                          
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {isInApp ? '더 많은 게시물을 보려면?' : '계속 보시겠어요?'}
-                          </h3>
-                          
-                          <p className="text-sm text-gray-600 mb-6">
-                            {isInApp 
-                              ? '앱을 설치하고 모든 게시물을 확인하세요!' 
-                              : '로그인하고 무제한으로 게시물을 확인하세요!'}
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">더 많은 게시물을 보려면?</h3>
+                          <p className="text-sm text-gray-600 mb-6">앱을 설치하고 모든 게시물을 확인하세요!</p>
+                          <button
+                            onClick={() => setShowInstallModal(true)}
+                            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg flex items-center justify-center space-x-2"
+                          >
+                            <Smartphone className="w-5 h-5" />
+                            <span>앱 설치하고 더 보기</span>
+                          </button>
+                        </div>
+                      ) : !user ? (
+                        <div className="max-w-md mx-auto bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-100 rounded-2xl p-6">
+                          <p className="text-sm text-gray-600">
+                            회원가입하면 글쓰기, 댓글, 북마크 기능을 이용할 수 있어요
                           </p>
-                          
-                          {isInApp ? (
-                            <button
-                              onClick={() => setShowInstallModal(true)}
-                              className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg flex items-center justify-center space-x-2"
-                            >
-                              <Smartphone className="w-5 h-5" />
-                              <span>앱 설치하고 더 보기</span>
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => navigate('/login')}
-                              className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-6 py-4 rounded-xl font-semibold hover-lift shadow-lg flex items-center justify-center space-x-2"
-                            >
-                              <User className="w-5 h-5" />
-                              <span>로그인하고 더 보기</span>
-                            </button>
-                          )}
+                          <button
+                            onClick={() => navigate('/login')}
+                            className="mt-3 px-4 py-2 text-sm text-teal-600 font-medium hover:bg-teal-50 rounded-lg transition-colors"
+                          >
+                            회원가입하기
+                          </button>
                         </div>
                       ) : (
                         <p className="text-sm text-gray-500">✨ 마지막 게시물입니다</p>
@@ -2408,9 +2293,8 @@ const closeGallery = () => {
                       </div>
                       <h4 className="font-semibold text-xs text-gray-900 line-clamp-1">{post.title}</h4>
                       <p className="text-[10px] text-gray-500">
-                        {post.type === 'hotdeal' && '핫딜'}
-                        {post.type === 'share' && '쉐어'}
-                        {post.type === 'job' && 'JOB'}
+                        {post.type === 'loan' && '정책자금'}
+                        {post.type === 'experience' && '경험담'}
                         {post.type === 'talk' && '톡'}
                         {post.type === 'notice' && '공지'}
                       </p>
@@ -2440,9 +2324,8 @@ const closeGallery = () => {
                       </div>
                       <h4 className="font-semibold text-xs text-gray-900 line-clamp-1">{post.title}</h4>
                       <p className="text-[10px] text-gray-500">
-                        {post.type === 'hotdeal' && '핫딜'}
-                        {post.type === 'share' && '쉐어'}
-                        {post.type === 'job' && 'JOB'}
+                        {post.type === 'loan' && '정책자금'}
+                        {post.type === 'experience' && '경험담'}
                         {post.type === 'talk' && '톡'}
                         {post.type === 'notice' && '공지'}
                       </p>
@@ -2485,7 +2368,7 @@ const closeGallery = () => {
                   onClick={() => setShowBusinessInfo(!showBusinessInfo)}
                   className="flex items-center justify-between w-full text-xs font-semibold text-gray-700 hover:text-teal-600 transition-colors"
                 >
-                  <span>UDT79 사업자 정보</span>
+                  <span>우리동네플러스 사업자 정보</span>
                   {showBusinessInfo ? (
                     <ChevronUp className="w-3 h-3" />
                   ) : (
@@ -2501,7 +2384,7 @@ const closeGallery = () => {
                     <p>통신판매업신고: [제0000-서울-00000호]</p>
                     <p>주소: [충청남도 천안시 동남구 풍세로801]</p>
                     <p>이메일: asd024@naver.com</p>
-                     <p className="pt-2 text-gray-500">© 2025 UDT79</p>
+                     <p className="pt-2 text-gray-500">© 2025 우리동네플러스</p>
                   </div>
                 )}
               </div>
@@ -2535,8 +2418,8 @@ const closeGallery = () => {
             <span className="text-[10px] font-medium">챌린지</span>
           </button>
 
-          <button 
-            onClick={() => handleActionClick(() => setIsWriteModalOpen(true))}
+          <button
+            onClick={() => handleAuthRequired(() => setIsWriteModalOpen(true))}
             className="flex flex-col items-center justify-center flex-1 h-full -mt-8"
           >
             <div className="w-14 h-14 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow-lg shadow-teal-500/30">
@@ -2585,24 +2468,6 @@ const closeGallery = () => {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => setNewPost({...newPost, type: 'hotdeal', category: ''})}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      newPost.type === 'hotdeal' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    핫딜
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setNewPost({...newPost, type: 'job', category: ''})}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      newPost.type === 'job' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    JOB
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => setNewPost({...newPost, type: 'talk', category: ''})}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       newPost.type === 'talk' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -2610,72 +2475,49 @@ const closeGallery = () => {
                   >
                     톡
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setNewPost({...newPost, type: 'experience', category: ''})}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      newPost.type === 'experience' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    경험담
+                  </button>
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2">세부 카테고리 *</label>
                 
-                {newPost.type === 'hotdeal' && (
+                {newPost.type === 'experience' && (
                   <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
-                      onClick={() => setNewPost({...newPost, category: '전단지'})}
+                      onClick={() => setNewPost({...newPost, category: '성공기'})}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        newPost.category === '전단지' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        newPost.category === '성공기' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      전단지
+                      성공기
                     </button>
                     <button
                       type="button"
-                      onClick={() => setNewPost({...newPost, category: '행사'})}
+                      onClick={() => setNewPost({...newPost, category: '실패기'})}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        newPost.category === '행사' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        newPost.category === '실패기' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      행사
+                      실패기
                     </button>
                     <button
                       type="button"
-                      onClick={() => setNewPost({...newPost, category: '기타'})}
+                      onClick={() => setNewPost({...newPost, category: 'Q&A'})}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        newPost.category === '기타' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        newPost.category === 'Q&A' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      기타
-                    </button>
-                  </div>
-                )}
-                
-                {newPost.type === 'job' && (
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setNewPost({...newPost, category: '구인'})}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        newPost.category === '구인' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      구인
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewPost({...newPost, category: '일자리제보'})}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        newPost.category === '일자리제보' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      일자리제보
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewPost({...newPost, category: '구직'})}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        newPost.category === '구직' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      구직
+                      Q&A
                     </button>
                   </div>
                 )}
@@ -2785,56 +2627,6 @@ const closeGallery = () => {
                       </button>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {newPost.type === 'hotdeal' && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">할인율</label>
-                    <input
-                      type="text"
-                      value={newPost.discount}
-                      onChange={(e) => setNewPost({...newPost, discount: e.target.value})}
-                      placeholder="예: 50%"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">가격</label>
-                    <input
-                      type="text"
-                      value={newPost.price}
-                      onChange={(e) => setNewPost({...newPost, price: e.target.value})}
-                      placeholder="예: 무료"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {newPost.type === 'job' && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">시급</label>
-                    <input
-                      type="text"
-                      value={newPost.hourlyPay}
-                      onChange={(e) => setNewPost({...newPost, hourlyPay: e.target.value})}
-                      placeholder="예: 15,000원"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">기간</label>
-                    <input
-                      type="text"
-                      value={newPost.period}
-                      onChange={(e) => setNewPost({...newPost, period: e.target.value})}
-                      placeholder="예: 1-2주"
-                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500"
-                    />
-                  </div>
                 </div>
               )}
 
@@ -3015,7 +2807,7 @@ const closeGallery = () => {
           {isSimpleModal ? (
             <div className="max-w-sm w-full bg-white rounded-2xl shadow-xl p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4 text-center">
-                UDT79
+                우리동네플러스
               </h2>
               <p className="text-sm text-gray-600 mb-6 text-center">
                 홈 화면에 추가하시겠습니까?
@@ -3245,95 +3037,6 @@ const closeGallery = () => {
         </div>
       )}
 
-      {/* 지원하기 모달 */}
-      {showApplicationModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">지원하기</h2>
-              <button
-                onClick={() => {
-                  setShowApplicationModal(false)
-                  setApplyingPostId(null)
-                  setApplicationMessage('')
-                }}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                사장님에게 하고 싶은 말
-              </label>
-              <textarea
-                value={applicationMessage}
-                onChange={(e) => setApplicationMessage(e.target.value)}
-                placeholder="예) 저는 성실하고 약속을 잘 지켜요. 사장님과 함께 일하고 싶어요."
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-teal-500 resize-none"
-                rows="6"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                💡 성실한 자세와 열정을 보여주세요!
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowApplicationModal(false)
-                  setApplyingPostId(null)
-                  setApplicationMessage('')
-                }}
-                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleApply}
-                disabled={!applicationMessage.trim()}
-                className="flex-1 px-4 py-3 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                지원하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* 🆕 글작성 포인트 모달 */}
-{showPostPointModal && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
-      <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
-        <span className="text-4xl">🎉</span>
-      </div>
-      
-      <h2 className="text-xl font-bold mb-2">글작성 완료!</h2>
-      <p className="text-teal-600 text-3xl font-black mb-2">
-        +{postEarnedPoints}P
-      </p>
-      <p className="text-gray-500 text-sm mb-6">
-        핫딜 게시글 작성 보상으로<br />
-        포인트를 획득했어요! 🎁
-      </p>
-      
-      <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 mb-6">
-        <p className="text-sm text-gray-700">
-          💡 핫딜 게시글을 작성하면<br />
-          <span className="font-bold text-teal-600">최대 300P</span>를 랜덤으로 받을 수 있어요!
-        </p>
-      </div>
-      
-      <button
-        onClick={() => setShowPostPointModal(false)}
-        className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl font-bold text-lg hover-lift shadow-lg"
-      >
-        확인
-      </button>
-    </div>
-  </div>
-)}
     </div>
   )
 }

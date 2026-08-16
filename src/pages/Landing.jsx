@@ -32,15 +32,15 @@ if (loading) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="UDT79" className="w-8 h-8 object-contain" />
-              <span className="text-lg font-bold gradient-text">UDT79</span>
+            <img src="/logo.png" alt="우리동네플러스" className="w-8 h-8 object-contain" />
+              <span className="text-lg font-bold gradient-text">우리동네플러스</span>
             </div>
             <div className="flex items-center space-x-3">
               <Link to="/feed" className="text-sm text-gray-700 hover:text-teal-600 font-medium transition-colors">
                 둘러보기
               </Link>
-              <Link 
-                to="/login" 
+              <Link
+                to="/login"
                 className="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-sm font-semibold hover-lift shadow-lg shadow-teal-500/30"
               >
                 시작하기
@@ -55,40 +55,43 @@ if (loading) {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
-              놓치면 후회할
+              서민을 위한
               <br />
-              <span className="gradient-text">최고의 기회</span>를 찾다
+              <span className="gradient-text">정책자금 정보</span>를 한눈에
             </h1>
             <p className="text-base text-gray-600 max-w-2xl mx-auto mb-6">
-              실시간 핫딜 정보와 알바 기회를 한 곳에서. 
-              커뮤니티가 검증한 진짜 정보만 공유합니다.
+              정부대출, 미소금융, 소상공인지원, 금리변동 정보와
+              실제 경험담을 한 곳에서. 검증된 정보만 공유합니다.
             </p>
             <div className="flex justify-center space-x-3">
-              <Link 
+              <Link
                 to="/login"
                 className="px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl font-bold text-sm hover-lift shadow-2xl shadow-teal-500/40 transform hover:scale-105 transition-all"
               >
                 무료로 시작하기
               </Link>
-              <button className="px-6 py-3 glass-effect rounded-xl text-sm font-semibold text-gray-700 hover-lift">
-                더 알아보기
-              </button>
+              <Link
+                to="/feed"
+                className="px-6 py-3 glass-effect rounded-xl text-sm font-semibold text-gray-700 hover-lift"
+              >
+                둘러보기
+              </Link>
             </div>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto mb-16">
             <div className="text-center animate-slide-up" style={{animationDelay: '0.1s'}}>
-              <div className="text-3xl font-bold gradient-text mb-1">1,234</div>
-              <div className="text-sm text-gray-600">오늘의 핫딜</div>
+              <div className="text-3xl font-bold gradient-text mb-1">10+</div>
+              <div className="text-sm text-gray-600">정책자금 가이드</div>
             </div>
             <div className="text-center animate-slide-up" style={{animationDelay: '0.2s'}}>
-              <div className="text-3xl font-bold gradient-text mb-1">5,678</div>
-              <div className="text-sm text-gray-600">활성 회원</div>
+              <div className="text-3xl font-bold gradient-text mb-1">100+</div>
+              <div className="text-sm text-gray-600">실제 경험담</div>
             </div>
             <div className="text-center animate-slide-up" style={{animationDelay: '0.3s'}}>
-              <div className="text-3xl font-bold gradient-text mb-1">89%</div>
-              <div className="text-sm text-gray-600">만족도</div>
+              <div className="text-3xl font-bold gradient-text mb-1">매일</div>
+              <div className="text-sm text-gray-600">금리 업데이트</div>
             </div>
           </div>
         </div>
@@ -98,18 +101,18 @@ if (loading) {
       <section className="py-16 px-4 bg-white/50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">
-            왜 <span className="gradient-text">UDT79</span>인가?
+            왜 <span className="gradient-text">우리동네플러스</span>인가?
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="glass-effect p-6 rounded-2xl hover-lift">
               <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2">실시간 업데이트</h3>
+              <h3 className="text-lg font-bold mb-2">정책자금 한눈에</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                최신 핫딜과 알바 정보를 실시간으로 받아보세요. 
-                놓칠 수 없는 기회를 가장 먼저 알려드립니다.
+                정부대출, 미소금융, 소상공인지원 등
+                서민을 위한 정책자금 정보를 한곳에서 확인하세요.
               </p>
             </div>
 
@@ -117,10 +120,10 @@ if (loading) {
               <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2">커뮤니티 검증</h3>
+              <h3 className="text-lg font-bold mb-2">실제 경험담</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                회원들이 직접 검증한 정보만 공유됩니다. 
-                허위 정보 걱정 없이 안심하고 이용하세요.
+                대출 성공기, 실패기, Q&A까지.
+                실제 이용자들의 생생한 경험을 공유합니다.
               </p>
             </div>
 
@@ -128,10 +131,10 @@ if (loading) {
               <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-xl flex items-center justify-center mb-4">
                 <Bell className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2">맞춤 알림</h3>
+              <h3 className="text-lg font-bold mb-2">금리 변동 알림</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                관심 카테고리를 설정하고 원하는 정보만 
-                골라서 받아보세요. 시간을 절약하세요.
+                기준금리 변동과 서민 대출 영향을
+                실시간으로 확인하세요.
               </p>
             </div>
           </div>
@@ -143,52 +146,37 @@ if (loading) {
   <div className="max-w-6xl mx-auto px-4">
     <div className="text-center mb-16">
       <h2 className="text-3xl md:text-4xl font-bold mb-4">다양한 카테고리</h2>
-      <p className="text-gray-600 text-lg">UDT79 에서 찾을 수 있는 모든 것</p>
+      <p className="text-gray-600 text-lg">우리동네플러스에서 찾을 수 있는 모든 것</p>
     </div>
 
     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {/* 핫딜 */}
+      {/* 정책자금정보 */}
       <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
         <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center mb-4">
           <Flame className="w-6 h-6 text-white" />
         </div>
-        <h3 className="text-xl font-bold mb-2">핫딜</h3>
+        <h3 className="text-xl font-bold mb-2">정책자금정보</h3>
         <p className="text-sm text-gray-600 mb-4">
-          지역내 모든 전단지, 매장의 할인 정보, 행사 정보
+          서민을 위한 정부대출, 미소금융, 소상공인지원 정보
         </p>
         <div className="flex items-start space-x-2 text-xs text-gray-500">
           <TrendingUp className="w-4 h-4 text-teal-500 flex-shrink-0 mt-0.5" />
-          <span>식탁, 카페, 마트, 매장, 프리마켓, 행사</span>
+          <span>정부대출, 미소금융, 소상공인지원, 금리변동</span>
         </div>
       </div>
 
-      {/* 쉐어 */}
+      {/* 경험담 */}
       <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
           <Share2 className="w-6 h-6 text-white" />
         </div>
-        <h3 className="text-xl font-bold mb-2">쉐어</h3>
+        <h3 className="text-xl font-bold mb-2">경험담</h3>
         <p className="text-sm text-gray-600 mb-4">
-          생활에 필요한 모든것 나눠쓰고, 빌려쓰는 개념의 쉐어링
+          대출 성공기, 실패기, Q&A 등 실제 이용 후기
         </p>
         <div className="flex items-start space-x-2 text-xs text-gray-500">
-          <TrendingUp className="w-4 h-4 text-purple-500 flex-shrink-0 mt-0.5" />
-          <span>생활용품, 부동산, 기타</span>
-        </div>
-      </div>
-
-      {/* JOB */}
-      <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
-        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
-          <Briefcase className="w-6 h-6 text-white" />
-        </div>
-        <h3 className="text-xl font-bold mb-2">JOB</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          지역 내 간단, 단기, 장기 일자리 구인정보와 구직 정보
-        </p>
-        <div className="flex items-start space-x-2 text-xs text-gray-500">
-          <Briefcase className="w-4 h-4 text-cyan-500 flex-shrink-0 mt-0.5" />
-          <span>구인, 구직, JOB썰</span>
+          <TrendingUp className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+          <span>성공기, 실패기, Q&A</span>
         </div>
       </div>
 
@@ -199,11 +187,26 @@ if (loading) {
         </div>
         <h3 className="text-xl font-bold mb-2">톡</h3>
         <p className="text-sm text-gray-600 mb-4">
-          공유하며 함께 생활하는 우리의 톡
+          자유로운 소통과 정보 공유의 공간
         </p>
         <div className="flex items-start space-x-2 text-xs text-gray-500">
           <MessageCircle className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
           <span>수다, 토닥, Q&A, 꿀팁</span>
+        </div>
+      </div>
+
+      {/* 공지 */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100">
+        <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
+          <Shield className="w-6 h-6 text-white" />
+        </div>
+        <h3 className="text-xl font-bold mb-2">공지</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          서비스 업데이트와 중요 안내사항
+        </p>
+        <div className="flex items-start space-x-2 text-xs text-gray-500">
+          <Shield className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+          <span>공지사항, 이벤트, 업데이트</span>
         </div>
       </div>
     </div>
@@ -219,9 +222,9 @@ if (loading) {
               지금 바로 <span className="gradient-text">시작하세요</span>
             </h2>
             <p className="text-base text-gray-600 mb-6">
-              무료 회원가입하고 최고의 핫딜과 알바 정보를 받아보세요
+              무료 회원가입하고 서민을 위한 정책자금 정보를 받아보세요
             </p>
-            <Link 
+            <Link
               to="/login"
               className="inline-block px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-xl font-bold text-sm hover-lift shadow-2xl shadow-teal-500/40 transform hover:scale-105 transition-all"
             >
@@ -240,17 +243,17 @@ if (loading) {
                 <div className="w-7 h-7 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-base font-bold">UDT79</span>
+                <span className="text-base font-bold">우리동네플러스</span>
               </div>
               <p className="text-gray-400 text-xs">
-                최고의 핫딜과 알바 정보를 공유하는 커뮤니티
+                서민을 위한 정책자금 정보를 공유하는 플랫폼
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm mb-3">서비스</h4>
               <ul className="space-y-1.5 text-gray-400 text-xs">
-                <li><a href="#" className="hover:text-white transition-colors">핫딜 찾기</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">알바 찾기</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">정책자금정보</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">경험담</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">커뮤니티</a></li>
               </ul>
             </div>
@@ -272,7 +275,7 @@ if (loading) {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-6 text-center text-gray-400 text-xs">
-            © 2024 UDT79. All rights reserved.
+            © 2025 우리동네플러스. All rights reserved.
           </div>
         </div>
       </footer>

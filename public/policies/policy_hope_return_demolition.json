@@ -1,0 +1,314 @@
+{
+  "policy": {
+    "id": "hope-return-demolition-2026",
+    "slug": "hope-return-demolition-2026",
+    "title": "희망리턴패키지 점포철거비 지원",
+    "owner": "소상공인시장진흥공단",
+    "status": "draft",
+    "source_url": "https://www.sbiz.or.kr/nhrp/pblanc/pblancView.do?pMenuNo=100100&cMenuNo=100102&selPblancClCode=BCC008&directCall=Y",
+    "source_published_at": "2026-08-03",
+    "source_note": "2026년 희망리턴패키지 원스톱폐업지원 사업 2차 수정 공고",
+    "checked_at": "2026-08-17T09:00:00+09:00",
+    "checked_by": "",
+    "effective_from": "2026-01-28",
+    "effective_to": null,
+    "effective_note": "예산 소진 시까지. 종료일 미정이므로 접수 상태를 별도 확인해야 함",
+    "apply_url": "https://www.sbiz24.kr/#/pbanc/567",
+    "contact_text": "소상공인24 및 소상공인시장진흥공단 공고 참조",
+    "disclaimer": "이 결과는 공개된 공고 기준의 사전 확인 안내이며, 지원 여부와 지급액은 서류·현장·정산 심사로 결정됩니다."
+  },
+
+  "version": {
+    "version_no": 1,
+    "is_current": true,
+    "reviewed_by": "",
+    "reviewed_at": "",
+    "diff_summary": "최초 작성. 2026-08-03 2차 수정 공고 기준."
+  },
+
+  "unknown_if": [
+    "지원제외 업종 해당 여부 (사용자 업종 코드 미수집. always_show_notes로 안내)",
+    "비영리 사업자·법인 해당 여부 (모수가 작아 질문에서 제외. always_show_notes로 안내)",
+    "현재 예산 잔여 및 접수 가능 상태 (실시간 변동. 소상공인24 확인 필요)",
+    "실제 철거비 공급가액",
+    "건축물대장상 용도 확인 결과"
+  ],
+
+  "questions": [
+    {
+      "key": "closure_status",
+      "order": 1,
+      "label": "현재 폐업하셨나요?",
+      "type": "single_select",
+      "required": true,
+      "options": [
+        { "value": "closed", "label": "이미 폐업했습니다" },
+        { "value": "planned", "label": "폐업할 예정입니다" },
+        { "value": "none", "label": "폐업 계획이 없습니다" }
+      ]
+    },
+    {
+      "key": "closure_date",
+      "order": 2,
+      "label": "폐업일은 언제인가요?",
+      "type": "single_select",
+      "required": true,
+      "show_if": { "field": "closure_status", "op": "eq", "value": "closed" },
+      "help": "사업자등록 폐업일 기준입니다.",
+      "options": [
+        { "value": "after_2025_07_11", "label": "2025년 7월 11일 이후" },
+        { "value": "between_2023_and_2025_07_10", "label": "2023년 1월 1일 ~ 2025년 7월 10일" },
+        { "value": "before_2023", "label": "2022년 12월 31일 이전" },
+        { "value": "unknown", "label": "잘 모르겠습니다" }
+      ]
+    },
+    {
+      "key": "lease_type",
+      "order": 3,
+      "label": "사업장은 어떤 형태로 사용하셨나요?",
+      "type": "single_select",
+      "required": true,
+      "show_if": { "field": "closure_status", "op": "in", "value": ["closed", "planned"] },
+      "help": "임대료를 내고 빌린 경우가 유상임대차입니다.",
+      "options": [
+        { "value": "paid_with_contract", "label": "임대료를 냈고, 임대차계약서가 있습니다" },
+        { "value": "paid_no_contract", "label": "임대료를 냈지만 계약서가 없습니다" },
+        { "value": "owned", "label": "본인 소유 건물입니다" },
+        { "value": "free", "label": "무상으로 사용했습니다" }
+      ]
+    },
+    {
+      "key": "operating_60days",
+      "order": 4,
+      "label": "개업일부터 60일 이상 운영하셨나요?",
+      "type": "single_select",
+      "required": true,
+      "show_if": { "field": "closure_status", "op": "in", "value": ["closed", "planned"] },
+      "options": [
+        { "value": "yes", "label": "네" },
+        { "value": "no", "label": "아니요" },
+        { "value": "unknown", "label": "잘 모르겠습니다" }
+      ]
+    },
+    {
+      "key": "exclusions",
+      "order": 5,
+      "label": "해당하는 항목을 모두 골라주세요.",
+      "type": "multi_select",
+      "required": true,
+      "show_if": { "field": "closure_status", "op": "in", "value": ["closed", "planned"] },
+      "help": "없으면 '해당 없음'을 선택해 주세요.",
+      "options": [
+        { "value": "prior_demolition_support", "label": "예전에 점포철거비를 지원받은 적이 있습니다" },
+        { "value": "other_gov_support", "label": "다른 정부·지자체 철거 지원을 받았습니다" },
+        { "value": "residential_or_illegal", "label": "철거 대상이 주거용·가설·무허가 건축물입니다" },
+        { "value": "relocation_only", "label": "폐업이 아니라 사업장을 옮기는 것입니다" },
+        { "value": "none", "label": "해당 없음" }
+      ]
+    },
+    {
+      "key": "area_pyeong",
+      "order": 6,
+      "label": "전용면적은 어느 정도인가요? (선택)",
+      "type": "single_select",
+      "required": false,
+      "show_if": { "field": "closure_status", "op": "in", "value": ["closed", "planned"] },
+      "help": "임대차계약서상 전용면적 기준입니다. 계약면적이 아닙니다.",
+      "options": [
+        { "value": "under_10", "label": "10평 미만" },
+        { "value": "10_to_20", "label": "10~20평" },
+        { "value": "20_to_30", "label": "20~30평" },
+        { "value": "over_30", "label": "30평 이상" },
+        { "value": "unknown", "label": "모르겠습니다" }
+      ]
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "any": [
+        { "field": "lease_type", "op": "eq", "value": "owned" },
+        { "field": "lease_type", "op": "eq", "value": "free" }
+      ]},
+      "result_status": "likely_mismatch",
+      "result_title": "현재 공개된 기준과 다를 가능성이 있습니다",
+      "result_body": "점포철거비는 유상임대차로 사업장을 운영한 경우를 대상으로 합니다. 자가 소유 건물이나 무상임차는 지원 대상에서 제외될 수 있습니다.",
+      "evidence_text": "공고: 유상임대차로 사업장을 운영하고 임대차계약서 제출 가능한 자"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "exclusions", "op": "contains", "value": "relocation_only" },
+      "result_status": "likely_mismatch",
+      "result_title": "현재 공개된 기준과 다를 가능성이 있습니다",
+      "result_body": "단순 사업장 이전은 지원 대상에서 제외됩니다.",
+      "evidence_text": "공고: 단순 사업장 이전의 경우 지원 제외"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "closure_date", "op": "eq", "value": "before_2023" },
+      "result_status": "likely_mismatch",
+      "result_title": "현재 공개된 기준과 다를 가능성이 있습니다",
+      "result_body": "이번 공고는 2023년 1월 1일 이후 폐업한 경우를 대상으로 합니다.",
+      "evidence_text": "공고: 폐업일이 2023년 1월 1일 이후인 경우 지원"
+    },
+    {
+      "priority": 40,
+      "expression": { "field": "exclusions", "op": "contains", "value": "prior_demolition_support" },
+      "result_status": "likely_mismatch",
+      "result_title": "중복 지원 가능성이 있습니다",
+      "result_body": "점포철거비는 주민등록번호 기준으로 1회만 신청할 수 있습니다.",
+      "evidence_text": "공고: 점포철거비 기수혜자 제외, 주민등록번호 기준 1회"
+    },
+    {
+      "priority": 50,
+      "expression": { "field": "closure_status", "op": "eq", "value": "none" },
+      "result_status": "review_required",
+      "result_title": "폐업 또는 폐업 예정 상태여야 합니다",
+      "result_body": "이 지원은 폐업했거나 폐업을 예정한 소상공인을 대상으로 합니다.",
+      "evidence_text": "공고: 공고일 기준 폐업 또는 폐업예정 소상공인"
+    },
+    {
+      "priority": 60,
+      "expression": { "any": [
+        { "field": "exclusions", "op": "contains", "value": "other_gov_support" },
+        { "field": "exclusions", "op": "contains", "value": "residential_or_illegal" }
+      ]},
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "유사 지원 중복 수혜 여부, 건축물 용도는 예외가 인정되는 경우가 있습니다. 소상공인24에서 개별 확인이 필요합니다.",
+      "evidence_text": "공고: 유사 지원 기수혜자 제외 / 주거용·가설·무허가 건축물 제외, 단 실제 상업시설 사용 등 예외 가능"
+    },
+    {
+      "priority": 70,
+      "expression": { "field": "lease_type", "op": "eq", "value": "paid_no_contract" },
+      "result_status": "needs_official_check",
+      "result_title": "임대차계약서 확인이 필요합니다",
+      "result_body": "신청 시 유상임대차계약서 제출이 필요합니다. 계약서를 확보할 수 있는지 먼저 확인해 주세요.",
+      "evidence_text": "공고 서류: 1차 신청 시 유상임대차계약서 필수"
+    },
+    {
+      "priority": 80,
+      "expression": { "any": [
+        { "field": "operating_60days", "op": "eq", "value": "no" },
+        { "field": "operating_60days", "op": "eq", "value": "unknown" },
+        { "field": "closure_date", "op": "eq", "value": "unknown" }
+      ]},
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "운영기간 60일 이상 요건과 폐업일 기준은 사업자등록 기록으로 확인해야 합니다.",
+      "evidence_text": "공고: 사업 운영기간 60일 이상"
+    },
+    {
+      "priority": 90,
+      "expression": { "field": "closure_status", "op": "eq", "value": "planned" },
+      "result_status": "check_first",
+      "result_title": "공식 신청을 먼저 확인해 보세요",
+      "result_body": "폐업예정자도 신청할 수 있습니다. 다만 정산서류 제출 시 폐업사실증명원을 낼 수 있어야 합니다. 철거 예정이라면 먼저 1차 신청서류를 내고 적격심사를 받은 뒤 철거를 진행하는 순서입니다.",
+      "evidence_text": "공고: 폐업예정자는 정산서류 제출 시 폐업사실증명원 제출 가능해야 함"
+    },
+    {
+      "priority": 100,
+      "expression": { "all": [
+        { "field": "closure_status", "op": "eq", "value": "closed" },
+        { "field": "closure_date", "op": "eq", "value": "after_2025_07_11" },
+        { "field": "lease_type", "op": "eq", "value": "paid_with_contract" },
+        { "field": "operating_60days", "op": "eq", "value": "yes" },
+        { "field": "exclusions", "op": "contains", "value": "none" }
+      ]},
+      "result_status": "check_first",
+      "result_title": "공식 신청을 먼저 확인해 보세요",
+      "result_body": "공개된 기본 조건에 해당합니다. 폐업일 기준 최대 한도는 600만 원 구간입니다.",
+      "limit_note": "최대 600만 원 / 전용면적 3.3㎡당 20만 원 이내",
+      "evidence_text": "공고: 2025년 7월 11일 이후 폐업 최대 600만 원, 전용면적 3.3㎡당 20만 원 이내"
+    },
+    {
+      "priority": 110,
+      "expression": { "all": [
+        { "field": "closure_status", "op": "eq", "value": "closed" },
+        { "field": "closure_date", "op": "eq", "value": "between_2023_and_2025_07_10" },
+        { "field": "lease_type", "op": "eq", "value": "paid_with_contract" },
+        { "field": "operating_60days", "op": "eq", "value": "yes" },
+        { "field": "exclusions", "op": "contains", "value": "none" }
+      ]},
+      "result_status": "check_first",
+      "result_title": "공식 신청을 먼저 확인해 보세요",
+      "result_body": "공개된 기본 조건에 해당합니다. 폐업일 기준 최대 한도는 400만 원 구간입니다.",
+      "limit_note": "최대 400만 원 / 전용면적 3.3㎡당 20만 원 이내",
+      "evidence_text": "공고: 2023년 1월 1일~2025년 7월 10일 폐업 최대 400만 원"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 판단하기 어렵습니다. 소상공인24 공고와 상담으로 확인해 주세요.",
+      "evidence_text": "기본 폴백"
+    }
+  ],
+
+  "always_show_notes": [
+    {
+      "key": "budget_status",
+      "level": "critical",
+      "title": "접수 가능 여부를 먼저 확인하세요",
+      "text": "이 사업은 예산 소진 시까지 접수합니다. 조건이 맞아도 예산이 소진되면 접수가 마감됩니다. 현재 접수 상태는 소상공인24에서 직접 확인해 주세요.",
+      "link_label": "소상공인24 접수 상태 확인",
+      "link_url": "https://www.sbiz24.kr/#/pbanc/567"
+    },
+    {
+      "key": "excluded_industry",
+      "level": "warning",
+      "title": "지원제외 업종",
+      "text": "희망리턴패키지는 소상공인 정책자금 지원제외업종을 그대로 적용합니다. 유흥·향락업, 금융·보험업, 부동산업, 보건·의료업, 약국, 수의업, 법무·회계·세무 등 전문업종, 담배도매업, 무도장운영업, 감정평가업 등이 제외되며 전자담배 도매·성인용품 소매도 지원되지 않습니다. 본인 업종이 목록에 있는지 반드시 확인하세요.",
+      "link_label": "정책자금 지원제외업종 전체 목록",
+      "link_url": "https://ols.semas.or.kr/ols/pfa/SPFA207P/page.do",
+      "source_note": "2026년 소상공인 정책자금 융자사업 공고 별표1 및 소상공인정책자금 누리집"
+    },
+    {
+      "key": "nonprofit",
+      "level": "warning",
+      "title": "비영리 사업자·법인은 확인이 필요합니다",
+      "text": "비영리 사업자 및 비영리법인(고유번호증 소지자)은 지원에서 제외될 수 있습니다. 해당되신다면 소상공인24 또는 공고 원문에서 확인해 주세요.",
+      "verification_status": "unverified_for_2026",
+      "verification_note": "2020년 정책브리핑 자료에서 확인된 조항. 2026년 2차 수정 공고 원문에서 재확인 필요."
+    },
+    {
+      "key": "self_demolition",
+      "level": "critical",
+      "title": "직접 철거하면 지원받을 수 없습니다",
+      "text": "자력철거는 지원 대상이 아닙니다. 반드시 국세청에 사업자등록된 철거업체를 이용해야 합니다. 철거 전 사진도 미리 촬영해 두세요."
+    },
+    {
+      "key": "vat_excluded",
+      "level": "warning",
+      "title": "부가세는 지원되지 않습니다",
+      "text": "전자세금계산서의 공급가액만 인정되며 부가가치세는 제외됩니다. 현금 거래도 인정되지 않으므로 전자세금계산서 또는 카드 증빙을 확보해야 합니다."
+    }
+  ],
+
+  "cross_sell_note": {
+    "text": "원스톱폐업지원은 사업정리컨설팅·점포철거비·법률자문·채무조정 네 분야를 중복 신청할 수 있습니다.",
+    "evidence_text": "공고: 4개 분야 중복신청 가능"
+  },
+
+  "test_cases": [
+    { "id": "A01", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "check_first", "expected_limit": "600만" },
+    { "id": "A02", "input": { "closure_status": "closed", "closure_date": "between_2023_and_2025_07_10", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "check_first", "expected_limit": "400만" },
+    { "id": "A03", "input": { "closure_status": "planned", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "check_first" },
+    { "id": "A04", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["none"], "area_pyeong": "over_30" }, "expected": "check_first", "note": "면적 입력이 결과 상태를 바꾸지 않아야 함" },
+
+    { "id": "B01", "input": { "closure_status": "closed", "closure_date": "before_2023", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "likely_mismatch" },
+    { "id": "B02", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "owned", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "likely_mismatch" },
+    { "id": "B03", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["relocation_only"] }, "expected": "likely_mismatch" },
+    { "id": "B04", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["prior_demolition_support"] }, "expected": "likely_mismatch" },
+
+    { "id": "C01", "input": { "closure_status": "closed", "closure_date": "unknown", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "needs_official_check" },
+    { "id": "C02", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_no_contract", "operating_60days": "yes", "exclusions": ["none"] }, "expected": "needs_official_check" },
+    { "id": "C03", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_with_contract", "operating_60days": "unknown", "exclusions": ["none"] }, "expected": "needs_official_check" },
+    { "id": "C04", "input": { "closure_status": "closed", "closure_date": "after_2025_07_11", "lease_type": "paid_with_contract", "operating_60days": "yes", "exclusions": ["residential_or_illegal"] }, "expected": "needs_official_check" },
+
+    { "id": "D01", "input": { "closure_status": "none" }, "expected": "review_required" },
+    { "id": "D02", "input": { "closure_status": "closed", "closure_date": "before_2023", "lease_type": "owned", "operating_60days": "no", "exclusions": ["prior_demolition_support"] }, "expected": "likely_mismatch", "note": "복수 배제 사유 시 우선순위가 가장 높은 규칙이 적용되는지 확인" }
+  ]
+}

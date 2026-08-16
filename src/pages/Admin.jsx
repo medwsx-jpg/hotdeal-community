@@ -555,6 +555,29 @@ const handleBanUser = async (userId, currentBanStatus) => {
   }
 }
 
+// 🆕 권한 변경 (관리자 ↔ 일반)
+const handleChangeRole = async (userId, currentRole, username) => {
+  const newRole = currentRole === '관리자' ? '일반' : '관리자'
+  if (!window.confirm(`${username || '이 회원'}의 권한을 "${newRole}"(으)로 변경하시겠습니까?`)) return
+
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ role: newRole })
+      .eq('id', userId)
+
+    if (error) throw error
+
+    alert(`권한 변경 완료! → ${newRole}`)
+    fetchAllUsersWithPoints(usersSearch)
+    if (selectedUserForPosts) {
+      setSelectedUserForPosts({...selectedUserForPosts, role: newRole})
+    }
+  } catch (error) {
+    alert('권한 변경 실패: ' + error.message)
+  }
+}
+
 // 🆕 사용자 글 삭제 (개별)
 const handleDeleteUserPost = async (postId) => {
   if (!window.confirm('이 게시물을 삭제하시겠습니까?')) return
@@ -1232,6 +1255,7 @@ const handleDeleteUserPost = async (postId) => {
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="font-bold text-gray-900 truncate">{u.username || '익명'}</h3>
                   <div className="flex items-center gap-1">
+                    {u.role === '관리자' && <span className="px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full font-semibold">관리자</span>}
                     {u.is_banned && <span className="px-2 py-0.5 bg-red-500 text-white text-xs rounded-full font-semibold">정지</span>}
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${u.level === 'vip' ? 'bg-green-100 text-green-700' : u.level === 'gold' ? 'bg-yellow-100 text-yellow-700' : u.level === 'silver' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
                       {u.levelLabel}
@@ -1277,6 +1301,15 @@ const handleDeleteUserPost = async (postId) => {
                   </button>
                 </div>
 
+                {/* 🆕 권한 변경 버튼 */}
+                <button
+                  onClick={() => handleChangeRole(u.id, u.role, u.username)}
+                  className={`w-full mt-2 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1 ${u.role === '관리자' ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>{u.role === '관리자' ? '관리자 → 일반' : '일반 → 관리자'}</span>
+                </button>
+
                 <p className="text-[10px] text-gray-400 mt-2">가입: {u.created_at ? getTimeAgo(u.created_at) : '최근'}</p>
               </div>
             </div>
@@ -1295,6 +1328,7 @@ const handleDeleteUserPost = async (postId) => {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-bold text-gray-900">{selectedUserForPosts.username || '익명'}</h3>
+                  {selectedUserForPosts.role === '관리자' && <span className="px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full font-semibold">관리자</span>}
                   {selectedUserForPosts.is_banned && <span className="px-2 py-0.5 bg-red-500 text-white text-xs rounded-full font-semibold">정지</span>}
                   <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${selectedUserForPosts.level === 'vip' ? 'bg-green-100 text-green-700' : selectedUserForPosts.level === 'gold' ? 'bg-yellow-100 text-yellow-700' : selectedUserForPosts.level === 'silver' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
                     {selectedUserForPosts.levelLabel}
