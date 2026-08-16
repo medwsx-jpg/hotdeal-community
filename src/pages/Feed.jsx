@@ -1508,20 +1508,37 @@ const closeGallery = () => {
           </div>
         </Link>
 
-        <Link
-          to="/check/hope-return-demolition-2026"
-          className="block mb-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-amber-100 mb-1">희망리턴패키지 점포철거비 지원</p>
-              <p className="text-base font-bold leading-snug">폐업 후 점포철거비,<br/>지원 대상인지 확인해보세요</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+          <Link
+            to="/check/hope-return-demolition-2026"
+            className="block bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-amber-100 mb-1">희망리턴패키지</p>
+                <p className="text-sm font-bold leading-snug">점포철거비 지원<br/>대상 확인하기</p>
+              </div>
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
+                <span className="text-xl">🏠</span>
+              </div>
             </div>
-            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
-              <span className="text-2xl">🏠</span>
+          </Link>
+
+          <Link
+            to="/check/maternity-benefit-uninsured-2026"
+            className="block bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-4 text-white shadow-lg shadow-pink-500/20 hover:shadow-xl transition-all"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-pink-100 mb-1">고용보험 미적용자</p>
+                <p className="text-sm font-bold leading-snug">출산급여 150만원<br/>대상 확인하기</p>
+              </div>
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
+                <span className="text-xl">🤰</span>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
 
         <div className="flex gap-5">
           {/* Feed */}

@@ -1,0 +1,347 @@
+{
+  "version": { "version_no": 1 },
+  "policy": {
+    "id": "maternity-benefit-uninsured-2026",
+    "slug": "maternity-benefit-uninsured-2026",
+    "title": "고용보험 미적용자 출산급여",
+    "owner": "고용노동부",
+    "source_url": "https://m.work24.go.kr/cm/c/f/1100/selecSystInfo.do?systId=SI00000390&systClId=SC00000250",
+    "source_published_at": "2026년",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.work24.go.kr/cm/c/b/1100/selectBbttInfo.do?currentPageNo=1&recordCountPerPage=10&polySvcFomtId=FM00000051",
+    "disclaimer": "이 진단은 공개된 제도 안내를 바탕으로 한 사전 확인용이며, 정확한 자격 여부와 최종 판정은 고용센터에서 확인하시기 바랍니다. 입력하신 정보는 서버로 전송되지 않고 브라우저에서만 처리됩니다."
+  },
+  "questions": [
+    {
+      "key": "income_activity",
+      "label": "현재 소득활동을 하고 계신가요?",
+      "help_text": "근로자, 1인 사업자, 프리랜서, 특수형태근로종사자 등 소득이 발생하는 활동을 말합니다.",
+      "type": "radio",
+      "required": true,
+      "order": 1,
+      "options": [
+        { "value": "yes", "label": "네, 소득활동을 하고 있습니다" },
+        { "value": "no", "label": "아니요, 소득활동을 하지 않습니다" }
+      ]
+    },
+    {
+      "key": "birth_type",
+      "label": "출산 또는 유산·사산 상황이 어떻게 되시나요?",
+      "type": "radio",
+      "required": true,
+      "order": 2,
+      "options": [
+        { "value": "birth", "label": "출산했습니다" },
+        { "value": "miscarriage", "label": "유산 또는 사산했습니다" },
+        { "value": "none", "label": "해당 없습니다" }
+      ]
+    },
+    {
+      "key": "within_one_year",
+      "label": "출산(유산·사산)일로부터 1년 이내인가요?",
+      "help_text": "출산급여는 출산일로부터 1년 이내에 신청해야 합니다.",
+      "type": "radio",
+      "required": true,
+      "order": 3,
+      "show_if": { "any": [
+        { "field": "birth_type", "op": "eq", "value": "birth" },
+        { "field": "birth_type", "op": "eq", "value": "miscarriage" }
+      ]},
+      "options": [
+        { "value": "yes", "label": "네, 1년 이내입니다" },
+        { "value": "no", "label": "아니요, 1년이 지났습니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ]
+    },
+    {
+      "key": "worker_type",
+      "label": "어떤 유형의 소득활동을 하고 계신가요?",
+      "type": "radio",
+      "required": true,
+      "order": 4,
+      "show_if": { "field": "income_activity", "op": "eq", "value": "yes" },
+      "options": [
+        { "value": "employee", "label": "근로자 (회사에 고용)", "description": "고용보험 가입 여부와 관계없이 회사에 고용되어 일하는 경우" },
+        { "value": "solo_biz", "label": "1인 사업자", "description": "피고용인 없이 혼자 운영하는 사업자" },
+        { "value": "freelancer", "label": "특수형태근로종사자 / 프리랜서", "description": "용역계약, 프리랜서, 특수고용 등" },
+        { "value": "public_excluded", "label": "공무원 / 사립학교교직원 / 외국인근로자 등", "description": "공무원, 사립학교교직원, 별정우체국 직원, 외국인근로자" }
+      ]
+    },
+    {
+      "key": "insurance_status",
+      "label": "고용보험 상태는 어떻게 되시나요?",
+      "help_text": "고용보험 가입 및 피보험기간에 따라 지원 유형이 달라집니다.",
+      "type": "radio",
+      "required": true,
+      "order": 5,
+      "show_if": { "field": "worker_type", "op": "eq", "value": "employee" },
+      "options": [
+        { "value": "insured_under_180", "label": "고용보험 가입 중이나 피보험기간 180일 미충족", "description": "출산일 전일까지 30일 이상 피보험자격을 유지하고 있어야 합니다" },
+        { "value": "exempt_business", "label": "고용보험 적용제외 사업에서 근무", "description": "총공사금액 2천만원 미만 공사, 연면적 100㎡ 이하 건축 등" },
+        { "value": "exempt_worker", "label": "고용보험 적용제외자", "description": "월 60시간(주 15시간) 미만 근로자, 4인 이하 농림어업 등" },
+        { "value": "insured_over_180", "label": "고용보험 가입, 피보험기간 180일 이상 충족" }
+      ]
+    },
+    {
+      "key": "solo_biz_employees",
+      "label": "출산일 현재 피고용인이 있으신가요?",
+      "type": "radio",
+      "required": true,
+      "order": 6,
+      "show_if": { "field": "worker_type", "op": "eq", "value": "solo_biz" },
+      "options": [
+        { "value": "none", "label": "피고용인 없음" },
+        { "value": "hired_one_after", "label": "임신 진단 이후 1인만 채용", "description": "예외적으로 임신 진단 이후 피고용인 1인까지만 인정됩니다" },
+        { "value": "has_multiple", "label": "2인 이상 피고용인 있음" }
+      ]
+    },
+    {
+      "key": "artist_insurance",
+      "label": "예술인·노무제공자로 고용보험 출산전후급여 수급 대상이신가요?",
+      "help_text": "고용보험법상 예술인·노무제공자 출산전후급여 대상자는 출산급여 대상에서 제외됩니다. 수급요건 미충족 시에는 출산급여 가능합니다.",
+      "type": "radio",
+      "required": true,
+      "order": 7,
+      "show_if": { "field": "worker_type", "op": "eq", "value": "freelancer" },
+      "options": [
+        { "value": "no", "label": "아니요 / 수급요건 미충족" },
+        { "value": "yes", "label": "네, 수급 대상입니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ]
+    },
+    {
+      "key": "pregnancy_weeks",
+      "label": "유산·사산 시 임신 기간은 어떻게 되셨나요?",
+      "help_text": "임신 기간에 따라 급여 금액이 달라집니다.",
+      "type": "radio",
+      "required": true,
+      "order": 8,
+      "show_if": { "field": "birth_type", "op": "eq", "value": "miscarriage" },
+      "options": [
+        { "value": "under_15", "label": "15주까지", "description": "급여: 30만원" },
+        { "value": "week_16_21", "label": "16~21주", "description": "급여: 50만원" },
+        { "value": "week_22_27", "label": "22~27주", "description": "급여: 100만원" },
+        { "value": "over_28", "label": "28주 이상", "description": "급여: 150만원" }
+      ]
+    },
+    {
+      "key": "income_period",
+      "label": "출산 전 18개월 중 3개월 이상 소득활동(세금 신고 기준)을 하셨나요?",
+      "help_text": "2026년 2월부터 세금이 신고된 소득 기준으로 소득활동을 인정합니다.",
+      "type": "radio",
+      "required": true,
+      "order": 9,
+      "options": [
+        { "value": "yes", "label": "네, 3개월 이상입니다" },
+        { "value": "no", "label": "아니요, 3개월 미만입니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "income_activity", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "지원 대상이 아닐 가능성이 높습니다",
+      "result_body": "고용보험 미적용자 출산급여는 소득활동을 하고 있지만 고용보험 출산휴가급여를 받지 못하는 분을 위한 제도입니다. 소득활동이 없는 경우 대상에 해당하지 않습니다.",
+      "evidence_text": "income_activity=no → 소득활동 미해당"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "birth_type", "op": "eq", "value": "none" },
+      "result_status": "likely_mismatch",
+      "result_title": "지원 대상이 아닐 가능성이 높습니다",
+      "result_body": "출산 또는 유산·사산에 해당하지 않는 경우 출산급여 신청 대상이 아닙니다.",
+      "evidence_text": "birth_type=none → 출산/유산·사산 미해당"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "within_one_year", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "신청 기한이 지났을 수 있습니다",
+      "result_body": "출산급여는 출산일(유산·사산일)로부터 1년 이내에 신청해야 합니다. 기한이 지난 경우 신청이 어려울 수 있습니다.",
+      "evidence_text": "within_one_year=no → 1년 초과"
+    },
+    {
+      "priority": 40,
+      "expression": { "field": "worker_type", "op": "eq", "value": "public_excluded" },
+      "result_status": "likely_mismatch",
+      "result_title": "지원 대상에서 제외되는 유형입니다",
+      "result_body": "공무원, 사립학교교직원, 외국인근로자, 별정우체국 직원은 고용보험 미적용자 출산급여 대상에서 제외됩니다.",
+      "evidence_text": "worker_type=public_excluded → 적용제외 대상"
+    },
+    {
+      "priority": 50,
+      "expression": { "field": "insurance_status", "op": "eq", "value": "insured_over_180" },
+      "result_status": "likely_mismatch",
+      "result_title": "고용보험 출산휴가급여 대상입니다",
+      "result_body": "고용보험에 가입하고 피보험기간 180일 이상을 충족한 경우, 고용보험의 출산전후휴가 급여를 신청하실 수 있습니다. 고용보험 미적용자 출산급여는 고용보험 급여를 받지 못하는 분을 위한 제도입니다.",
+      "evidence_text": "insurance_status=insured_over_180 → 고용보험 급여 대상"
+    },
+    {
+      "priority": 60,
+      "expression": { "field": "solo_biz_employees", "op": "eq", "value": "has_multiple" },
+      "result_status": "likely_mismatch",
+      "result_title": "지원 대상이 아닐 가능성이 높습니다",
+      "result_body": "1인 사업자 출산급여는 출산일 현재 피고용인이 없는 단독·공동사업자를 대상으로 합니다. 피고용인이 2인 이상인 경우 대상에 해당하지 않습니다. (예외: 임신 진단 이후 1인까지만 채용 인정)",
+      "evidence_text": "solo_biz_employees=has_multiple → 피고용인 2인 이상"
+    },
+    {
+      "priority": 70,
+      "expression": { "field": "artist_insurance", "op": "eq", "value": "yes" },
+      "result_status": "likely_mismatch",
+      "result_title": "예술인·노무제공자 출산전후급여 대상입니다",
+      "result_body": "고용보험법상 예술인·노무제공자 출산전후급여 수급 대상자는 출산급여 대상에서 제외됩니다. 고용보험 출산전후급여를 신청해 주세요.",
+      "evidence_text": "artist_insurance=yes → 예술인 출산전후급여 대상"
+    },
+    {
+      "priority": 80,
+      "expression": { "field": "income_period", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "소득활동 기간이 부족할 수 있습니다",
+      "result_body": "출산 전 18개월 중 3개월 이상 소득활동(세금 신고된 소득 기준)이 확인되어야 합니다. 소득활동 기간이 3개월 미만인 경우 대상에 해당하지 않을 수 있습니다.",
+      "evidence_text": "income_period=no → 소득활동 3개월 미만"
+    },
+    {
+      "priority": 100,
+      "expression": {
+        "all": [
+          { "field": "worker_type", "op": "eq", "value": "employee" },
+          { "field": "insurance_status", "op": "eq", "value": "insured_under_180" },
+          { "field": "income_period", "op": "eq", "value": "yes" },
+          { "field": "within_one_year", "op": "in", "value": ["yes", "unsure"] }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "출산급여 확인 대상입니다 (1유형)",
+      "result_body": "고용보험 가입자이나 피보험기간 180일 미충족으로 출산휴가급여를 받지 못하는 근로자(1유형)에 해당할 수 있습니다.\n\n출산급여 150만원 (유산·사산의 경우 임신 기간에 따라 상이)을 지원받을 수 있습니다.",
+      "limit_note": "출산일 전일까지 30일 이상 피보험자격을 유지하고 있어야 합니다. 신청 시 근로계약서 등 근로자 증빙 및 임금 입금내역이 필요합니다.",
+      "evidence_text": "1유형: 고용보험 가입, 180일 미충족 근로자"
+    },
+    {
+      "priority": 110,
+      "expression": {
+        "all": [
+          { "field": "worker_type", "op": "eq", "value": "employee" },
+          { "field": "insurance_status", "op": "in", "value": ["exempt_business", "exempt_worker"] },
+          { "field": "income_period", "op": "eq", "value": "yes" },
+          { "field": "within_one_year", "op": "in", "value": ["yes", "unsure"] }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "출산급여 확인 대상입니다 (2유형)",
+      "result_body": "고용보험 적용제외 사업의 근로자 또는 고용보험 적용제외자(2유형)에 해당할 수 있습니다.\n\n출산급여 150만원 (유산·사산의 경우 임신 기간에 따라 상이)을 지원받을 수 있습니다.",
+      "limit_note": "신청 시 근로계약서 등 근로자 증빙, 임금 입금내역, 고용보험 미가입 확인서가 필요합니다.",
+      "evidence_text": "2유형: 고용보험 적용제외 근로자"
+    },
+    {
+      "priority": 120,
+      "expression": {
+        "all": [
+          { "field": "worker_type", "op": "eq", "value": "solo_biz" },
+          { "field": "solo_biz_employees", "op": "in", "value": ["none", "hired_one_after"] },
+          { "field": "income_period", "op": "eq", "value": "yes" },
+          { "field": "within_one_year", "op": "in", "value": ["yes", "unsure"] }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "출산급여 확인 대상입니다 (3유형)",
+      "result_body": "피고용인이 없는 1인 사업자(3유형)에 해당할 수 있습니다.\n\n출산급여 150만원 (유산·사산의 경우 임신 기간에 따라 상이)을 지원받을 수 있습니다.",
+      "limit_note": "공동사업자인 경우 명의, 실질 모두 공동사업자여야 합니다. 신청 시 1인사업자 사실확인서, 건강보험자격득실확인서 등이 필요합니다.",
+      "evidence_text": "3유형: 1인 사업자"
+    },
+    {
+      "priority": 130,
+      "expression": {
+        "all": [
+          { "field": "worker_type", "op": "eq", "value": "freelancer" },
+          { "field": "artist_insurance", "op": "in", "value": ["no", "unsure"] },
+          { "field": "income_period", "op": "eq", "value": "yes" },
+          { "field": "within_one_year", "op": "in", "value": ["yes", "unsure"] }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "출산급여 확인 대상입니다 (4유형)",
+      "result_body": "특수형태근로종사자·프리랜서 등(4유형)에 해당할 수 있습니다.\n\n출산급여 150만원 (유산·사산의 경우 임신 기간에 따라 상이)을 지원받을 수 있습니다.",
+      "limit_note": "신청 시 용역계약서 등 소득활동 증빙 서류가 필요합니다.",
+      "evidence_text": "4유형: 특수형태근로종사자/프리랜서"
+    },
+    {
+      "priority": 200,
+      "expression": {
+        "all": [
+          { "field": "income_period", "op": "eq", "value": "unsure" },
+          { "field": "within_one_year", "op": "in", "value": ["yes", "unsure"] }
+        ]
+      },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "소득활동 기간을 정확히 확인하기 어려운 경우, 고용센터에서 확인하시기 바랍니다. 국세청 소득 신고 내역으로 소득활동 여부를 확인할 수 있습니다.",
+      "evidence_text": "income_period=unsure → 소득활동 기간 불명확"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 판단하기 어렵습니다. 고용센터(국번 없이 1350) 또는 워크넷(work24.go.kr)에서 확인해 주세요.",
+      "evidence_text": "no rule matched → fallback"
+    }
+  ],
+  "always_show_notes": [
+    "출산급여는 150만원이며, 유산·사산의 경우 임신 기간에 따라 30만~150만원입니다.",
+    "출산일로부터 1년 이내에 신청해야 합니다.",
+    "2026년 2월부터 세금이 신고된 소득 기준으로 소득활동을 인정합니다.",
+    "거짓이나 부정한 방법으로 출산급여를 청구·수급한 경우 공공재정환수법에 따라 환수됩니다.",
+    "이 진단 결과는 공식 판정이 아니며, 최종 결정은 고용센터에서 이루어집니다."
+  ],
+  "cross_sell_note": "고용보험에 가입한 근로자 및 예술인·노무제공자는 고용보험의 출산전후휴가급여를 신청할 수 있습니다. 해당 여부는 고용센터에서 확인해 주세요.",
+  "unknown_if": [
+    "가구내 고용활동 또는 자가소비 생산활동에 해당하는 경우 대상에서 제외될 수 있습니다.",
+    "공동사업자의 경우 명의와 실질 모두 공동사업자여야 하며, 개별 확인이 필요합니다.",
+    "예술인·노무제공자 출산전후급여 수급요건 미충족 여부는 고용센터 확인이 필요합니다."
+  ],
+  "test_cases": [
+    {
+      "name": "1유형 - 고용보험 가입 180일 미충족 근로자",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "yes", "worker_type": "employee", "insurance_status": "insured_under_180", "income_period": "yes" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "2유형 - 고용보험 적용제외 사업 근로자",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "yes", "worker_type": "employee", "insurance_status": "exempt_business", "income_period": "yes" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "3유형 - 1인 사업자 피고용인 없음",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "yes", "worker_type": "solo_biz", "solo_biz_employees": "none", "income_period": "yes" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "4유형 - 프리랜서",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "yes", "worker_type": "freelancer", "artist_insurance": "no", "income_period": "yes" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "고용보험 180일 이상 → 미적용자 출산급여 대상 아님",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "yes", "worker_type": "employee", "insurance_status": "insured_over_180", "income_period": "yes" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "공무원 → 제외 대상",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "yes", "worker_type": "public_excluded", "income_period": "yes" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "소득활동 없음",
+      "answers": { "income_activity": "no", "birth_type": "birth", "within_one_year": "yes", "income_period": "yes" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "1년 초과",
+      "answers": { "income_activity": "yes", "birth_type": "birth", "within_one_year": "no", "worker_type": "employee", "insurance_status": "insured_under_180", "income_period": "yes" },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}
