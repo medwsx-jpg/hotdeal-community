@@ -1493,39 +1493,47 @@ const closeGallery = () => {
         </div>
 
         {/* 정책 진단기 카드 */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
           <Link
             to="/check/small-biz-fund-2026"
-            className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl px-3 py-2.5 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            className="flex items-center gap-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl px-3.5 py-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
           >
             <span className="text-2xl flex-shrink-0">🩺</span>
             <div className="min-w-0">
-              <p className="text-sm font-bold leading-tight">소상공인 정책자금</p>
-              <p className="text-[11px] text-teal-100 mt-0.5 font-medium">진단하기 →</p>
+              <p className="text-base font-bold leading-tight">소상공인 정책자금</p>
+              <p className="text-xs text-teal-100 mt-0.5 font-medium">진단하기 →</p>
             </div>
           </Link>
 
           <Link
             to="/check/hope-return-demolition-2026"
-            className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl px-3 py-2.5 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            className="flex items-center gap-2.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl px-3.5 py-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
           >
             <span className="text-2xl flex-shrink-0">🏠</span>
             <div className="min-w-0">
-              <p className="text-sm font-bold leading-tight">점포철거비 지원</p>
-              <p className="text-[11px] text-amber-100 mt-0.5 font-medium">진단하기 →</p>
+              <p className="text-base font-bold leading-tight">점포철거비 지원</p>
+              <p className="text-xs text-amber-100 mt-0.5 font-medium">진단하기 →</p>
             </div>
           </Link>
 
           <Link
             to="/check/maternity-benefit-uninsured-2026"
-            className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl px-3 py-2.5 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+            className="flex items-center gap-2.5 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl px-3.5 py-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
           >
             <span className="text-2xl flex-shrink-0">🤰</span>
             <div className="min-w-0">
-              <p className="text-sm font-bold leading-tight">출산급여 150만원</p>
-              <p className="text-[11px] text-pink-100 mt-0.5 font-medium">진단하기 →</p>
+              <p className="text-base font-bold leading-tight">출산급여 150만원</p>
+              <p className="text-xs text-pink-100 mt-0.5 font-medium">진단하기 →</p>
             </div>
           </Link>
+
+          <div className="flex items-center gap-2.5 bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl px-3.5 py-3">
+            <span className="text-2xl flex-shrink-0">🔜</span>
+            <div className="min-w-0">
+              <p className="text-base font-bold leading-tight text-gray-400">준비 중</p>
+              <p className="text-xs text-gray-300 mt-0.5 font-medium">곧 추가됩니다</p>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-5">
