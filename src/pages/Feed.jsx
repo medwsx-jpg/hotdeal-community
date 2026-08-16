@@ -1849,20 +1849,20 @@ const closeGallery = () => {
                   </div>
                   <p className="text-sm text-gray-500 mb-3">정부24·복지로에서 먼저 확인할 혜택을 정리합니다.</p>
                   <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">
-                      <span className="text-lg flex-shrink-0">🔜</span>
+                    <Link to="/check/energy-voucher-2026" className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-sky-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <span className="text-lg flex-shrink-0">⚡</span>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-400 leading-tight">에너지바우처</p>
-                        <p className="text-xs text-gray-300 mt-0.5">준비중</p>
+                        <p className="text-sm font-bold leading-tight">에너지바우처 최대 70만원</p>
+                        <p className="text-xs text-blue-100 mt-0.5">30초 체크 →</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-3 cursor-default">
-                      <span className="text-lg flex-shrink-0">🔜</span>
+                    </Link>
+                    <Link to="/check/eitc-2026" className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg px-3 py-3 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                      <span className="text-lg flex-shrink-0">💰</span>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-400 leading-tight">근로장려금</p>
-                        <p className="text-xs text-gray-300 mt-0.5">준비중</p>
+                        <p className="text-sm font-bold leading-tight">근로장려금 최대 330만원</p>
+                        <p className="text-xs text-emerald-100 mt-0.5">30초 체크 →</p>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                 </div>
 

@@ -1,0 +1,173 @@
+{
+  "policy": {
+    "id": "energy-voucher-2026",
+    "slug": "energy-voucher-2026",
+    "title": "2026년 에너지바우처",
+    "owner": "산업통상자원부 · 한국에너지공단",
+    "source_url": "https://www.energyv.or.kr",
+    "source_published_at": "2026-06-15",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.bokjiro.go.kr",
+    "disclaimer": "본 체크는 2026년 에너지바우처 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 세부 조건은 반드시 복지로, 에너지바우처 홈페이지(www.energyv.or.kr) 또는 읍·면·동 행정복지센터에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 기준 (신청기간 2026.6.15~12.31)"
+  },
+
+  "questions": [
+    {
+      "key": "benefit_status",
+      "label": "기초생활보장 급여를 받고 계신가요?",
+      "help_text": "생계급여, 의료급여, 주거급여, 교육급여 중 하나 이상 수급 중이어야 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 수급 중입니다 (생계·의료·주거·교육급여 중 1개 이상)" },
+        { "value": "no", "label": "아니요, 수급자가 아닙니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "household_member",
+      "label": "가구원 중 다음에 해당하는 분이 있나요?",
+      "help_text": "본인 또는 함께 사는 가구원 중 1명 이상 해당해야 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "elderly", "label": "만 65세 이상 노인" },
+        { "value": "infant", "label": "만 7세 미만 영유아" },
+        { "value": "disabled", "label": "등록 장애인" },
+        { "value": "pregnant", "label": "임산부" },
+        { "value": "patient", "label": "중증·희귀·중증난치질환자" },
+        { "value": "single_parent", "label": "한부모가족" },
+        { "value": "child_headed", "label": "소년소녀가정" },
+        { "value": "multi_child", "label": "자녀 2명 이상 다자녀 가구" },
+        { "value": "none", "label": "해당하는 가구원이 없습니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "benefit_status", "op": "eq", "value": "yes" }
+    },
+    {
+      "key": "already_received",
+      "label": "지난해 에너지바우처를 받으셨나요?",
+      "help_text": "기존 수급자는 이사·세대원 변동이 없으면 자동 갱신되어 재신청이 필요 없을 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes_same", "label": "네, 받았고 이사·세대원 변동이 없습니다" },
+        { "value": "yes_changed", "label": "네, 받았지만 이사 또는 세대원 변동이 있습니다" },
+        { "value": "no", "label": "아니요, 처음 신청합니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "benefit_status", "op": "eq", "value": "yes" },
+          { "field": "household_member", "op": "neq", "value": "none" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "benefit_status", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "기초생활보장 수급자가 아니면 대상이 아닙니다",
+      "result_body": "에너지바우처는 생계·의료·주거·교육급여 수급자를 대상으로 합니다. 수급자가 아닌 경우 지원 대상에 해당하지 않습니다.\n\n기초생활보장 수급 대상인지 궁금하시다면 복지로 모의계산으로 먼저 확인해 보세요.",
+      "evidence_text": "benefit_status = no"
+    },
+    {
+      "priority": 11,
+      "expression": { "field": "benefit_status", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "수급 여부를 먼저 확인해 주세요",
+      "result_body": "기초생활보장 급여 수급 여부는 복지로 또는 읍·면·동 행정복지센터에서 확인할 수 있습니다. 수급자 증명서 발급 내역이 있다면 수급 중일 가능성이 높습니다.",
+      "evidence_text": "benefit_status = unsure"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "household_member", "op": "eq", "value": "none" },
+      "result_status": "likely_mismatch",
+      "result_title": "세대원 특성 기준에 해당하지 않습니다",
+      "result_body": "에너지바우처는 수급자이면서 가구원 중 노인·영유아·장애인·임산부·중증질환자·한부모가족·소년소녀가정·다자녀 중 1명 이상이 있어야 합니다.\n\n기준은 공고에 따라 달라질 수 있으니, 애매한 경우 행정복지센터에 문의해 보세요.",
+      "evidence_text": "household_member = none"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "already_received", "op": "eq", "value": "yes_same" },
+      "result_status": "check_first",
+      "result_title": "자동 갱신 대상일 수 있습니다 — 지급 여부만 확인하세요",
+      "result_body": "지난해 수급자로 이사·세대원 변동이 없다면 별도 재신청 없이 자동 갱신될 수 있습니다.\n\n에너지바우처 홈페이지 또는 행정복지센터에서 지급 여부와 잔액을 확인해 보세요.",
+      "limit_note": "지원금액(연간): 1인 295,200원 | 2인 407,500원 | 3인 532,700원 | 4인 이상 701,300원 | 사용기간: 2026.7.1~2027.5.31",
+      "evidence_text": "already_received = yes_same"
+    },
+    {
+      "priority": 110,
+      "expression": { "field": "already_received", "op": "in", "value": ["yes_changed", "no"] },
+      "result_status": "check_first",
+      "result_title": "에너지바우처 확인 대상입니다",
+      "result_body": "현재 공개 기준상 에너지바우처 지원 대상에 해당할 수 있습니다. 복지로에서 온라인으로 신청하시거나, 신분증을 지참하여 읍·면·동 행정복지센터를 방문해 신청하실 수 있습니다.\n\n이사·세대원 변동이 있었던 경우 변경 신청이 필요합니다.",
+      "limit_note": "지원금액(연간): 1인 295,200원 | 2인 407,500원 | 3인 532,700원 | 4인 이상 701,300원 | 신청기간: 2026.6.15~12.31 | 사용기간: 2026.7.1~2027.5.31",
+      "evidence_text": "수급자 + 세대원 특성 충족"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 에너지바우처 콜센터(1600-3190) 또는 읍·면·동 행정복지센터에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 지원 여부는 공식기관 심사로 결정됩니다.",
+    "바우처는 전기·가스·등유·연탄·LPG 구입에 사용할 수 있습니다 (국민행복카드 등).",
+    "보장시설 수급자, 한국에너지공단의 등유바우처·연탄쿠폰 수혜자 등은 제외될 수 있습니다.",
+    "온라인 신청: 복지로(www.bokjiro.go.kr) | 방문: 읍·면·동 행정복지센터 | 문의: 1600-3190"
+  ],
+
+  "cross_sell_note": "저소득 근로자시라면 '근로장려금' 30초 체크도 확인해 보세요.",
+
+  "unknown_if": [
+    "세대원 특성 기준의 세부 연령·출생연도 기준은 공고에 따라 달라질 수 있습니다",
+    "지원금액은 동·하절기 배분 등 세부 운영 방식에 따라 달라질 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "수급자 아님",
+      "answers": { "benefit_status": "no" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "수급자 + 노인 가구원 + 신규",
+      "answers": {
+        "benefit_status": "yes",
+        "household_member": "elderly",
+        "already_received": "no"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "자동 갱신 대상",
+      "answers": {
+        "benefit_status": "yes",
+        "household_member": "disabled",
+        "already_received": "yes_same"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "세대원 특성 없음",
+      "answers": {
+        "benefit_status": "yes",
+        "household_member": "none"
+      },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}

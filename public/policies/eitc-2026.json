@@ -1,0 +1,240 @@
+{
+  "policy": {
+    "id": "eitc-2026",
+    "slug": "eitc-2026",
+    "title": "2026년 근로장려금",
+    "owner": "국세청",
+    "source_url": "https://www.hometax.go.kr",
+    "source_published_at": "2026-01-01",
+    "checked_at": "2026-08-16",
+    "apply_url": "https://www.hometax.go.kr",
+    "disclaimer": "본 체크는 근로장려금 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 지급액은 반드시 국세청 홈택스 또는 장려금 상담센터(1566-3636)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 기준 (2025년 소득 기준)"
+  },
+
+  "questions": [
+    {
+      "key": "income_type",
+      "label": "2025년에 어떤 소득이 있으셨나요?",
+      "help_text": "근로소득, 사업소득(전문직 제외), 종교인소득이 있어야 신청할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "work", "label": "근로소득 (직장, 아르바이트 등)" },
+        { "value": "business", "label": "사업소득 (자영업, 프리랜서 등)" },
+        { "value": "religious", "label": "종교인소득" },
+        { "value": "none", "label": "위 소득이 없었습니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "household_type",
+      "label": "가구 유형은 어디에 해당하나요?",
+      "help_text": "배우자·부양자녀·70세 이상 직계존속 유무로 판단합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "single", "label": "단독 가구", "description": "배우자, 부양자녀, 70세 이상 직계존속이 없음" },
+        { "value": "single_income", "label": "홑벌이 가구", "description": "배우자(총급여 300만원 미만) 또는 부양자녀·70세 이상 직계존속 있음" },
+        { "value": "dual_income", "label": "맞벌이 가구", "description": "본인과 배우자 각각 총급여 300만원 이상" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "income_type", "op": "neq", "value": "none" }
+    },
+    {
+      "key": "income_range",
+      "label": "2025년 부부합산 연간 총소득이 기준 미만인가요?",
+      "help_text": "단독 2,200만원 / 홑벌이 3,200만원 / 맞벌이 4,400만원 미만이어야 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "under", "label": "네, 기준 미만입니다" },
+        { "value": "over", "label": "아니요, 기준 이상입니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": { "field": "income_type", "op": "neq", "value": "none" }
+    },
+    {
+      "key": "asset_range",
+      "label": "2025년 6월 1일 기준 가구원 전체 재산 합계가 2억 4천만원 미만인가요?",
+      "help_text": "주택, 토지, 자동차, 예금 등을 합산합니다. 부채는 차감하지 않습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "under", "label": "네, 2억 4천만원 미만입니다" },
+        { "value": "over", "label": "아니요, 2억 4천만원 이상입니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": {
+        "all": [
+          { "field": "income_type", "op": "neq", "value": "none" },
+          { "field": "income_range", "op": "eq", "value": "under" }
+        ]
+      }
+    },
+    {
+      "key": "exclusion",
+      "label": "다음 중 해당되는 사항이 있나요?",
+      "help_text": "해당 시 신청이 제한될 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "none", "label": "해당 없음" },
+        { "value": "professional", "label": "본인 또는 배우자가 변호사·의사 등 전문직 사업자입니다" },
+        { "value": "dependent", "label": "다른 사람의 부양자녀로 등록되어 있습니다" },
+        { "value": "unsure", "label": "잘 모르겠음" }
+      ],
+      "required": true,
+      "order": 5,
+      "show_if": {
+        "all": [
+          { "field": "income_type", "op": "neq", "value": "none" },
+          { "field": "income_range", "op": "eq", "value": "under" },
+          { "field": "asset_range", "op": "eq", "value": "under" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "income_type", "op": "eq", "value": "none" },
+      "result_status": "likely_mismatch",
+      "result_title": "근로·사업·종교인 소득이 있어야 신청할 수 있습니다",
+      "result_body": "근로장려금은 일해서 얻은 소득(근로·사업·종교인소득)이 있는 가구를 지원하는 제도입니다. 해당 소득이 없는 경우 신청 대상이 아닙니다.\n\n생활이 어려우시다면 기초생활보장(복지로) 제도를 확인해 보세요.",
+      "evidence_text": "income_type = none"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "income_range", "op": "eq", "value": "over" },
+      "result_status": "likely_mismatch",
+      "result_title": "소득 기준을 초과할 가능성이 있습니다",
+      "result_body": "근로장려금 소득 기준은 단독 2,200만원, 홑벌이 3,200만원, 맞벌이 4,400만원 미만입니다. 기준 이상인 경우 지급 대상에 해당하지 않을 수 있습니다.\n\n정확한 총소득은 홈택스에서 확인할 수 있습니다.",
+      "evidence_text": "income_range = over"
+    },
+    {
+      "priority": 21,
+      "expression": { "field": "income_range", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "소득 금액을 확인해 주세요",
+      "result_body": "홈택스(www.hometax.go.kr)에서 2025년 소득 내역을 확인하신 후 다시 체크해 보세요. 신청 안내문(카카오톡·우편)을 받으셨다면 이미 대상자로 분류되었을 가능성이 높습니다.",
+      "evidence_text": "income_range = unsure"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "asset_range", "op": "eq", "value": "over" },
+      "result_status": "likely_mismatch",
+      "result_title": "재산 기준을 초과할 가능성이 있습니다",
+      "result_body": "가구원 전체 재산 합계가 2억 4천만원 이상인 경우 지급 대상에서 제외됩니다. 재산에는 주택·토지·자동차·예금 등이 포함되며 부채는 차감하지 않습니다.",
+      "evidence_text": "asset_range = over"
+    },
+    {
+      "priority": 31,
+      "expression": { "field": "asset_range", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "재산 합계를 확인해 주세요",
+      "result_body": "재산 기준(2억 4천만원 미만) 충족 여부 확인이 필요합니다. 1억 7천만원 이상인 경우 지급액이 50% 감액될 수 있으니 참고하세요.",
+      "evidence_text": "asset_range = unsure"
+    },
+    {
+      "priority": 40,
+      "expression": { "field": "exclusion", "op": "eq", "value": "professional" },
+      "result_status": "likely_mismatch",
+      "result_title": "전문직 사업자는 신청이 제한됩니다",
+      "result_body": "본인 또는 배우자가 변호사·의사·세무사 등 전문직 사업을 영위하는 경우 근로장려금 신청 대상에서 제외됩니다.",
+      "evidence_text": "exclusion = professional"
+    },
+    {
+      "priority": 41,
+      "expression": { "field": "exclusion", "op": "eq", "value": "dependent" },
+      "result_status": "likely_mismatch",
+      "result_title": "다른 거주자의 부양자녀는 신청할 수 없습니다",
+      "result_body": "다른 사람의 부양자녀로 등록된 경우 본인이 직접 근로장려금을 신청할 수 없습니다.",
+      "evidence_text": "exclusion = dependent"
+    },
+    {
+      "priority": 42,
+      "expression": { "field": "exclusion", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "제외 사유 해당 여부를 확인해 주세요",
+      "result_body": "제외 사유 해당 여부는 장려금 상담센터(1566-3636)에서 확인할 수 있습니다.",
+      "evidence_text": "exclusion = unsure"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "exclusion", "op": "eq", "value": "none" },
+      "result_status": "check_first",
+      "result_title": "근로장려금 확인 대상입니다 — 신청시기를 확인하세요",
+      "result_body": "현재 공개 기준상 근로장려금 지급 대상에 해당할 수 있습니다. 홈택스에서 신청 대상 여부를 먼저 확인해 보세요.\n\n📅 신청시기\n• 정기 신청: 매년 5월 (모든 소득 유형)\n• 반기 신청: 상반기분 9월 / 하반기분 3월 (근로소득자만 가능)\n• 기한 후 신청: 6월~11월 30일 (지급액 5% 차감)\n\n사업자·프리랜서·종교인은 5월 정기 신청만 가능합니다.",
+      "limit_note": "최대 지급액: 단독 165만원 | 홑벌이 285만원 | 맞벌이 330만원 (소득 구간별 산정) | 신청: 홈택스·손택스·ARS(1544-9944)",
+      "evidence_text": "소득·재산·제외 요건 모두 충족"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 국세청 홈택스 또는 장려금 상담센터(1566-3636)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 지급 여부와 금액은 국세청 심사로 결정됩니다.",
+    "지급액은 소득 구간에 따라 산정되며, 재산 1억 7천만원 이상 시 50% 감액됩니다.",
+    "자녀가 있다면 자녀장려금(자녀 1인당 최대 100만원)도 함께 확인해 보세요.",
+    "신청: 홈택스(PC)·손택스(모바일)·ARS 1544-9944 | 문의: 1566-3636"
+  ],
+
+  "cross_sell_note": "기초생활보장 수급자시라면 '에너지바우처' 30초 체크도 확인해 보세요.",
+
+  "unknown_if": [
+    "소득·재산 기준과 지급액은 세법 개정에 따라 달라질 수 있습니다",
+    "가구 유형 판단(부양자녀·직계존속 요건)은 세부 기준 확인이 필요합니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "소득 없음",
+      "answers": { "income_type": "none" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "전체 요건 충족",
+      "answers": {
+        "income_type": "work",
+        "household_type": "single",
+        "income_range": "under",
+        "asset_range": "under",
+        "exclusion": "none"
+      },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "재산 초과",
+      "answers": {
+        "income_type": "work",
+        "household_type": "single",
+        "income_range": "under",
+        "asset_range": "over"
+      },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "전문직",
+      "answers": {
+        "income_type": "business",
+        "household_type": "single_income",
+        "income_range": "under",
+        "asset_range": "under",
+        "exclusion": "professional"
+      },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}
