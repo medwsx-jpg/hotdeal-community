@@ -1494,7 +1494,24 @@ const closeGallery = () => {
           </div>
         </div>
 
-        {/* 30초 자격 체크 카드 */}
+        {/* 30초 체크 안내 배너 (체크 탭에서는 숨김) */}
+        {activeMainTab !== 'check' && (
+          <button
+            onClick={() => setActiveMainTab('check')}
+            className="w-full mb-4 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl px-4 py-4 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-base md:text-lg font-bold leading-tight">⚡ 오늘 내가 먼저 확인할 정책은 어디일까요?</p>
+                <p className="text-xs md:text-sm text-teal-100 mt-1">로그인 없이 30초만에 공식 확인 창구를 알려드립니다 — 정책자금·바우처·출산급여 등</p>
+              </div>
+              <span className="flex-shrink-0 bg-white/20 rounded-lg px-3 py-2 text-sm font-bold whitespace-nowrap">30초 체크 →</span>
+            </div>
+          </button>
+        )}
+
+        {/* (보존) 기존 30초 자격 체크 카드 그리드 — 되돌리려면 false를 activeMainTab !== 'check'로 변경 */}
+        {false && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
           <Link
             to="/check/small-biz-fund-2026"
@@ -1537,6 +1554,7 @@ const closeGallery = () => {
             </div>
           </div>
         </div>
+        )}
 
         <div className="flex gap-5">
           {/* Feed */}
