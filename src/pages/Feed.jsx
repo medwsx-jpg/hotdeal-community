@@ -1508,6 +1508,21 @@ const closeGallery = () => {
           </div>
         </Link>
 
+        <Link
+          to="/check/hope-return-demolition-2026"
+          className="block mb-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg shadow-amber-500/20 hover:shadow-xl transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-amber-100 mb-1">희망리턴패키지 점포철거비 지원</p>
+              <p className="text-base font-bold leading-snug">폐업 후 점포철거비,<br/>지원 대상인지 확인해보세요</p>
+            </div>
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
+              <span className="text-2xl">🏠</span>
+            </div>
+          </div>
+        </Link>
+
         <div className="flex gap-5">
           {/* Feed */}
           <main className="flex-1 overflow-hidden">
