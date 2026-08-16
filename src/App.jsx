@@ -12,6 +12,7 @@ import Challenge from './pages/Challenge'
 import Store from './pages/Store'  // 🆕 스토어 추가
 import PostDetail from './pages/PostDetail'
 import PolicyCheck from './pages/PolicyCheck'
+import CheckHome from './pages/CheckHome'
 import { lazy, Suspense } from 'react'
 const Market = lazy(() => import('./pages/Market'))
 const AuctionDetail = lazy(() => import('./pages/AuctionDetail'))
@@ -44,6 +45,7 @@ function App() {
           <Route path="/open" element={<Navigate to="/feed" replace />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
+          <Route path="/check" element={<CheckHome />} />
           <Route path="/check/:slug" element={<PolicyCheck />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
