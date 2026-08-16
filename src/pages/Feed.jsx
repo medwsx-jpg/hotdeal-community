@@ -1481,9 +1481,32 @@ const closeGallery = () => {
               >
                 🏷️ 마켓
               </button>
+
+              <button
+                onClick={() => navigate('/check/small-biz-fund-2026')}
+                className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-emerald-100 hover:text-emerald-600"
+              >
+                🩺 정책진단
+              </button>
             </div>
           </div>
         </div>
+
+        {/* 정책 진단기 배너 */}
+        <Link
+          to="/check/small-biz-fund-2026"
+          className="block mb-4 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-4 text-white shadow-lg shadow-teal-500/20 hover:shadow-xl transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-teal-100 mb-1">소상공인 정책자금 진단기</p>
+              <p className="text-base font-bold leading-snug">내가 받을 수 있는 정책자금,<br/>1분 만에 확인해보세요</p>
+            </div>
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
+              <span className="text-2xl">🩺</span>
+            </div>
+          </div>
+        </Link>
 
         <div className="flex gap-5">
           {/* Feed */}
