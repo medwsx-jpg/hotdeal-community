@@ -1492,46 +1492,112 @@ const closeGallery = () => {
           </div>
         </div>
 
-        {/* 30초 자격 체크 카드 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-          <Link
-            to="/check/small-biz-fund-2026"
-            className="flex items-center gap-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl px-3.5 py-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
-          >
-            <span className="text-2xl flex-shrink-0">🩺</span>
-            <div className="min-w-0">
-              <p className="text-base font-bold leading-tight">소상공인 정책자금</p>
-              <p className="text-xs text-teal-100 mt-0.5 font-medium">30초 체크 →</p>
-            </div>
-          </Link>
+        {/* 30초 공식확인 게이트웨이 */}
+        <div className="mb-4 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+          <div className="text-center mb-4">
+            <h2 className="text-lg font-bold text-gray-900">오늘 내가 먼저 확인할 정책은 어디일까요?</h2>
+            <p className="text-sm text-gray-500 mt-1">로그인 없이, 30초만에 공식 확인 창구와 준비할 내용을 알려드립니다.</p>
+          </div>
 
-          <Link
-            to="/check/hope-return-demolition-2026"
-            className="flex items-center gap-2.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl px-3.5 py-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
-          >
-            <span className="text-2xl flex-shrink-0">🏠</span>
-            <div className="min-w-0">
-              <p className="text-base font-bold leading-tight">점포철거비 지원</p>
-              <p className="text-xs text-amber-100 mt-0.5 font-medium">30초 체크 →</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* 생활·복지 확인 */}
+            <div className="border border-blue-200 rounded-xl p-3 bg-blue-50/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🏠</span>
+                <h3 className="text-sm font-bold text-blue-800">생활·복지 확인</h3>
+                <span className="text-xs text-blue-400 ml-auto">정부24·복지로</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-2.5 cursor-default">
+                  <span className="text-base flex-shrink-0">🔜</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-400 leading-tight">에너지바우처</p>
+                    <p className="text-xs text-gray-300 mt-0.5">준비중</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-2.5 cursor-default">
+                  <span className="text-base flex-shrink-0">🔜</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-400 leading-tight">근로장려금</p>
+                    <p className="text-xs text-gray-300 mt-0.5">준비중</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </Link>
 
-          <Link
-            to="/check/maternity-benefit-uninsured-2026"
-            className="flex items-center gap-2.5 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl px-3.5 py-3 text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
-          >
-            <span className="text-2xl flex-shrink-0">🤰</span>
-            <div className="min-w-0">
-              <p className="text-base font-bold leading-tight">출산급여 150만원</p>
-              <p className="text-xs text-pink-100 mt-0.5 font-medium">30초 체크 →</p>
+            {/* 취업·직업훈련 확인 */}
+            <div className="border border-green-200 rounded-xl p-3 bg-green-50/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">💼</span>
+                <h3 className="text-sm font-bold text-green-800">취업·직업훈련 확인</h3>
+                <span className="text-xs text-green-400 ml-auto">고용24</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Link to="/check/maternity-benefit-uninsured-2026" className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg px-3 py-2.5 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                  <span className="text-base flex-shrink-0">🤰</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold leading-tight">출산급여 150만원</p>
+                    <p className="text-xs text-pink-100 mt-0.5">30초 체크 →</p>
+                  </div>
+                </Link>
+                <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-2.5 cursor-default">
+                  <span className="text-base flex-shrink-0">🔜</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-400 leading-tight">준비 중</p>
+                    <p className="text-xs text-gray-300 mt-0.5">곧 추가됩니다</p>
+                  </div>
+                </div>
+              </div>
             </div>
-          </Link>
 
-          <div className="flex items-center gap-2.5 bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl px-3.5 py-3">
-            <span className="text-2xl flex-shrink-0">🔜</span>
-            <div className="min-w-0">
-              <p className="text-base font-bold leading-tight text-gray-400">준비 중</p>
-              <p className="text-xs text-gray-300 mt-0.5 font-medium">곧 추가됩니다</p>
+            {/* 사업 운영·소상공인 확인 */}
+            <div className="border border-teal-200 rounded-xl p-3 bg-teal-50/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🏪</span>
+                <h3 className="text-sm font-bold text-teal-800">사업 운영·소상공인 확인</h3>
+                <span className="text-xs text-teal-400 ml-auto">소상공인24·기업마당</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Link to="/check/small-biz-fund-2026" className="flex items-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg px-3 py-2.5 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                  <span className="text-base flex-shrink-0">🩺</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold leading-tight">소상공인 정책자금</p>
+                    <p className="text-xs text-teal-100 mt-0.5">30초 체크 →</p>
+                  </div>
+                </Link>
+                <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-2.5 cursor-default">
+                  <span className="text-base flex-shrink-0">🔜</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-400 leading-tight">준비 중</p>
+                    <p className="text-xs text-gray-300 mt-0.5">곧 추가됩니다</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 폐업·재기 지원 확인 */}
+            <div className="border border-amber-200 rounded-xl p-3 bg-amber-50/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🔄</span>
+                <h3 className="text-sm font-bold text-amber-800">폐업·재기 지원 확인</h3>
+                <span className="text-xs text-amber-400 ml-auto">소상공인24</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Link to="/check/hope-return-demolition-2026" className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg px-3 py-2.5 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+                  <span className="text-base flex-shrink-0">🏗️</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold leading-tight">점포철거비 지원</p>
+                    <p className="text-xs text-amber-100 mt-0.5">30초 체크 →</p>
+                  </div>
+                </Link>
+                <div className="flex items-center gap-2 bg-gray-100 border border-dashed border-gray-300 rounded-lg px-3 py-2.5 cursor-default">
+                  <span className="text-base flex-shrink-0">🔜</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-400 leading-tight">준비 중</p>
+                    <p className="text-xs text-gray-300 mt-0.5">곧 추가됩니다</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
