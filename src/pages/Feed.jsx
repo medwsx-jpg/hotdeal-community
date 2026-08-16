@@ -1486,13 +1486,13 @@ const closeGallery = () => {
                 onClick={() => navigate('/check/small-biz-fund-2026')}
                 className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap text-gray-700 hover:bg-emerald-100 hover:text-emerald-600"
               >
-                🩺 정책진단
+                ⚡ 30초 체크
               </button>
             </div>
           </div>
         </div>
 
-        {/* 정책 진단기 카드 */}
+        {/* 30초 자격 체크 카드 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
           <Link
             to="/check/small-biz-fund-2026"
@@ -1501,7 +1501,7 @@ const closeGallery = () => {
             <span className="text-2xl flex-shrink-0">🩺</span>
             <div className="min-w-0">
               <p className="text-base font-bold leading-tight">소상공인 정책자금</p>
-              <p className="text-xs text-teal-100 mt-0.5 font-medium">진단하기 →</p>
+              <p className="text-xs text-teal-100 mt-0.5 font-medium">30초 체크 →</p>
             </div>
           </Link>
 
@@ -1512,7 +1512,7 @@ const closeGallery = () => {
             <span className="text-2xl flex-shrink-0">🏠</span>
             <div className="min-w-0">
               <p className="text-base font-bold leading-tight">점포철거비 지원</p>
-              <p className="text-xs text-amber-100 mt-0.5 font-medium">진단하기 →</p>
+              <p className="text-xs text-amber-100 mt-0.5 font-medium">30초 체크 →</p>
             </div>
           </Link>
 
@@ -1523,7 +1523,7 @@ const closeGallery = () => {
             <span className="text-2xl flex-shrink-0">🤰</span>
             <div className="min-w-0">
               <p className="text-base font-bold leading-tight">출산급여 150만원</p>
-              <p className="text-xs text-pink-100 mt-0.5 font-medium">진단하기 →</p>
+              <p className="text-xs text-pink-100 mt-0.5 font-medium">30초 체크 →</p>
             </div>
           </Link>
 

@@ -172,7 +172,7 @@ export default function PolicyCheck() {
             <button onClick={handleReset} className="p-2 -ml-2 text-gray-500 hover:text-gray-800">
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="ml-2 text-lg font-bold text-gray-800 truncate">진단 결과</h1>
+            <h1 className="ml-2 text-lg font-bold text-gray-800 truncate">체크 결과</h1>
           </div>
         </div>
 
@@ -203,7 +203,7 @@ export default function PolicyCheck() {
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-4 bg-teal-500 hover:bg-teal-600 text-white rounded-2xl font-bold text-lg transition-colors shadow-lg shadow-teal-500/25"
             >
-              소상공인정책자금 사이트에서 신청하기
+              공식 사이트에서 신청 확인하기
               <ExternalLink className="w-5 h-5" />
             </a>
           )}
@@ -287,7 +287,7 @@ export default function PolicyCheck() {
               className="flex-1 py-3 border border-gray-300 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
             >
               <RotateCcw className="w-4 h-4" />
-              다시 진단하기
+              다시 체크하기
             </button>
             <Link
               to="/feed"
@@ -311,7 +311,7 @@ export default function PolicyCheck() {
             <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-500 hover:text-gray-800">
               <ChevronLeft className="w-6 h-6" />
             </button>
-            <h1 className="ml-2 text-lg font-bold text-gray-800">정책 자격 진단</h1>
+            <h1 className="ml-2 text-lg font-bold text-gray-800">30초 자격 체크</h1>
           </div>
         </div>
 
@@ -329,7 +329,7 @@ export default function PolicyCheck() {
             {/* 안내 */}
             <div className="p-6 space-y-5">
               <p className="text-gray-600 leading-relaxed">
-                간단한 질문에 답하시면, 이 정책의 지원 대상에 해당하는지 사전 확인할 수 있습니다.
+                간단한 질문에 답하면, 이 정책의 공식 확인을 먼저 해볼 대상인지 30초 안에 체크할 수 있습니다.
               </p>
 
               <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -339,7 +339,7 @@ export default function PolicyCheck() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 bg-teal-400 rounded-full" />
-                  소요시간 약 1분
+                  약 30초
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 bg-teal-400 rounded-full" />
@@ -349,7 +349,7 @@ export default function PolicyCheck() {
 
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p className="text-sm text-amber-800 leading-relaxed">
-                  이 진단은 공고문 기준 사전 확인용이며, 정확한 자격 여부는 반드시 공식 기관에서 확인하세요.
+                  이 체크는 공고문 기준 사전 확인용이며, 최종 자격 여부는 반드시 공식 기관에서 확인하세요.
                   입력하신 정보는 서버로 전송되지 않고 브라우저에서만 처리됩니다.
                 </p>
               </div>
@@ -358,7 +358,7 @@ export default function PolicyCheck() {
                 onClick={() => setStep(0)}
                 className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white rounded-2xl font-bold text-lg transition-colors shadow-lg shadow-teal-500/25"
               >
-                진단 시작하기
+                30초 체크 시작
               </button>
 
               {policy.policy.source_url && (
@@ -504,7 +504,7 @@ export default function PolicyCheck() {
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
-            {step >= questions.length - 1 ? '진단 결과 보기' : '다음'}
+            {step >= questions.length - 1 ? '체크 결과 보기' : '다음'}
           </button>
         </div>
       </div>
