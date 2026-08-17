@@ -103,6 +103,7 @@ export default function Feed() {
 
   const [activeTab, setActiveTab] = useState('all')
   const [activeMainTab, setActiveMainTab] = useState(searchParams.get('tab') === 'check' ? 'check' : 'home')
+  const [checkGroup, setCheckGroup] = useState('all')
   const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, loan: false, experience: false })
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
@@ -1839,9 +1840,36 @@ const closeGallery = () => {
                 <div className="text-center mb-2">
                   <h2 className="text-lg font-bold text-gray-900">오늘 내가 먼저 확인할 정책은 어디일까요?</h2>
                   <p className="text-sm text-gray-500 mt-1">로그인 없이, 30초만에 공식 확인 창구와 준비할 내용을 알려드립니다.</p>
+                  <div className="flex justify-center gap-2 mt-4">
+                    <button
+                      onClick={() => setCheckGroup('all')}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${
+                        checkGroup === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      전체
+                    </button>
+                    <button
+                      onClick={() => setCheckGroup('personal')}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${
+                        checkGroup === 'personal' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:border-blue-400'
+                      }`}
+                    >
+                      개인
+                    </button>
+                    <button
+                      onClick={() => setCheckGroup('biz')}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${
+                        checkGroup === 'biz' ? 'bg-teal-600 text-white' : 'bg-white text-gray-600 border border-gray-300 hover:border-teal-400'
+                      }`}
+                    >
+                      자영업자·소상공인
+                    </button>
+                  </div>
                 </div>
 
                 {/* ===== 개인 그룹 ===== */}
+                {(checkGroup === 'all' || checkGroup === 'personal') && (<>
                 <div className="flex items-center gap-2 pt-1">
                   <span className="text-lg">👤</span>
                   <h2 className="text-base font-extrabold text-gray-800">개인</h2>
@@ -1996,7 +2024,10 @@ const closeGallery = () => {
                   </div>
                 </div>
 
+                </>)}
+
                 {/* ===== 자영업자 그룹 ===== */}
+                {(checkGroup === 'all' || checkGroup === 'biz') && (<>
                 <div className="flex items-center gap-2 pt-3">
                   <span className="text-lg">🏪</span>
                   <h2 className="text-base font-extrabold text-gray-800">자영업자·소상공인</h2>
@@ -2110,6 +2141,8 @@ const closeGallery = () => {
                     </Link>
                   </div>
                 </div>
+
+                </>)}
 
                 <div className="text-center mt-2">
                   <p className="text-xs text-gray-400">이 체크는 공고문 기준 사전 확인용이며, 최종 자격·지급 여부는 공식기관의 심사로 결정됩니다.</p>
