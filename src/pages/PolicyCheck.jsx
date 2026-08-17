@@ -215,6 +215,19 @@ export default function PolicyCheck() {
             </div>
           )}
 
+          {/* 새 정책 알림 안내 (카톡 로그인 유도) */}
+          <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-300 rounded-2xl p-5 text-center">
+            <p className="text-base font-bold text-gray-900">새로운 지원금이 나오면 가장 먼저 알려드릴게요</p>
+            <p className="text-sm text-gray-600 mt-1.5">카톡 3초 로그인만 하면 새 정책과 마감 일정을 놓치지 않습니다</p>
+            <button
+              onClick={() => navigate('/login')}
+              className="mt-3 inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#FEE500] hover:bg-[#f5dc00] text-gray-900 rounded-xl font-bold text-sm transition-colors"
+            >
+              💬 카톡으로 시작하기
+            </button>
+            <p className="text-[11px] text-gray-400 mt-2">체크 결과는 로그인 없이 계속 이용할 수 있습니다</p>
+          </div>
+
           {/* 꼭 확인하세요 */}
           {result.notes && result.notes.length > 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 space-y-3">
