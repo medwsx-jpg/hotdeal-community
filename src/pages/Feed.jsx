@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
   TrendingUp, Search, Bell, User, Plus,
@@ -99,9 +99,10 @@ const getUserLevel = (consecutiveDays) => {
 export default function Feed() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
-  
+  const [searchParams] = useSearchParams()
+
   const [activeTab, setActiveTab] = useState('all')
-  const [activeMainTab, setActiveMainTab] = useState('home')
+  const [activeMainTab, setActiveMainTab] = useState(searchParams.get('tab') === 'check' ? 'check' : 'home')
   const [expandedMenus, setExpandedMenus] = useState({ home: true, talk: false, notice: false, loan: false, experience: false })
   const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)

@@ -308,7 +308,7 @@ export default function PolicyCheck() {
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white border-b sticky top-0 z-10">
           <div className="max-w-lg mx-auto px-4 py-3 flex items-center">
-            <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-500 hover:text-gray-800">
+            <button onClick={() => navigate('/feed?tab=check')} className="p-2 -ml-2 text-gray-500 hover:text-gray-800">
               <ChevronLeft className="w-6 h-6" />
             </button>
             <h1 className="ml-2 text-lg font-bold text-gray-800">30초 자격 체크</h1>
