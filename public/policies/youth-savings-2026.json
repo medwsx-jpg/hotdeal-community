@@ -1,0 +1,158 @@
+{
+  "policy": {
+    "id": "youth-savings-2026",
+    "slug": "youth-savings-2026",
+    "title": "2026년 청년내일저축계좌",
+    "owner": "보건복지부",
+    "source_url": "https://www.bokjiro.go.kr",
+    "source_published_at": "2026-05-04",
+    "checked_at": "2026-08-17",
+    "apply_url": "https://www.bokjiro.go.kr",
+    "disclaimer": "본 체크는 청년내일저축계좌 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부는 반드시 복지로 또는 자산형성지원 콜센터(1522-3690)에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 모집 기준 (5월 신청)"
+  },
+
+  "questions": [
+    {
+      "key": "age_check",
+      "label": "나이가 만 15세~39세인가요?",
+      "help_text": "기준 중위소득 50% 이하 가구는 만 15~39세, 그 외는 만 19~34세가 기준일 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 해당 연령입니다" },
+        { "value": "no", "label": "아니요, 범위 밖입니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "work_income",
+      "label": "현재 일해서 버는 소득이 월 10만원 이상인가요?",
+      "help_text": "정규직·아르바이트·자영업 모두 인정됩니다.",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 월 10만원 이상 근로·사업소득이 있습니다" },
+        { "value": "no", "label": "아니요, 일하고 있지 않거나 소득이 없습니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "age_check", "op": "eq", "value": "yes" }
+    },
+    {
+      "key": "household_income",
+      "label": "가구 소득이 기준 중위소득 100% 이하인가요?",
+      "help_text": "가구원 수에 따라 기준액이 다릅니다. 1인 가구는 월 약 240만원 수준입니다.",
+      "type": "radio",
+      "options": [
+        { "value": "under_50", "label": "중위소득 50% 이하인 것 같습니다 (저소득)" },
+        { "value": "50_100", "label": "50% 초과 ~ 100% 이하인 것 같습니다" },
+        { "value": "over", "label": "100%를 초과하는 것 같습니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "age_check", "op": "eq", "value": "yes" },
+          { "field": "work_income", "op": "eq", "value": "yes" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "age_check", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "연령 기준에 해당하지 않습니다",
+      "result_body": "청년내일저축계좌는 만 15~39세(소득 구간에 따라 만 19~34세)를 대상으로 합니다.",
+      "evidence_text": "age_check = no"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "work_income", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "근로·사업소득이 있어야 가입할 수 있습니다",
+      "result_body": "청년내일저축계좌는 월 10만원 이상의 근로·사업소득이 있는 청년을 대상으로 합니다. 아르바이트 소득도 인정되니, 일을 시작한 후에 다시 확인해 보세요.\n\n구직 중이시라면 '구직촉진수당'(월 60만원) 30초 체크를 확인해 보세요.",
+      "evidence_text": "work_income = no"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "household_income", "op": "eq", "value": "over" },
+      "result_status": "likely_mismatch",
+      "result_title": "가구 소득 기준을 초과할 가능성이 있습니다",
+      "result_body": "청년내일저축계좌는 가구 기준 중위소득 100% 이하를 대상으로 합니다.\n\n소득 기준이 넉넉한 청년 자산형성 상품으로는 '청년미래적금' 등이 있으니 함께 확인해 보세요.",
+      "evidence_text": "household_income = over"
+    },
+    {
+      "priority": 31,
+      "expression": { "field": "household_income", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "가구 소득 기준을 확인해 주세요",
+      "result_body": "가구원 수별 중위소득 기준액은 복지로에서 확인할 수 있습니다. 5월 모집 기간에 복지로에서 신청하면 소득 조사를 통해 정확히 판정됩니다.",
+      "evidence_text": "household_income = unsure"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "household_income", "op": "eq", "value": "under_50" },
+      "result_status": "check_first",
+      "result_title": "청년내일저축계좌(정부 월 30만원 적립) 확인 대상입니다",
+      "result_body": "중위소득 50% 이하 구간은 본인이 월 10만원 저축하면 정부가 월 30만원을 추가 적립해, 3년 후 1,440만원 이상을 받을 수 있는 조건입니다.\n\n📅 신청은 매년 5월 초에만 받습니다. 모집 기간을 놓치면 1년을 기다려야 하니, 복지로에서 일정을 미리 확인해 두세요.",
+      "limit_note": "본인 10만원 + 정부 30만원/월, 3년 만기 시 1,440만원+ | 신청: 매년 5월, 복지로 또는 주민센터 | 문의: 1522-3690",
+      "evidence_text": "household_income = under_50"
+    },
+    {
+      "priority": 110,
+      "expression": { "field": "household_income", "op": "eq", "value": "50_100" },
+      "result_status": "check_first",
+      "result_title": "청년내일저축계좌(정부 월 10만원 적립) 확인 대상입니다",
+      "result_body": "중위소득 50~100% 구간은 본인이 월 10만원 저축하면 정부가 월 10만원을 추가 적립해, 3년 후 720만원 이상을 받을 수 있는 조건입니다.\n\n📅 신청은 매년 5월 초에만 받습니다. 모집 기간을 놓치면 1년을 기다려야 하니, 복지로에서 일정을 미리 확인해 두세요.",
+      "limit_note": "본인 10만원 + 정부 10만원/월, 3년 만기 시 720만원+ | 신청: 매년 5월, 복지로 또는 주민센터 | 문의: 1522-3690",
+      "evidence_text": "household_income = 50_100"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 복지로 또는 자산형성지원 콜센터(1522-3690)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 가입 여부는 소득·재산 조사로 결정됩니다.",
+    "3년간 근로활동 유지, 교육 이수, 자금사용계획서 제출이 만기 지급 조건입니다.",
+    "만기 전 중도해지하면 정부 적립금을 받지 못할 수 있습니다.",
+    "신청: 복지로(bokjiro.go.kr) 또는 주민센터, 매년 5월 모집 | 문의: 1522-3690"
+  ],
+
+  "cross_sell_note": "월세로 거주 중이시라면 '청년 월세지원'(월 20만원), 일하는 저소득 가구라면 '근로장려금'(최대 330만원) 30초 체크도 확인해 보세요.",
+
+  "unknown_if": [
+    "연령·소득 구간별 세부 기준은 연도별 공고에 따라 달라질 수 있습니다",
+    "재산 기준(대도시·중소도시별)이 별도로 적용될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "저소득 청년",
+      "answers": { "age_check": "yes", "work_income": "yes", "household_income": "under_50" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "중간소득 청년",
+      "answers": { "age_check": "yes", "work_income": "yes", "household_income": "50_100" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "소득 없음",
+      "answers": { "age_check": "yes", "work_income": "no" },
+      "expected_status": "likely_mismatch"
+    }
+  ]
+}

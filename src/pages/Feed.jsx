@@ -1841,6 +1841,14 @@ const closeGallery = () => {
                   <p className="text-sm text-gray-500 mt-1">로그인 없이, 30초만에 공식 확인 창구와 준비할 내용을 알려드립니다.</p>
                 </div>
 
+                {/* ===== 개인 그룹 ===== */}
+                <div className="flex items-center gap-2 pt-1">
+                  <span className="text-lg">👤</span>
+                  <h2 className="text-base font-extrabold text-gray-800">개인</h2>
+                  <span className="text-xs text-gray-400">복지·취업·대출·청년 지원</span>
+                  <div className="flex-1 h-px bg-gray-200 ml-1"></div>
+                </div>
+
                 {/* 생활·복지 확인 */}
                 <div className="bg-white border border-gray-200 border-t-[3px] border-t-blue-500 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-1">
@@ -1916,6 +1924,84 @@ const closeGallery = () => {
                       <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-emerald-500">30초 체크 →</div>
                     </Link>
                   </div>
+                </div>
+
+                {/* 서민금융 대출 확인 */}
+                <div className="bg-white border border-gray-200 border-t-[3px] border-t-indigo-500 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl">🏦</span>
+                    <h3 className="text-base font-bold text-indigo-700">서민금융 대출 확인</h3>
+                    <span className="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full ml-auto">서민금융진흥원</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3 ml-7">고금리·불법 사금융 대신 먼저 확인할 정책 대출을 안내합니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <Link to="/check/micro-loan-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-indigo-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-indigo-300 text-indigo-600">급전</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-indigo-300 text-indigo-600">무직 가능</span>
+                      </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">소액생계비대출</p>
+                      <p className="text-base font-extrabold text-indigo-600 text-center mt-1">당일 최대 100만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">저신용·무직·연체자도 상담으로 가능한 긴급 생계비 대출입니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-indigo-500">30초 체크 →</div>
+                    </Link>
+                    <Link to="/check/sunshine-loan-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-indigo-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-indigo-300 text-indigo-600">정책대출</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-indigo-300 text-indigo-600">중·저신용</span>
+                      </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">햇살론</p>
+                      <p className="text-base font-extrabold text-indigo-600 text-center mt-1">최대 1,500만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">연 소득 4,500만원 이하 근로자·사업자 대상 보증부 대출입니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-indigo-500">30초 체크 →</div>
+                    </Link>
+                    <div className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 text-gray-300 text-[13px] font-semibold min-h-[150px]">
+                      <span>🔜</span><span>준비 중</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 청년·주거 확인 */}
+                <div className="bg-white border border-gray-200 border-t-[3px] border-t-violet-500 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xl">🏙️</span>
+                    <h3 className="text-base font-bold text-violet-700">청년·주거 확인</h3>
+                    <span className="text-[11px] font-semibold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full ml-auto">복지로·주택기금</span>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3 ml-7">청년 대상 주거비·자산형성 지원을 안내합니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <Link to="/check/youth-rent-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-violet-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-violet-300 text-violet-600">만 19~34세</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-violet-300 text-violet-600">월세</span>
+                      </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">청년 월세지원</p>
+                      <p className="text-base font-extrabold text-violet-600 text-center mt-1">월 20만원 × 24개월</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">독립 거주 무주택 청년의 월세를 최대 480만원 지원합니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-violet-500">30초 체크 →</div>
+                    </Link>
+                    <Link to="/check/youth-savings-2026" className="flex flex-col bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:-translate-y-0.5 hover:border-violet-400 transition-all duration-150">
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-violet-300 text-violet-600">만 15~39세</span>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full border border-violet-300 text-violet-600">5월 신청</span>
+                      </div>
+                      <p className="text-[15px] font-bold text-gray-900 text-center leading-snug">청년내일저축계좌</p>
+                      <p className="text-base font-extrabold text-violet-600 text-center mt-1">3년 최대 1,440만원</p>
+                      <p className="text-xs text-gray-500 leading-relaxed mt-1.5 flex-1">월 10만원 저축에 정부가 10~30만원을 더해 목돈을 만듭니다.</p>
+                      <div className="mt-3 text-center text-[13px] font-bold text-white py-2 rounded-lg bg-violet-500">30초 체크 →</div>
+                    </Link>
+                    <div className="flex flex-col items-center justify-center gap-1.5 bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 text-gray-300 text-[13px] font-semibold min-h-[150px]">
+                      <span>🔜</span><span>준비 중</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ===== 자영업자 그룹 ===== */}
+                <div className="flex items-center gap-2 pt-3">
+                  <span className="text-lg">🏪</span>
+                  <h2 className="text-base font-extrabold text-gray-800">자영업자·소상공인</h2>
+                  <span className="text-xs text-gray-400">사업 운영·폐업·재기 지원</span>
+                  <div className="flex-1 h-px bg-gray-200 ml-1"></div>
                 </div>
 
                 {/* 사업 운영·소상공인 확인 */}

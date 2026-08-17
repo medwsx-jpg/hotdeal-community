@@ -1,0 +1,199 @@
+{
+  "policy": {
+    "id": "sunshine-loan-2026",
+    "slug": "sunshine-loan-2026",
+    "title": "2026년 햇살론 (일반·특례)",
+    "owner": "금융위원회 · 서민금융진흥원",
+    "source_url": "https://www.kinfa.or.kr",
+    "source_published_at": "2026-01-01",
+    "checked_at": "2026-08-17",
+    "apply_url": "https://www.kinfa.or.kr",
+    "disclaimer": "본 체크는 2026년 개편 햇살론 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 한도·금리는 반드시 서민금융진흥원(1397) 또는 취급 금융기관에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 개편(일반·특례) 기준"
+  },
+
+  "questions": [
+    {
+      "key": "income_range",
+      "label": "연 소득이 어느 범위인가요?",
+      "help_text": "근로·사업 소득 기준입니다. 재직(사업 영위) 3개월 이상, 소득 증빙이 가능해야 합니다.",
+      "type": "radio",
+      "options": [
+        { "value": "under_3500", "label": "3,500만원 이하" },
+        { "value": "3500_4500", "label": "3,500만원 초과 ~ 4,500만원 이하" },
+        { "value": "over_4500", "label": "4,500만원 초과" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "credit_range",
+      "label": "신용점수가 하위 20% 수준인가요?",
+      "help_text": "KCB 700점 이하 또는 NICE 749점 이하 기준입니다. 토스·카카오페이 등에서 무료 조회할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "low", "label": "네, 해당 점수 이하입니다" },
+        { "value": "high", "label": "아니요, 그보다 높습니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "income_range", "op": "neq", "value": "over_4500" }
+    },
+    {
+      "key": "income_proof",
+      "label": "3개월 이상 재직(또는 사업 운영) 중이며 소득 증빙이 가능한가요?",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 가능합니다" },
+        { "value": "no", "label": "아니요, 어렵습니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "any": [
+          { "field": "income_range", "op": "eq", "value": "under_3500" },
+          {
+            "all": [
+              { "field": "income_range", "op": "eq", "value": "3500_4500" },
+              { "field": "credit_range", "op": "eq", "value": "low" }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "income_range", "op": "eq", "value": "over_4500" },
+      "result_status": "likely_mismatch",
+      "result_title": "소득 기준을 초과합니다",
+      "result_body": "햇살론은 연 소득 4,500만원 이하(신용 하위 20%인 경우) 또는 3,500만원 이하를 대상으로 합니다. 소득이 4,500만원을 초과하면 대상에 해당하지 않습니다.\n\n은행권 신용대출 또는 새희망홀씨 등 다른 서민금융 상품을 확인해 보세요.",
+      "evidence_text": "income_range = over_4500"
+    },
+    {
+      "priority": 20,
+      "expression": {
+        "all": [
+          { "field": "income_range", "op": "eq", "value": "3500_4500" },
+          { "field": "credit_range", "op": "eq", "value": "high" }
+        ]
+      },
+      "result_status": "likely_mismatch",
+      "result_title": "이 소득 구간에서는 신용 하위 20%만 대상입니다",
+      "result_body": "연 소득 3,500만~4,500만원 구간은 신용점수 하위 20%(KCB 700점, NICE 749점 이하)인 경우에만 햇살론 일반 대상입니다.\n\n신용점수가 높다면 은행권 대출 조건이 더 유리할 수 있으니 먼저 비교해 보세요.",
+      "evidence_text": "3500_4500 + credit high"
+    },
+    {
+      "priority": 21,
+      "expression": { "field": "credit_range", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "신용점수를 확인해 주세요",
+      "result_body": "토스, 카카오페이, 네이버페이 등에서 신용점수를 무료로 조회할 수 있습니다. 확인 후 다시 체크해 보세요.",
+      "evidence_text": "credit_range = unsure"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "income_proof", "op": "eq", "value": "no" },
+      "result_status": "needs_official_check",
+      "result_title": "소득 증빙 요건을 확인해 주세요",
+      "result_body": "햇살론은 통상 3개월 이상 재직(사업 영위)과 소득 증빙이 필요합니다. 증빙이 어려운 상황이라면 '소액생계비대출'(무직·증빙 없이 가능, 50~100만원)을 확인해 보시거나, 서민금융진흥원(1397) 상담으로 가능한 상품을 안내받아 보세요.",
+      "evidence_text": "income_proof = no"
+    },
+    {
+      "priority": 100,
+      "expression": {
+        "all": [
+          { "field": "income_range", "op": "eq", "value": "under_3500" },
+          { "field": "credit_range", "op": "eq", "value": "low" },
+          { "field": "income_proof", "op": "eq", "value": "yes" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "햇살론 일반·특례 모두 확인 대상입니다",
+      "result_body": "연 소득 3,500만원 이하 + 신용 하위 20%로, 햇살론 일반(최대 1,500만원)과 특례(최대 1,000만원) 모두 확인해 볼 수 있는 조건입니다.\n\n일반이 금리가 더 낮으니(최고 10%) 일반부터 확인하고, 승인이 어려우면 특례(12.5% 이내)를 검토하는 순서를 권합니다. 서민금융진흥원 앱 또는 은행 앱(토스뱅크 등 취급 기관)에서 신청할 수 있습니다.",
+      "limit_note": "일반: 최대 1,500만원, 최고 연 10% | 특례: 최대 1,000만원, 연 12.5% 이내 | 상환: 5년 이내 원리금균등 | 문의: 1397",
+      "evidence_text": "3500 이하 + 신용 하위 20% + 증빙 가능"
+    },
+    {
+      "priority": 110,
+      "expression": {
+        "all": [
+          { "field": "income_range", "op": "eq", "value": "under_3500" },
+          { "field": "credit_range", "op": "eq", "value": "high" },
+          { "field": "income_proof", "op": "eq", "value": "yes" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "햇살론 일반 확인 대상입니다",
+      "result_body": "연 소득 3,500만원 이하는 신용점수와 관계없이 햇살론 일반(최대 1,500만원) 대상에 해당할 수 있습니다.\n\n서민금융진흥원 앱 또는 취급 금융기관(은행 앱)에서 신청할 수 있습니다.",
+      "limit_note": "한도: 최대 1,500만원 | 금리: 최고 연 10%(보증료 별도 연 2.5% 이내) | 상환: 5년 이내 원리금균등 | 문의: 1397",
+      "evidence_text": "3500 이하 + 증빙 가능"
+    },
+    {
+      "priority": 120,
+      "expression": {
+        "all": [
+          { "field": "income_range", "op": "eq", "value": "3500_4500" },
+          { "field": "credit_range", "op": "eq", "value": "low" },
+          { "field": "income_proof", "op": "eq", "value": "yes" }
+        ]
+      },
+      "result_status": "check_first",
+      "result_title": "햇살론 일반 확인 대상입니다",
+      "result_body": "연 소득 4,500만원 이하 + 신용 하위 20%로, 햇살론 일반(최대 1,500만원) 대상에 해당할 수 있습니다.\n\n서민금융진흥원 앱 또는 취급 금융기관(은행 앱)에서 신청할 수 있습니다.",
+      "limit_note": "한도: 최대 1,500만원 | 금리: 최고 연 10%(보증료 별도 연 2.5% 이내) | 상환: 5년 이내 원리금균등 | 문의: 1397",
+      "evidence_text": "4500 이하 + 신용 하위 20% + 증빙 가능"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 서민금융진흥원(1397)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 승인 여부와 한도·금리는 보증·대출 심사로 결정됩니다.",
+    "취급 기관(은행·저축은행)마다 세부 조건과 금리가 다를 수 있습니다.",
+    "정부 지원 정책상품이므로 별도의 수수료·작업비를 요구하는 업체는 사칭 사기입니다. 공식 채널만 이용하세요.",
+    "신청: 서민금융진흥원 앱(kinfa.or.kr) 또는 취급 금융기관 | 문의: 1397"
+  ],
+
+  "cross_sell_note": "당장 소액(100만원 이하)이 급하시면 '소액생계비대출' 30초 체크를 확인해 보세요. 자영업자시라면 '소상공인 정책자금'도 함께 확인해 보시길 권합니다.",
+
+  "unknown_if": [
+    "보증료율과 실제 적용 금리는 심사 결과에 따라 달라집니다",
+    "상품 개편에 따라 기준이 변경될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "3500 이하 + 저신용",
+      "answers": { "income_range": "under_3500", "credit_range": "low", "income_proof": "yes" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "3500 이하 + 신용 무관",
+      "answers": { "income_range": "under_3500", "credit_range": "high", "income_proof": "yes" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "4500 초과",
+      "answers": { "income_range": "over_4500" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "증빙 불가",
+      "answers": { "income_range": "under_3500", "credit_range": "low", "income_proof": "no" },
+      "expected_status": "needs_official_check"
+    }
+  ]
+}

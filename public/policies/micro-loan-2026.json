@@ -1,0 +1,183 @@
+{
+  "policy": {
+    "id": "micro-loan-2026",
+    "slug": "micro-loan-2026",
+    "title": "2026년 소액생계비대출",
+    "owner": "금융위원회 · 서민금융진흥원",
+    "source_url": "https://www.kinfa.or.kr",
+    "source_published_at": "2026-01-01",
+    "checked_at": "2026-08-17",
+    "apply_url": "https://www.kinfa.or.kr",
+    "disclaimer": "본 체크는 소액생계비대출 공개 자료를 바탕으로 작성된 사전 확인용입니다. 참고용이며 법적 효력이 없습니다. 정확한 자격 여부와 한도·금리는 반드시 서민금융진흥원(1397) 또는 서민금융통합지원센터에서 확인하시기 바랍니다."
+  },
+  "version": {
+    "version_no": 1,
+    "note": "2026년 기준"
+  },
+
+  "questions": [
+    {
+      "key": "age_check",
+      "label": "만 19세 이상 성인이신가요?",
+      "type": "radio",
+      "options": [
+        { "value": "yes", "label": "네, 만 19세 이상입니다" },
+        { "value": "no", "label": "아니요, 미성년자입니다" }
+      ],
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "income_range",
+      "label": "연 소득이 3,500만원 이하인가요?",
+      "help_text": "무직·소득이 없는 경우도 신청할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "under", "label": "네, 3,500만원 이하입니다 (무직 포함)" },
+        { "value": "over", "label": "아니요, 3,500만원을 초과합니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 2,
+      "show_if": { "field": "age_check", "op": "eq", "value": "yes" }
+    },
+    {
+      "key": "credit_range",
+      "label": "신용점수가 하위 20% 수준인가요?",
+      "help_text": "KCB 700점 이하 또는 NICE 749점 이하 기준입니다. 토스·카카오페이 등에서 무료 조회할 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "low", "label": "네, 해당 점수 이하입니다" },
+        { "value": "high", "label": "아니요, 그보다 높습니다" },
+        { "value": "unsure", "label": "잘 모르겠습니다" }
+      ],
+      "required": true,
+      "order": 3,
+      "show_if": {
+        "all": [
+          { "field": "age_check", "op": "eq", "value": "yes" },
+          { "field": "income_range", "op": "eq", "value": "under" }
+        ]
+      }
+    },
+    {
+      "key": "overdue_status",
+      "label": "현재 다른 대출을 연체 중인가요?",
+      "help_text": "연체 중이어도 신용·부채 관리 컨설팅을 받는 조건으로 승인될 수 있습니다.",
+      "type": "radio",
+      "options": [
+        { "value": "no", "label": "연체 없음" },
+        { "value": "yes", "label": "연체 중입니다" }
+      ],
+      "required": true,
+      "order": 4,
+      "show_if": {
+        "all": [
+          { "field": "age_check", "op": "eq", "value": "yes" },
+          { "field": "income_range", "op": "eq", "value": "under" },
+          { "field": "credit_range", "op": "eq", "value": "low" }
+        ]
+      }
+    }
+  ],
+
+  "rules": [
+    {
+      "priority": 10,
+      "expression": { "field": "age_check", "op": "eq", "value": "no" },
+      "result_status": "likely_mismatch",
+      "result_title": "만 19세 이상 성인 대상 제도입니다",
+      "result_body": "소액생계비대출은 만 19세 이상 성인을 대상으로 합니다.",
+      "evidence_text": "age_check = no"
+    },
+    {
+      "priority": 20,
+      "expression": { "field": "income_range", "op": "eq", "value": "over" },
+      "result_status": "likely_mismatch",
+      "result_title": "소득 기준을 초과할 가능성이 있습니다",
+      "result_body": "소액생계비대출은 연 소득 3,500만원 이하를 대상으로 합니다.\n\n소득이 이보다 높고 급전이 필요하시면 '햇살론' 30초 체크를 확인해 보세요 (연 소득 4,500만원 이하까지 가능한 유형이 있습니다).",
+      "evidence_text": "income_range = over"
+    },
+    {
+      "priority": 21,
+      "expression": { "field": "income_range", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "소득을 먼저 확인해 주세요",
+      "result_body": "홈택스 소득금액증명 또는 급여명세서로 연 소득을 확인하신 후 다시 체크해 보세요. 무직이어도 신청 가능하니 소득이 없다면 '3,500만원 이하'를 선택하시면 됩니다.",
+      "evidence_text": "income_range = unsure"
+    },
+    {
+      "priority": 30,
+      "expression": { "field": "credit_range", "op": "eq", "value": "high" },
+      "result_status": "likely_mismatch",
+      "result_title": "신용점수 기준에 해당하지 않을 수 있습니다",
+      "result_body": "소액생계비대출은 신용 하위 20%(KCB 700점 이하, NICE 749점 이하)를 대상으로 합니다. 점수가 그보다 높다면 '햇살론'이나 은행권 대출을 먼저 확인해 보세요.",
+      "evidence_text": "credit_range = high"
+    },
+    {
+      "priority": 31,
+      "expression": { "field": "credit_range", "op": "eq", "value": "unsure" },
+      "result_status": "needs_official_check",
+      "result_title": "신용점수를 확인해 주세요",
+      "result_body": "토스, 카카오페이, 네이버페이 등에서 신용점수를 무료로 조회할 수 있습니다. KCB 700점 이하 또는 NICE 749점 이하라면 대상에 해당할 수 있습니다.",
+      "evidence_text": "credit_range = unsure"
+    },
+    {
+      "priority": 100,
+      "expression": { "field": "overdue_status", "op": "eq", "value": "no" },
+      "result_status": "check_first",
+      "result_title": "소액생계비대출 확인 대상입니다",
+      "result_body": "현재 공개 기준상 소액생계비대출 대상에 해당할 수 있습니다.\n\n신청 방법: 서민금융진흥원 앱에서 방문 예약 → 신분증 지참하여 서민금융통합지원센터 방문 → 상담 후 당일 입금\n\n기본 50만원이며, 병원비·월세 등 증빙 시 최대 100만원까지 가능합니다.",
+      "limit_note": "한도: 50만~100만원 | 금리: 연 15.9% 시작, 성실상환 시 최저 9.4%까지 인하(금융교육 이수 시 추가 인하) | 신청: 서민금융진흥원 앱 예약 후 센터 방문 | 문의: 1397",
+      "evidence_text": "나이·소득·신용 요건 충족, 연체 없음"
+    },
+    {
+      "priority": 110,
+      "expression": { "field": "overdue_status", "op": "eq", "value": "yes" },
+      "result_status": "needs_official_check",
+      "result_title": "연체 중이어도 상담을 받아보세요",
+      "result_body": "연체 중인 경우에도 신용·부채 관리 컨설팅을 받는 조건으로 승인될 수 있습니다. 서민금융통합지원센터 방문 상담에서 확인하세요.\n\n연체 상태가 길어졌다면 신용회복위원회(1600-5500) 채무조정도 함께 검토해 보시길 권합니다.",
+      "evidence_text": "overdue_status = yes"
+    },
+    {
+      "priority": 999,
+      "expression": { "always": true },
+      "result_status": "needs_official_check",
+      "result_title": "공식 확인이 필요합니다",
+      "result_body": "입력하신 조건만으로는 정확한 판단이 어렵습니다. 서민금융진흥원(1397)에 문의하여 확인하시기 바랍니다.",
+      "evidence_text": "no rule matched"
+    }
+  ],
+
+  "always_show_notes": [
+    "이 체크는 공개 기준 사전 확인이며, 최종 승인 여부는 상담·심사로 결정됩니다.",
+    "센터 방문 예약은 수~금요일 선착순으로 운영될 수 있으니 앱에서 미리 확인하세요.",
+    "정부 지원 정책상품이므로 별도의 수수료를 요구하는 업체는 사칭 사기입니다. 공식 채널(1397)만 이용하세요.",
+    "신청: 서민금융진흥원 앱·홈페이지(kinfa.or.kr) | 문의: 1397"
+  ],
+
+  "cross_sell_note": "더 큰 금액이 필요하시면 '햇살론'(최대 1,500만원) 30초 체크를, 채무 부담이 크시면 신용회복위원회 채무조정을 확인해 보세요.",
+
+  "unknown_if": [
+    "한도·금리 인하 조건은 상담 시 개인별로 달라질 수 있습니다",
+    "예산 소진 시 접수가 제한될 수 있습니다"
+  ],
+
+  "test_cases": [
+    {
+      "name": "전체 요건 충족",
+      "answers": { "age_check": "yes", "income_range": "under", "credit_range": "low", "overdue_status": "no" },
+      "expected_status": "check_first"
+    },
+    {
+      "name": "소득 초과",
+      "answers": { "age_check": "yes", "income_range": "over" },
+      "expected_status": "likely_mismatch"
+    },
+    {
+      "name": "연체 중",
+      "answers": { "age_check": "yes", "income_range": "under", "credit_range": "low", "overdue_status": "yes" },
+      "expected_status": "needs_official_check"
+    }
+  ]
+}
