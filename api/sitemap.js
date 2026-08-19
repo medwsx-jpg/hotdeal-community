@@ -68,7 +68,7 @@ export default async function handler(req, res) {
   // 3. 게시글 (Supabase에서 최신 1000개)
   try {
     const resp = await fetch(
-      `${SUPABASE_URL}/rest/v1/posts?select=id,created_at,updated_at&order=created_at.desc&limit=1000`,
+      `${SUPABASE_URL}/rest/v1/posts?select=id,created_at&order=created_at.desc&limit=1000`,
       {
         headers: {
           apikey: SUPABASE_ANON_KEY,
@@ -79,10 +79,9 @@ export default async function handler(req, res) {
     if (resp.ok) {
       const posts = await resp.json()
       posts.forEach(p => {
-        const d = p.updated_at || p.created_at
         urls.push(urlTag({
           loc: `/post/${p.id}`,
-          lastmod: d ? String(d).slice(0, 10) : undefined,
+          lastmod: p.created_at ? String(p.created_at).slice(0, 10) : undefined,
           changefreq: 'monthly',
           priority: '0.7',
         }))
